@@ -1,8 +1,8 @@
 ﻿using System;
 
-public class Class1
+public class webcam_service
 {
-	public Class1()
+	public webcam_service()
 	{
 
 	}

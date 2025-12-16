@@ -1,8 +1,8 @@
 ﻿using System;
 
-public class Class1
+public class QR_Service
 {
-	public Class1()
+	public QR_Service()
 	{
 	}
 }

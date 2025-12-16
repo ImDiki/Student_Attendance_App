@@ -7,9 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Student_Attendance_System",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Views", "Views", "{DDB4EF12-CC4E-5E88-E6FC-71A802F4DE97}"
 	ProjectSection(SolutionItems) = preProject
-		Dashboard.xaml = Dashboard.xaml
-		Login_windows.xaml = Login_windows.xaml
-		Register_window.xaml = Register_window.xaml
+		Login_window.xaml = Login_window.xaml
+		Login_window.xaml.cs = Login_window.xaml.cs
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{7794C4AD-CE47-4DDB-931D-12B5094013E7}"
