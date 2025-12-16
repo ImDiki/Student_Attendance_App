@@ -1,9 +1,30 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35919.96 d17.13
+VisualStudioVersion = 17.13.35919.96
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Student_Attendance_System", "Student_Attendance_System.csproj", "{A3A72A3C-136E-48B8-A18A-660F502C3A54}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Views", "Views", "{DDB4EF12-CC4E-5E88-E6FC-71A802F4DE97}"
+	ProjectSection(SolutionItems) = preProject
+		Dashboard.xaml = Dashboard.xaml
+		Login_windows.xaml = Login_windows.xaml
+		Register_window.xaml = Register_window.xaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{7794C4AD-CE47-4DDB-931D-12B5094013E7}"
+	ProjectSection(SolutionItems) = preProject
+		QR_Service.cs = QR_Service.cs
+		webcam_service.cs = webcam_service.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Database", "Database", "{A91256C2-8DB5-407D-B6F0-5C0F8584FD93}"
+	ProjectSection(SolutionItems) = preProject
+		Admin.cs = Admin.cs
+		Student_Info.cs = Student_Info.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{5244C171-E2D2-4A6D-AF61-76D359836EB5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
