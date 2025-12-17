@@ -7,6 +7,49 @@
         mc:Ignorable="d"
         Title="Register" Height="450" Width="800">
     <Grid>
-        
+        <Border Width="350"
+                Padding="30"
+                CornerRadius="15"
+                Background="White"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center">
+
+            <StackPanel>
+
+                <TextBlock Text="Create Account"
+                           FontSize="22"
+                           FontWeight="Bold"
+                           TextAlignment="Center"
+                           Margin="0,0,0,25"/>
+
+                <TextBlock Text="Username"/>
+                <TextBox x:Name="txtUsername"
+                         Height="35"
+                         Margin="0,5,0,15"/>
+
+                <TextBlock Text="Password"/>
+                <PasswordBox x:Name="txtPassword"
+                             Height="35"
+                             Margin="0,5,0,15"/>
+
+                <TextBlock Text="Confirm Password"/>
+                <PasswordBox x:Name="txtConfirm"
+                             Height="35"
+                             Margin="0,5,0,25"/>
+
+                <Button Content="Register"
+                        Height="40"
+                        Background="#4A90E2"
+                        Foreground="White"
+                        FontWeight="Bold"/>
+
+                <TextBlock Text="Back to Login"
+                           Foreground="#4A90E2"
+                           TextAlignment="Center"
+                           Margin="0,20,0,0"
+                           Cursor="Hand"/>
+
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

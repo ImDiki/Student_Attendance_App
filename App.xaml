@@ -4,6 +4,12 @@
              xmlns:local="clr-namespace:Student_Attendance_System"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#FFF5F5F5"/>
+        <SolidColorBrush x:Key="CardBackgroundBrush" Color="White"/>
+        <SolidColorBrush x:Key="CardBorderBrush" Color="#DDDDDD"/>
+
+        <SolidColorBrush x:Key="TextBrush" Color="#222222"/>
+        <SolidColorBrush x:Key="SubTextBrush" Color="#666666"/>
+
     </Application.Resources>
 </Application>
