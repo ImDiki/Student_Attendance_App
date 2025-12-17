@@ -6,17 +6,17 @@
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
             <TextBlock Text="Student Attendance System" FontSize="30" FontWeight="Bold" Margin="0,0,0,30" HorizontalAlignment="Center"/>
 
-            <Button Content="Start Attendance Check (Camera)" Height="50" Width="300" Margin="10" 
+            <Button Content="ログイン" Height="50" Width="300" Margin="10" 
                     Background="#4CAF50" Foreground="White" FontSize="16"
-                    Click="btnOpenWebcam_Click"/>
+                    Click="btnLogin_Click"/>
 
-            <Button Content="Register New Student" Height="50" Width="300" Margin="10" 
+            <Button Content="新し学生の登録" Height="50" Width="300" Margin="10" 
                     Background="#2196F3" Foreground="White" FontSize="16"
-                    Click="btnOpenRegister_Click"/>
+                    Click="btnRegister_Click"/>
 
             <Button Content="Admin Dashboard" Height="50" Width="300" Margin="10" 
                     Background="#FF9800" Foreground="White" FontSize="16"
-                    Click="btnOpenDashboard_Click"/>
+                    Click="btnDashboard_Click"/>
         </StackPanel>
     </Grid>
 </Window>

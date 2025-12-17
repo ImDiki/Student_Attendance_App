@@ -10,27 +10,26 @@ namespace Student_Attendance_System
             InitializeComponent();
         }
 
-        // WebcamWindow ကို ဖွင့်မယ်
-        private void btnOpenWebcam_Click(object sender, RoutedEventArgs e)
+        private void btnLogin_Click(object sender, RoutedEventArgs e)
         {
-            WebcamWindow webcamWin = new WebcamWindow();
-            webcamWin.Show();
-            // this.Close(); // လိုချင်ရင် Main ကို ပိတ်လိုက်လို့ရတယ်
+            Login_window login = new Login_window();
+            login.Show();
+            this.Close();
+
         }
 
-     /*
-        private void btnOpenRegister_Click(object sender, RoutedEventArgs e)
+        private void btnRegister_Click(object sender, RoutedEventArgs e)
         {
-            Register_window regWin = new Register_window();
-            regWin.Show();
+            Register register = new Register();
+            register.Show();
+            this.Close();
         }
 
-        // Dashboard ကို ဖွင့်မယ်
-        private void btnOpenDashboard_Click(object sender, RoutedEventArgs e)
+        private void btnDashboard_Click(object sender, RoutedEventArgs e)
         {
-            Dashboard dashWin = new Dashboard();
-            dashWin.Show();
+            Dashboard dashboard = new Dashboard();
+            dashboard.Show();
+            this.Close();
         }
-     */
     }
 }
