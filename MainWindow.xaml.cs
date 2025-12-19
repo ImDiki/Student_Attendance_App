@@ -27,8 +27,12 @@ namespace Student_Attendance_System
 
         private void btnDashboard_Click(object sender, RoutedEventArgs e)
         {
-            Dashboard dashboard = new Dashboard();
-            dashboard.Show();
+            //Dashboard dashboard = new Dashboard();
+            //dashboard.Show();
+            //this.Close();
+
+            Admin admin = new Admin();
+            admin.Show();
             this.Close();
         }
     }

@@ -1,12 +1,147 @@
 ﻿<Window x:Class="Student_Attendance_System.Views.Admin"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Student_Attendance_System.Views"
-        mc:Ignorable="d"
-        Title="Admin" Height="450" Width="800">
-    <Grid>
-        
+        Title="管理者ダッシュボード"
+        Width="950"
+        Height="550"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource WindowBg}">
+
+    <!-- ========= リソース ========= -->
+    <Window.Resources>
+
+        <!-- ライト -->
+        <SolidColorBrush x:Key="LightWindowBg" Color="#F4F6F9"/>
+        <SolidColorBrush x:Key="LightCardBg" Color="White"/>
+        <SolidColorBrush x:Key="LightText" Color="#2C3E50"/>
+
+        <!-- ダーク -->
+        <SolidColorBrush x:Key="DarkWindowBg" Color="#1E1E1E"/>
+        <SolidColorBrush x:Key="DarkCardBg" Color="#2B2B2B"/>
+        <SolidColorBrush x:Key="DarkText" Color="White"/>
+
+        <!-- 初期（ライト） -->
+        <SolidColorBrush x:Key="WindowBg" Color="#F4F6F9"/>
+        <SolidColorBrush x:Key="CardBg" Color="White"/>
+        <SolidColorBrush x:Key="TextColor" Color="#2C3E50"/>
+
+        <!-- カード -->
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource CardBg}"/>
+            <Setter Property="CornerRadius" Value="15"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="Margin" Value="10"/>
+        </Style>
+
+        <!-- ボタン -->
+        <Style TargetType="Button">
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="Margin" Value="8"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Background" Value="#3498DB"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+    </Window.Resources>
+
+    <!-- ========= レイアウト ========= -->
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ヘッダー -->
+        <Grid Grid.Row="0" Margin="0,0,0,15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- タイトル -->
+            <TextBlock Text="管理者ダッシュボード"
+                       FontSize="26"
+                       FontWeight="Bold"
+                       Foreground="{DynamicResource TextColor}"
+                       VerticalAlignment="Center"/>
+
+            <!-- 右上（ダーク切替・ログアウト） -->
+            <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Right">
+
+                <ToggleButton x:Name="ThemeToggle"
+                              Width="50"
+                              Height="36"
+                              Content="🌙"
+                              Margin="0,0,10,0"
+                              Checked="ThemeToggle_Checked"
+                              Unchecked="ThemeToggle_Unchecked"/>
+
+                <Button Content="ログアウト"
+                        Width="90"
+                        Background="#E74C3C"
+                        Click="Logout_Click"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- 本日の情報 -->
+        <UniformGrid Grid.Row="1" Columns="3">
+
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <TextBlock Text="本日の日付"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource TextColor}"/>
+                    <TextBlock x:Name="txtDate"
+                               FontSize="20"
+                               Margin="0,10,0,0"
+                               Foreground="{DynamicResource TextColor}"/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <TextBlock Text="本日の出席数"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource TextColor}"/>
+                    <TextBlock x:Name="txtAttendance"
+                               FontSize="20"
+                               Margin="0,10,0,0"
+                               Foreground="{DynamicResource TextColor}"/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <TextBlock Text="本日のクラス数"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource TextColor}"/>
+                    <TextBlock x:Name="txtClasses"
+                               FontSize="20"
+                               Margin="0,10,0,0"
+                               Foreground="{DynamicResource TextColor}"/>
+                </StackPanel>
+            </Border>
+
+        </UniformGrid>
+
+        <!-- 管理ボタン -->
+        <UniformGrid Grid.Row="2" Columns="3" Margin="0,25,0,0">
+
+            <Button Content="👨‍🏫 教師管理"/>
+            <Button Content="🎓 学生管理"/>
+            <Button Content="🏫 クラス管理"/>
+
+            <Button Content="📝 出席管理"/>
+            <Button Content="📅 イベント管理"/>
+            <Button Content="📊 レポート"/>
+
+        </UniformGrid>
+
     </Grid>
 </Window>

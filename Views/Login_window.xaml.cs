@@ -1,4 +1,4 @@
-﻿using Student_Attendance_System.Themes;
+﻿//using Student_Attendance_System.Themes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,6 +65,11 @@ namespace Student_Attendance_System.Views
                 BtnThemeToggle.Content = "🌙";
                 isDarkMode = false;
             }
+        }
+
+        private void btnLogin_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

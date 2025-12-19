@@ -48,18 +48,13 @@
             <StackPanel>
 
                 <!-- Title -->
-                <TextBlock Text="Student Attendance System"
+                <TextBlock
                        FontSize="22"
                        FontWeight="Bold"
                        Foreground="{DynamicResource TextBrush}"
                        TextAlignment="Center"
-                       Margin="0,0,0,5"/>
+                       Margin="0,0,0,5"><Run Language="ja-jp" Text="学校管理システム"/></TextBlock>
 
-                <TextBlock Text="Login"
-                       FontSize="14"
-                       Foreground="{DynamicResource SubTextBrush}"
-                       TextAlignment="Center"
-                       Margin="0,0,0,25"/>
 
                 <!-- Username -->
                 <TextBlock Text="Username"
@@ -88,14 +83,14 @@
                          BorderBrush="{DynamicResource CardBorderBrush}"/>
 
                 <!-- Login Button -->
-                <Button Content="Login"
+                <Button Content="ログイン"
                     Height="40"
                     FontSize="15"
                     FontWeight="Bold"
                     Background="BlueViolet"
                     Foreground="White"
                     BorderThickness="0"
-                    Cursor="Hand"/>
+                    Cursor="Hand" Click="btnLogin_Click"/>
 
                 <!-- Bottom Links -->
                 <StackPanel Orientation="Horizontal"
