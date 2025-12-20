@@ -1,0 +1,35 @@
+﻿<Page x:Class="Student_Attendance_System.Views.DashboardPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Dashboard" Background="#F5F7FA">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="White" Padding="15" BorderBrush="#EEE" BorderThickness="0,0,0,2">
+            <StackPanel Orientation="Horizontal">
+                <Button Content="⬅ 戻る (Back)" Width="100" Height="35" Background="#EEE" Foreground="#333" 
+                        FontWeight="Bold" BorderThickness="0" Click="btnBack_Click"/>
+
+                <TextBlock Text="管理者ダッシュボード" FontSize="20" FontWeight="Bold" VerticalAlignment="Center" Margin="20,0,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <TabControl Grid.Row="1" Margin="10" BorderThickness="0" Background="Transparent">
+            <TabItem Header="📊 概要 (Overview)" FontSize="14" FontWeight="Bold">
+                <Grid>
+                    <TextBlock Text="Dashboard Content Here..." HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="👥 チーム (Team)" FontSize="14" FontWeight="Bold">
+                <Grid>
+                    <TextBlock Text="Team Members Here..." HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Page>
