@@ -1,48 +1,37 @@
-﻿using System.Linq; // List ရှာဖို့လိုတယ်
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
-using Student_Attendance_System;
 
 namespace Student_Attendance_System.Views
 {
     public partial class LoginPage : Page
     {
-        public LoginPage()
+        public LoginPage() { InitializeComponent(); }
+
+        private void btnLogin_Click(object sender, RoutedEventArgs e)
         {
-            InitializeComponent();
+            string user = txtUser.Text;
+
+            if (user == "admin")
+            {
+                // Admin Dashboard ကို သွားမယ်
+                NavigationService.Navigate(new DashboardPage());
+            }
+            else if (user == "student")
+            {
+                // Student Dashboard (အသစ်ဆောက်ရမယ်) ကို သွားမယ်
+                MessageBox.Show("Welcome Student!");
+                // NavigationService.Navigate(new StudentDashboardPage());
+            }
+            else
+            {
+                MessageBox.Show("User not found!");
+            }
         }
 
         private void btnBack_Click(object sender, RoutedEventArgs e)
         {
-            if (NavigationService.CanGoBack) NavigationService.GoBack();
-        }
-
-        private void btnLogin_Click(object sender, RoutedEventArgs e)
-        {
-            string inputUser = txtUsername.Text;
-            string inputPass = txtPassword.Password;
-
-            // MockDatabase ထဲမှာ အဲ့ဒီလူ ရှိမရှိ စစ်မယ်
-            var user = MockDatabase.Users.FirstOrDefault(u => u.Username == inputUser && u.Password == inputPass);
-
-            if (user != null)
-            {
-                // ရှိတယ်ဆိုရင် Role ကို စစ်မယ်
-                if (user.Role == "Admin")
-                {
-                    NavigationService.Navigate(new DashboardPage()); // Admin Page
-                }
-                else if (user.Role == "Student")
-                {
-                    
-                    NavigationService.Navigate(new StudentDashboardPage(user.FullName));
-                }
-            }
-            else
-            {
-                MessageBox.Show("Invalid Username or Password!", "Login Failed", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            NavigationService.GoBack(); // Main Menu ပြန်သွားမယ်
         }
     }
 }
