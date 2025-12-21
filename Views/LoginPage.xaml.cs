@@ -31,7 +31,11 @@ namespace Student_Attendance_System.Views
                 // ရှိတယ်ဆိုရင် Role ကို စစ်မယ်
                 if (user.Role == "Admin")
                 {
-                    NavigationService.Navigate(new DashboardPage()); // Admin Page
+                    //NavigationService.Navigate(new DashboardPage()); // Admin Page
+                    Admin admin = new Admin();
+                    admin.Show();
+                    this.Close();
+                    
                 }
                 else if (user.Role == "Student")
                 {
