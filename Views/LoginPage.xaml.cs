@@ -1,52 +1,42 @@
-﻿using System.Linq; // List ရှာဖို့လိုတယ်
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
-using Student_Attendance_System;
+using Student_Attendance_System.Data;
+using Student_Attendance_System.Models;
 
 namespace Student_Attendance_System.Views
 {
     public partial class LoginPage : Page
     {
-        public LoginPage()
+        public LoginPage() { InitializeComponent(); }
+
+        private void BtnLogin_Click(object sender, RoutedEventArgs e)
         {
-            InitializeComponent();
+            var user = DBConn.Login(txtUser.Text, txtPass.Password);
+
+            if (user == null)
+            {
+                MessageBox.Show("Invalid username or password");
+                return;
+            }
+
+            // ROLE CHECK
+            if (user.Role == "Admin")
+            {
+                Admin admin = new Admin();
+                admin.Show();   
+            }
+            else
+            {
+                NavigationService.Navigate(new StudentDashboardPage(user.FullName));
+            }
+
+            Application.Current.MainWindow.Close();
         }
 
         private void btnBack_Click(object sender, RoutedEventArgs e)
         {
-            if (NavigationService.CanGoBack) NavigationService.GoBack();
-        }
-
-        private void btnLogin_Click(object sender, RoutedEventArgs e)
-        {
-            string inputUser = txtUsername.Text;
-            string inputPass = txtPassword.Password;
-
-            // MockDatabase ထဲမှာ အဲ့ဒီလူ ရှိမရှိ စစ်မယ်
-            var user = MockDatabase.Users.FirstOrDefault(u => u.Username == inputUser && u.Password == inputPass);
-
-            if (user != null)
-            {
-                // ရှိတယ်ဆိုရင် Role ကို စစ်မယ်
-                if (user.Role == "Admin")
-                {
-                    //NavigationService.Navigate(new DashboardPage()); // Admin Page
-                    Admin admin = new Admin();
-                    admin.Show();
-                    this.Close();
-                    
-                }
-                else if (user.Role == "Student")
-                {
-                    
-                    NavigationService.Navigate(new StudentDashboardPage(user.FullName));
-                }
-            }
-            else
-            {
-                MessageBox.Show("Invalid Username or Password!", "Login Failed", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            NavigationService.Navigate(new MainMenuPage());
         }
     }
 }
