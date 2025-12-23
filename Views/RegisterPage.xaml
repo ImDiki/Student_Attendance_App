@@ -1,43 +1,35 @@
 ﻿<Page x:Class="Student_Attendance_System.Views.RegisterPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      Title="Register" Background="{DynamicResource AppBackground}">
+      Title="Register" Background="White">
 
     <Grid>
-        <ScrollViewer>
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,40">
-                <Border Background="{DynamicResource SurfaceColor}" CornerRadius="20" Width="500" Padding="40" BorderBrush="{DynamicResource NeonPink}" BorderThickness="1">
-                    <Border.Effect>
-                        <DropShadowEffect Color="#FF0055" BlurRadius="20" Opacity="0.2"/>
-                    </Border.Effect>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-                    <StackPanel>
-                        <TextBlock Text="新規学生登録" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,0,0,30" HorizontalAlignment="Center"/>
-
-                        <TextBlock Text="氏名 (Full Name)" Foreground="{DynamicResource SecondaryText}" Margin="0,5"/>
-                        <TextBox Height="40" Margin="0,0,0,15"/>
-
-                        <TextBlock Text="学籍番号 (Student ID)" Foreground="{DynamicResource SecondaryText}" Margin="0,5"/>
-                        <TextBox Height="40" Margin="0,0,0,15"/>
-
-                        <TextBlock Text="生年月日 (Date of Birth)" Foreground="{DynamicResource SecondaryText}" Margin="0,5"/>
-                        <DatePicker Height="40" Margin="0,0,0,15"/>
-
-                        <TextBlock Text="顔写真 (Face Photo)" Foreground="{DynamicResource SecondaryText}" Margin="0,10,0,5"/>
-                        <Border Height="200" Background="#111" CornerRadius="10" BorderBrush="#333" BorderThickness="1" Margin="0,0,0,10">
-                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <TextBlock Text="📷" FontSize="30" HorizontalAlignment="Center" Foreground="#555"/>
-                                <TextBlock Text="カメラプレビュー (Preview)" Foreground="#555"/>
-                            </StackPanel>
-                        </Border>
-                        <Button Content="撮影 (CAPTURE)" BorderBrush="{DynamicResource NeonBlue}" Foreground="{DynamicResource NeonBlue}" Margin="0,0,0,25"/>
-
-                        <Button Content="登録 (REGISTER)" Height="50" BorderBrush="{DynamicResource NeonPink}" Foreground="{DynamicResource NeonPink}" Margin="0,0,0,15"/>
-
-                        <Button Content="戻る (BACK)" Click="btnBack_Click" BorderThickness="0" Foreground="{DynamicResource SecondaryText}"/>
-                    </StackPanel>
-                </Border>
+        <Border Grid.Row="0" Background="#F5F5F5" Padding="15">
+            <StackPanel Orientation="Horizontal">
+                <Button Content="⬅ 戻る (Back)" Width="100" Height="35" Background="White" Foreground="#333" 
+                        FontWeight="Bold" BorderThickness="1" Click="btnBack_Click"/>
+                <TextBlock Text="新規学生登録" FontSize="20" FontWeight="Bold" VerticalAlignment="Center" Margin="20,0,0,0"/>
             </StackPanel>
-        </ScrollViewer>
+        </Border>
+
+        <StackPanel Grid.Row="1" Margin="50" HorizontalAlignment="Center">
+            <TextBlock Text="学生名 (Name):" x:Name="txtID" FontWeight="Bold" Margin="0,0,0,5"/>
+            <TextBox Width="300" Height="35" Margin="0,0,0,20"/>
+
+            <TextBlock Text="学生番号 (ID):" x:Name="txtName" FontWeight="Bold" Margin="0,0,0,5"/>
+            <TextBox Width="300" Height="35" Margin="0,0,0,30"/>
+
+            <Button Content="📷 写真を撮る (Webcam)" Height="45" Width="300" Background="#2196F3" Foreground="White"
+                    FontSize="16" FontWeight="Bold" Click="btnWebcam_Click" Margin="0,0,0,20"/>
+
+            <Button Content="登録 (Register)"  Width="300" Background="#2196F3" Foreground="White" Margin="0,0,0,5"
+                    FontSize="16" FontWeight="Bold" Click="btnSave_Click" />
+            
+        </StackPanel>
     </Grid>
 </Page>

@@ -1,34 +1,20 @@
-﻿using System.Collections.Generic;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
 
 namespace Student_Attendance_System.Views
 {
-    // Team Member Data Model
-    public class TeamMember
-    {
-        public string Name { get; set; }
-        public string Role { get; set; }
-        public string ImagePath { get; set; }
-        public string Major { get; set; }
-        public string ClassInfo { get; set; }
-    }
-
     public partial class DashboardPage : Page
     {
         public DashboardPage()
         {
             InitializeComponent();
-            LoadStaticTeamMembers();
         }
 
-        private void LoadStaticTeamMembers()
+        private void btnBack_Click(object sender, RoutedEventArgs e)
         {
-            List<TeamMember> members = new List<TeamMember>();
-
-            // 1. MYAT THADAR LINN
-            members.Add(new TeamMember
+            // နောက်ပြန်ဆုတ်ခြင်း Logic
+            if (NavigationService.CanGoBack)
             {
                 Name = "MYAT THADAR LINN",
                 Role = "Lead Developer",
