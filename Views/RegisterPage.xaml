@@ -24,8 +24,7 @@
             <TextBlock Text="学生番号 (ID):" x:Name="txtName" FontWeight="Bold" Margin="0,0,0,5"/>
             <TextBox Width="300" Height="35" Margin="0,0,0,30"/>
 
-            <Button Content="📷 写真を撮る (Webcam)" Height="45" Width="300" Background="#2196F3" Foreground="White"
-                    FontSize="16" FontWeight="Bold" Click="btnWebcam_Click" Margin="0,0,0,20"/>
+            
 
             <Button Content="登録 (Register)"  Width="300" Background="#2196F3" Foreground="White" Margin="0,0,0,5"
                     FontSize="16" FontWeight="Bold" Click="btnSave_Click" />
