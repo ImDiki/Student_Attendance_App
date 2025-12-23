@@ -1,5 +1,5 @@
 ﻿using System.Windows;
-using Student_Attendance_System.Views; // Views folder ကို လှမ်းချိတ်မှ MainMenuPage ကို သိမယ်
+using Student_Attendance_System.Views;
 
 namespace Student_Attendance_System
 {
@@ -8,8 +8,8 @@ namespace Student_Attendance_System
         public MainWindow()
         {
             InitializeComponent();
-            // App စဖွင့်ရင် MainMenuPage ကို သွားမယ်
-            RootFrame.Navigate(new MainMenuPage());
+            // ဆော့ဝဲလ်စဖွင့်ရင် MainMenuPage ကို စပြ
+            MainFrame.Navigate(new MainMenuPage());
         }
     }
 }
