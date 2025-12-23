@@ -34,7 +34,7 @@ namespace Student_Attendance_System.Views
                     //NavigationService.Navigate(new DashboardPage()); // Admin Page
                     Admin admin = new Admin();
                     admin.Show();
-                    this.Close();
+                    
                     
                 }
                 else if (user.Role == "Student")
