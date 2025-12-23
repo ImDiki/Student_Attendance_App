@@ -38,14 +38,14 @@ namespace Student_Attendance_System.Views
             });
 
             // 2. KHINE ZIN MAR LYNN
-            members.Add(new TeamMember
-            {
-                Name = "KHINE ZIN MAR LYNN",
-                Role = "UI/UX Designer",
-                ImagePath = "/Resources/khine.jpg",
-                Major = "Web・グラフィックデザイン専攻 3年",
-                ClassInfo = "1A25KS"
-            });
+           // members.Add(new TeamMember
+            //{
+              //  Name = "KHINE ZIN MAR LYNN",
+                //Role = "UI/UX Designer",
+                //ImagePath = "/Resources/khine.jpg",
+                //Major = "Web・グラフィックデザイン専攻 3年",
+                //ClassInfo = "1A25KS"
+            //});
 
             // 3. SI THU BO SANN
             members.Add(new TeamMember
