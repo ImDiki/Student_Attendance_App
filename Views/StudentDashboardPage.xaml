@@ -1,33 +1,35 @@
 ﻿<Page x:Class="Student_Attendance_System.Views.StudentDashboardPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      Title="Student Dashboard" Background="#E3F2FD">
+      Title="Student Dashboard">
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-        <Border Grid.Row="0" Background="White" Padding="15">
-            <StackPanel Orientation="Horizontal">
-                <Button Content="⬅ Logout (ログアウト)" Width="120" Height="35" Background="#FFEBEE" Foreground="Red" 
-                        FontWeight="Bold" BorderThickness="0" Click="btnLogout_Click"/>
-                <TextBlock x:Name="txtWelcome" Text="Welcome Student" FontSize="20" FontWeight="Bold" VerticalAlignment="Center" Margin="20,0,0,0"/>
+        <Border Background="#333" Grid.Column="0">
+            <StackPanel Margin="10">
+                <TextBlock Text="My School" Foreground="White" FontSize="18" Margin="0,0,0,20"/>
+
+                <Button Content="Dashboard" Height="35" Margin="0,5"/>
+                <Button Content="Timetable" Height="35" Margin="0,5"/>
+                <Button Content="Logout" Height="35" Margin="0,20" Background="Red" Foreground="White" Click="btnLogout_Click"/>
             </StackPanel>
         </Border>
 
-        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock Text="🎓 Student Portal" FontSize="30" FontWeight="Bold" HorizontalAlignment="Center" Foreground="#1976D2"/>
-            <TextBlock Text="Attendance History will appear here." FontSize="16" Foreground="Gray" Margin="0,10,0,0"/>
+        <Grid Grid.Column="1" Margin="20">
+            <StackPanel>
+                <TextBlock x:Name="lblWelcome" Text="Welcome, Student!" FontSize="24" FontWeight="Bold"/>
 
-            <Border Background="White" CornerRadius="10" Padding="20" Margin="0,30,0,0" Width="300">
-                <StackPanel>
-                    <TextBlock Text="My Attendance" FontWeight="Bold" Margin="0,0,0,10"/>
-                    <ProgressBar Value="80" Height="20" Foreground="#4CAF50"/>
-                    <TextBlock Text="80% Present" HorizontalAlignment="Right" FontSize="12"/>
-                </StackPanel>
-            </Border>
-        </StackPanel>
+                <Border Background="#E3F2FD" Height="100" Margin="0,20,0,0" CornerRadius="8" Padding="15">
+                    <StackPanel>
+                        <TextBlock Text="Attendance Percentage" FontWeight="Bold"/>
+                        <TextBlock x:Name="lblPercent" Text="85%" FontSize="30" Foreground="Blue"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Page>

@@ -1,21 +1,35 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
+using Student_Attendance_System.UserData;
 
 namespace Student_Attendance_System.Views
 {
     public partial class StudentDashboardPage : Page
     {
-        public StudentDashboardPage(string studentName)
+        public StudentDashboardPage()
         {
             InitializeComponent();
-            txtWelcome.Text = $"Welcome, {studentName} 🎓";
+            LoadUserData();
+        }
+
+        private void LoadUserData()
+        {
+            if (UserData.UserData.CurrentUser != null)
+            {
+                lblWelcome.Text = $"Welcome, {UserData.UserData.CurrentUser.FullName}!";
+
+                // ---------------------------------------------------------
+                // bo sann's code
+                // ---------------------------------------------------------
+                // Database ကနေ Attendance % ကို ဆွဲထုတ်ပြီး lblPercent မှာ ပြပေးရမယ်
+            }
         }
 
         private void btnLogout_Click(object sender, RoutedEventArgs e)
         {
-            // Logout လုပ်ရင် Main Menu ပြန်သွားမယ်
-            NavigationService.Navigate(new MainMenuPage());
+            UserData.UserData.CurrentUser = null; // Clear Data
+            NavigationService.Navigate(new LoginPage()); // Go back to Login
         }
     }
 }

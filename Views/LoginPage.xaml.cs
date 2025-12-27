@@ -1,8 +1,8 @@
-﻿using System.Linq; // List ရှာဖို့လိုတယ်
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input; // MouseButtonEventArgs အတွက် ဒါမဖြစ်မနေလိုတယ်
 using System.Windows.Navigation;
-using Student_Attendance_System;
+using Student_Attendance_System.Models;
 
 namespace Student_Attendance_System.Views
 {
@@ -13,40 +13,52 @@ namespace Student_Attendance_System.Views
             InitializeComponent();
         }
 
-        private void btnBack_Click(object sender, RoutedEventArgs e)
-        {
-            if (NavigationService.CanGoBack) NavigationService.GoBack();
-        }
-
+        // Login Button နှိပ်ရင် အလုပ်လုပ်မယ့်နေရာ
         private void btnLogin_Click(object sender, RoutedEventArgs e)
         {
-            string inputUser = txtUsername.Text;
-            string inputPass = txtPassword.Password;
+            string username = txtUsername.Text;
+            string password = txtPassword.Password;
 
-            // MockDatabase ထဲမှာ အဲ့ဒီလူ ရှိမရှိ စစ်မယ်
-            var user = MockDatabase.Users.FirstOrDefault(u => u.Username == inputUser && u.Password == inputPass);
+            // ---------------------------------------------------------
+            // bo sann's code (Backend Logic)
+            // ---------------------------------------------------------
+            // Database စစ်ဆေးခြင်း (လောလောဆယ် Fake Data နဲ့ စစ်မယ်)
+            User fakeUser = null;
 
-            if (user != null)
+            if (username == "student" && password == "123")
             {
-                // ရှိတယ်ဆိုရင် Role ကို စစ်မယ်
-                if (user.Role == "Admin")
+                fakeUser = new User { Id = 1, Username = "std001", Role = "Student", FullName = "Mg Mg", Major = "IT" };
+            }
+            else if (username == "teacher" && password == "123")
+            {
+                fakeUser = new User { Id = 2, Username = "tr001", Role = "Teacher", FullName = "Daw Mya", Major = "IT" };
+            }
+            else if (username == "admin" && password == "123")
+            {
+                fakeUser = new User { Id = 99, Username = "admin", Role = "Admin", FullName = "Head Master" };
+            }
+            // ---------------------------------------------------------
+
+            if (fakeUser != null)
+            {
+                // Login အောင်မြင်ရင် MainWindow ကို လှမ်းပြောပြီး Sidebar တွေဖွင့်ခိုင်းမယ်
+                // Application.Current.MainWindow ဆိုတာ လက်ရှိ Run နေတဲ့ Window ကြီးကို လှမ်းခေါ်တာ
+                if (Application.Current.MainWindow is MainWindow mainWindow)
                 {
-                    //NavigationService.Navigate(new DashboardPage()); // Admin Page
-                    Admin admin = new Admin();
-                    admin.Show();
-                    
-                    
-                }
-                else if (user.Role == "Student")
-                {
-                    
-                    NavigationService.Navigate(new StudentDashboardPage(user.FullName));
+                    mainWindow.HandleLoginSuccess(fakeUser);
                 }
             }
             else
             {
-                MessageBox.Show("Invalid Username or Password!", "Login Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Login Failed! Incorrect username or password.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        // Register စာသားကို နှိပ်ရင် အလုပ်လုပ်မယ့်နေရာ (Error တက်ခဲ့တဲ့နေရာ)
+        private void GoToRegister_Click(object sender, MouseButtonEventArgs e)
+        {
+            // RegisterPage ကို ကူးမယ်
+            NavigationService.Navigate(new RegisterPage());
         }
     }
 }
