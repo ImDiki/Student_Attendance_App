@@ -1,8 +1,8 @@
 ﻿<Window x:Class="Student_Attendance_System.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Student Attendance System" Height="650" Width="1100"
-        WindowStartupLocation="CenterScreen">
+        Title="Student Attendance System" Height="700" Width="1100"
+        WindowStartupLocation="CenterScreen" WindowState="Maximized">
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -14,18 +14,21 @@
             <StackPanel Margin="10">
                 <TextBlock Text="ATTENDANCE APP" Foreground="White" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,20,0,30"/>
 
-                <Button x:Name="btnLanguage" Content="Language: EN" Height="40" Background="#34495E" Foreground="White" Margin="0,5" Click="btnLanguage_Click"/>
-                <Button x:Name="btnAbout" Content="About Us / Team" Height="40" Background="Transparent" Foreground="White" Click="btnAbout_Click"/>
+                <Button x:Name="btnLanguage" Content="Language: EN" Height="45" Background="#34495E" Foreground="White" Margin="0,5" Click="btnLanguage_Click"/>
+
+                <Button x:Name="btnAbout" Content="About Us / Team" Height="45" Background="Transparent" Foreground="White" Click="btnAbout_Click"/>
+
+                <Button x:Name="btnLogin" Content="Login (Teacher/Student)" Height="45" Background="#2980b9" Foreground="White" Margin="0,20,0,0" Click="btnLogin_Click"/>
+
 
                 <StackPanel x:Name="pnlUserMenu" Visibility="Collapsed">
                     <Separator Background="Gray" Margin="0,20"/>
-                    <TextBlock Text="Main Menu" Foreground="Gray" Margin="5,0,0,5"/>
+                    <TextBlock x:Name="lblUserTitle" Text="Main Menu" Foreground="Gray" Margin="5,0,0,5"/>
 
-                    <Button Content="Dashboard" Height="40" Background="Transparent" Foreground="White" HorizontalContentAlignment="Left" Click="btnDashboard_Click"/>
-                    <Button Content="Timetable" Height="40" Background="Transparent" Foreground="White" HorizontalContentAlignment="Left"/>
-                    <Button Content="My Profile" Height="40" Background="Transparent" Foreground="White" HorizontalContentAlignment="Left"/>
+                    <Button x:Name="btnDashboard" Content="Dashboard" Height="45" Background="Transparent" Foreground="White" HorizontalContentAlignment="Left" Click="btnDashboard_Click"/>
+                    <Button Content="My Profile" Height="45" Background="Transparent" Foreground="White" HorizontalContentAlignment="Left"/>
 
-                    <Button Content="Logout" Height="40" Background="#C0392B" Foreground="White" Margin="0,30,0,0" Click="btnLogout_Click"/>
+                    <Button x:Name="btnLogout" Content="Logout" Height="45" Background="#C0392B" Foreground="White" Margin="0,30,0,0" Click="btnLogout_Click"/>
                 </StackPanel>
 
             </StackPanel>

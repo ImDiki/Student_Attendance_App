@@ -18,7 +18,7 @@ namespace Student_Attendance_System.Views
             }
 
             // ၂။ စဖွင့်ဖွင့်ချင်း Dashboard ကို Default အနေနဲ့ ပြမယ်
-            // (Bro ရှေ့မှာ StudentDashboardPage ဆောက်ထားတယ်မလား? အဲ့ကောင်ကို ခေါ်ထည့်လိုက်မယ်)
+            // (Bro ရှေ့မှာ StudentDashboardPage ဆောက်ထားတယ် အဲ့ကောင်ကို ခေါ်ထည့်လိုက်မယ်)
             ContentFrame.Navigate(new StudentDashboardPage());
             lblPageTitle.Text = "Dashboard";
         }
@@ -30,7 +30,7 @@ namespace Student_Attendance_System.Views
             lblPageTitle.Text = "Dashboard";
         }
 
-        // QR Scan Button (ခဏနေမှ ဆောက်မယ်၊ လောလောဆယ် Placeholder ထားမယ်)
+        // QR Scan Button (ခဏနေမှ ဆောက်မယ်၊ လောလောဆယ် Placeholder )
         private void btnScan_Click(object sender, RoutedEventArgs e)
         {
             // ContentFrame.Navigate(new Webcam()); // Webcam page မရှိသေးရင် Error တက်မယ်
