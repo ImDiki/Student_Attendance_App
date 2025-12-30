@@ -1,18 +1,56 @@
 ﻿<Page x:Class="Student_Attendance_System.Views.ScanPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      Title="Scan Page" Background="Black" Unloaded="Page_Unloaded">
+      Title="Scan Page" Background="Black" 
+      Focusable="True" 
+      KeyDown="Page_KeyDown">
 
     <Grid>
-        <Image x:Name="imgWebcam" Stretch="UniformToFill"/>
+        <Image x:Name="imgWebcam" Stretch="UniformToFill" RenderTransformOrigin="0.5,0.5">
+            <Image.RenderTransform>
+                <ScaleTransform ScaleX="-1"/>
+            </Image.RenderTransform>
+        </Image>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="250"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="400"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Row="0" Grid.ColumnSpan="3" Background="Black"/>
+            <Border Grid.Row="2" Grid.ColumnSpan="3" Background="Black"/>
+            <Border Grid.Row="1" Grid.Column="0" Background="Black"/>
+            <Border Grid.Row="1" Grid.Column="2" Background="Black"/>
+
+            <Border Grid.Row="1" Grid.Column="1" BorderBrush="#3498DB" BorderThickness="4" CornerRadius="10" Background="Transparent">
+                <Border.Effect>
+                    <DropShadowEffect Color="#3498DB" BlurRadius="20" ShadowDepth="0"/>
+                </Border.Effect>
+                <Border Height="2" Background="#2ECC71" VerticalAlignment="Top" Opacity="0.8">
+                    <Border.Triggers>
+                        <EventTrigger RoutedEvent="Loaded">
+                            <BeginStoryboard>
+                                <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                                    <ThicknessAnimation Storyboard.TargetProperty="Margin" From="0,10,0,0" To="0,230,0,0" Duration="0:0:1.5"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Border.Triggers>
+                </Border>
+            </Border>
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="Place ID Card Here" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,-30" FontSize="14" Opacity="0.8"/>
+        </Grid>
 
         <Grid>
             <StackPanel x:Name="pnlStart" VerticalAlignment="Center" HorizontalAlignment="Center">
-                <TextBlock Text="ATTENDANCE SYSTEM" Foreground="White" FontSize="28" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20">
-                    <TextBlock.Effect>
-                        <DropShadowEffect ShadowDepth="2" BlurRadius="5"/>
-                    </TextBlock.Effect>
-                </TextBlock>
+                <TextBlock Text="READY TO SCAN" Foreground="White" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
 
                 <Button x:Name="btnStart" Content="START CAMERA" 
                         Width="220" Height="60" FontSize="18" FontWeight="Bold"
@@ -24,21 +62,27 @@
                         </Style>
                     </Button.Resources>
                 </Button>
+
+                <Button Content="Stop Scanning &amp; Review" 
+                        Width="220" Height="40" Margin="0,20,0,0"
+                        Background="#E67E22" Foreground="White" FontWeight="Bold"
+                        Cursor="Hand" Click="btnReview_Click">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="20"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
             </StackPanel>
 
             <Border x:Name="ResultBorder" Background="White" VerticalAlignment="Top" HorizontalAlignment="Center" 
                     Margin="0,60,0,0" CornerRadius="15" Padding="25" Visibility="Collapsed">
-                <Border.Effect>
-                    <DropShadowEffect BlurRadius="20" Opacity="0.5"/>
-                </Border.Effect>
                 <StackPanel HorizontalAlignment="Center">
                     <TextBlock x:Name="lblResultStatus" Text="Present" FontSize="26" FontWeight="Bold" HorizontalAlignment="Center"/>
                     <TextBlock x:Name="lblResultMessage" Text="Confirmed" FontSize="16" Foreground="Gray" HorizontalAlignment="Center"/>
                     <TextBlock x:Name="lblCurrentTime" Text="09:00 AM" FontSize="14" Foreground="#333" HorizontalAlignment="Center" Margin="0,5,0,0"/>
                 </StackPanel>
             </Border>
-
-            <TextBlock x:Name="lblStatus" Text="Ready" Foreground="White" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="20" Opacity="0.8"/>
         </Grid>
     </Grid>
 </Page>

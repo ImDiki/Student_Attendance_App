@@ -3,12 +3,13 @@ using System.Drawing;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using System.Windows.Navigation; // For Navigation
 using AForge.Video;
 using AForge.Video.DirectShow;
 using ZXing;
-// အောက်ပါ namespace အသစ်ကို ထည့်ဖို့ Package သွင်းထားရမယ်
 using ZXing.Windows.Compatibility;
 
 namespace Student_Attendance_System.Views
@@ -17,6 +18,10 @@ namespace Student_Attendance_System.Views
     {
         FilterInfoCollection filterInfoCollection;
         VideoCaptureDevice videoCaptureDevice;
+
+        private bool _isProcessing = false;
+        private string _scannerBuffer = "";
+        private DateTime _lastKeystroke = DateTime.Now;
 
         public ScanPage()
         {
@@ -27,57 +32,89 @@ namespace Student_Attendance_System.Views
 
         private void ScanPage_Loaded(object sender, RoutedEventArgs e)
         {
+            this.Focus();
             filterInfoCollection = new FilterInfoCollection(FilterCategory.VideoInputDevice);
         }
 
+        // --- KEYBOARD INPUT ---
+        private void Page_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (_isProcessing) return;
+            TimeSpan elapsed = DateTime.Now - _lastKeystroke;
+            if (elapsed.TotalMilliseconds > 100) _scannerBuffer = "";
+            _lastKeystroke = DateTime.Now;
+
+            if (e.Key == Key.Enter)
+            {
+                if (!string.IsNullOrWhiteSpace(_scannerBuffer))
+                {
+                    StartVerificationProcess(_scannerBuffer);
+                    _scannerBuffer = "";
+                }
+            }
+            else { _scannerBuffer += GetCharFromKey(e.Key); }
+        }
+
+        private string GetCharFromKey(Key key)
+        {
+            if (key >= Key.D0 && key <= Key.D9) return ((int)key - (int)Key.D0).ToString();
+            if (key >= Key.NumPad0 && key <= Key.NumPad9) return ((int)key - (int)Key.NumPad0).ToString();
+            if (key >= Key.A && key <= Key.Z) return key.ToString();
+            return "";
+        }
+
+        // --- WEBCAM & BUTTONS ---
         private void btnStart_Click(object sender, RoutedEventArgs e)
         {
+            this.Focus();
             if (filterInfoCollection == null || filterInfoCollection.Count == 0)
             {
                 MessageBox.Show("No Camera Found!", "Error");
                 return;
             }
-
-            // Start ခလုတ်ကို ဖျောက်မယ်
             pnlStart.Visibility = Visibility.Collapsed;
 
-            // --- CAMERA SELECTION LOGIC (အသစ်) ---
-           
             string selectedCameraMoniker = "";
-
             foreach (FilterInfo device in filterInfoCollection)
             {
-                // "USB" သို့မဟုတ် "WebCam" ပါတဲ့ကောင်ကို ဦးစားပေးရှာမယ်
-                if (device.Name.Contains("USB") || device.Name.Contains("WebCam") || device.Name.Contains("Integrated"))
+                if (device.Name.Contains("USB") || device.Name.Contains("WebCam"))
                 {
                     selectedCameraMoniker = device.MonikerString;
-                    break; // တွေ့ရင် Loop ရပ်လိုက်မယ်
+                    break;
                 }
             }
+            if (string.IsNullOrEmpty(selectedCameraMoniker)) selectedCameraMoniker = filterInfoCollection[0].MonikerString;
 
-            // ရှာလို့မတွေ့ရင် ပထမဆုံးတစ်ခုကိုပဲ ယူမယ် (Fallback)
-            if (string.IsNullOrEmpty(selectedCameraMoniker))
-            {
-                selectedCameraMoniker = filterInfoCollection[0].MonikerString;
-            }
-
-            // Camera ဖွင့်မယ်
             videoCaptureDevice = new VideoCaptureDevice(selectedCameraMoniker);
             videoCaptureDevice.NewFrame += VideoCaptureDevice_NewFrame;
             videoCaptureDevice.Start();
-
-            lblStatus.Text = "Scanning... Show your ID Card";
         }
+
+        // *** NEW: RETURN TO DASHBOARD ***
+        private void btnReview_Click(object sender, RoutedEventArgs e)
+        {
+            if (videoCaptureDevice != null && videoCaptureDevice.IsRunning)
+            {
+                videoCaptureDevice.SignalToStop();
+                videoCaptureDevice.WaitForStop();
+            }
+
+            // Dashboard ကို ပြန်ခေါ်မယ် (Tab 2 ဖွင့်ခိုင်းမယ်)
+            TeacherDashboard dashboard = new TeacherDashboard();
+            dashboard.OpenManagerTab = true;
+            NavigationService.Navigate(dashboard);
+        }
+
         private void VideoCaptureDevice_NewFrame(object sender, NewFrameEventArgs eventArgs)
         {
             try
             {
                 Bitmap bitmap = (Bitmap)eventArgs.Frame.Clone();
                 BitmapImage bitmapImage = BitmapToImageSource(bitmap);
-
                 Dispatcher.Invoke(() => imgWebcam.Source = bitmapImage);
 
-                // BarcodeReader (from ZXing.Windows.Compatibility)
+                if (_isProcessing) return;
+
                 BarcodeReader reader = new BarcodeReader();
                 reader.Options.TryHarder = true;
                 var result = reader.Decode(bitmap);
@@ -85,80 +122,99 @@ namespace Student_Attendance_System.Views
                 if (result != null)
                 {
                     string decodedText = result.Text;
-                    videoCaptureDevice.SignalToStop();
-                    Dispatcher.Invoke(() => ProcessAttendance(decodedText));
+                    Dispatcher.Invoke(() => StartVerificationProcess(decodedText));
                 }
             }
             catch { }
         }
 
-        // (ProcessAttendance, ShowResultUI, RestartCameraAfterDelay, BitmapToImageSource Code 
-
-
-        private void ProcessAttendance(string studentID)
+        private void StartVerificationProcess(string studentID)
         {
-            // ၁။ အတန်းချိန် ရှိမရှိ စစ်မယ်
+            if (_isProcessing) return;
+            _isProcessing = true;
+
             if (!App.IsClassActive)
             {
-                ShowResultUI("No Active Class", "Please wait for teacher.", true);
-                RestartCameraAfterDelay();
+                ShowResultUI("No Active Class", "Wait for teacher", true);
+                ResetSystemAfterDelay();
                 return;
             }
 
-            // ၂။ အချိန်ကွာခြားချက်ကို တွက်မယ်
-            TimeSpan diff = DateTime.Now - App.CurrentActiveSessionStart;
+            ResultBorder.Visibility = Visibility.Visible;
+            ResultBorder.Background = System.Windows.Media.Brushes.LightBlue;
+            lblResultStatus.Text = "Card Detected";
+            lblResultStatus.Foreground = System.Windows.Media.Brushes.Black;
+            lblResultMessage.Text = $"ID: {studentID}\nVerifying Identity...";
 
+            DispatcherTimer faceCheckTimer = new DispatcherTimer();
+            faceCheckTimer.Interval = TimeSpan.FromSeconds(2);
+            faceCheckTimer.Tick += (s, args) =>
+            {
+                faceCheckTimer.Stop();
+                CalculateAttendance(studentID); // Mock Success
+            };
+            faceCheckTimer.Start();
+        }
+
+        private void CalculateAttendance(string studentID)
+        {
+            TimeSpan diff = DateTime.Now - App.CurrentActiveSessionStart;
             string status = "";
             string msg = "";
             bool isError = false;
 
-            // =========================================================
-            // NEW RULE: Strict 5 Minute Cutoff
-            // =========================================================
-
             if (diff.TotalMinutes <= 5)
             {
-                // ၅ မိနစ် အတွင်း (OK)
                 status = "Present (出席)";
-                msg = "Attendance Confirmed";
-                isError = false; // အစိမ်းရောင်ပြမယ်
+                msg = "Identity Verified";
+                isError = false;
             }
             else
             {
-                // ၅ မိနစ် ကျော်သွားပြီ (Absent)
-                status = "Time Over (欠席)";
-                msg = $"Late by {diff.Minutes} mins"; // ဘယ်နှစ်မိနစ်နောက်ကျလဲ ပြမယ်
-                isError = true; // အနီရောင်ပြမယ်
+                status = "Absent (欠席)";
+                msg = "Time Over";
+                isError = true;
             }
 
-            // =========================================================
-            // BO SANN'S CODE ZONE (Save to DB)
-            // =========================================================
-            // Insert into Attendance Table (Status: Present or Absent)
-            // =========================================================
+            App.TempAttendanceList.Add(new AttendanceRecord
+            {
+                StudentID = studentID,
+                Status = status.Contains("Present") ? "Present" : "Absent",
+                Date = DateTime.Now.ToString("yyyy-MM-dd HH:mm")
+            });
 
-            // UI ပြမယ်
             ShowResultUI(status, $"{studentID}\n{msg}", isError);
-            RestartCameraAfterDelay();
+            ResetSystemAfterDelay();
         }
 
-
-        // Helper Functions...
         private void ShowResultUI(string status, string message, bool isError)
         {
             ResultBorder.Visibility = Visibility.Visible;
             lblResultStatus.Text = status;
             lblResultMessage.Text = message;
-            // Color logic...
+            lblCurrentTime.Text = DateTime.Now.ToString("HH:mm:ss");
+
+            if (isError)
+            {
+                ResultBorder.Background = System.Windows.Media.Brushes.Red;
+                lblResultStatus.Foreground = System.Windows.Media.Brushes.White;
+            }
+            else
+            {
+                ResultBorder.Background = System.Windows.Media.Brushes.LightGreen;
+                lblResultStatus.Foreground = System.Windows.Media.Brushes.Black;
+            }
         }
 
-        private void RestartCameraAfterDelay()
+        private void ResetSystemAfterDelay()
         {
             DispatcherTimer timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(3);
-            timer.Tick += (s, args) => {
+            timer.Tick += (s, args) =>
+            {
                 ResultBorder.Visibility = Visibility.Collapsed;
-                if (videoCaptureDevice != null && !videoCaptureDevice.IsRunning) videoCaptureDevice.Start();
+                this.Focus();
+                _isProcessing = false;
                 timer.Stop();
             };
             timer.Start();
