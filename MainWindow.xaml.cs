@@ -37,7 +37,7 @@ namespace Student_Attendance_System
             }
             else if (user.Role == "Admin")
             {
-                MessageBox.Show("Welcome Admin!");
+                MainFrame.Navigate(new AdminDashboard());
             }
         }
 
@@ -68,6 +68,8 @@ namespace Student_Attendance_System
             if (UserData.UserData.CurrentUser.Role == "Student")
                 MainFrame.Navigate(new StudentDashboardPage());
             else if (UserData.UserData.CurrentUser.Role == "Teacher")
+                MainFrame.Navigate(new TeacherDashboard());
+            else if (UserData.UserData.CurrentUser.Role == "Admin")
                 MainFrame.Navigate(new TeacherDashboard());
         }
 

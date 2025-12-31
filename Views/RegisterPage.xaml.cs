@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Data.Common;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
+using Microsoft.Data.SqlClient;
 
 namespace Student_Attendance_System.Views
 {
@@ -22,26 +24,56 @@ namespace Student_Attendance_System.Views
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
             // Validation
-            if (string.IsNullOrWhiteSpace(txtStudentID.Text) || string.IsNullOrWhiteSpace(txtName.Text))
+            if (string.IsNullOrWhiteSpace(txtStudentID.Text) ||
+                string.IsNullOrWhiteSpace(txtName.Text) ||
+                string.IsNullOrWhiteSpace(txtPassword.Password))
             {
-                MessageBox.Show("Please fill in Student ID and Name!", "Warning");
+                MessageBox.Show("Please fill all required fields!", "Warning");
                 return;
             }
 
-            string studentID = txtStudentID.Text;
-            string fullName = txtName.Text;
+            try
+            {
+                using (SqlConnection conn = DBConnection.GetConnection())
+                {
+                    string sql = @"INSERT INTO Students
+                                  (StudentID, FullName, Department, BirthDate, EnrollmentDate, PasswordHash)
+                                  VALUES
+                                  (@StudentID, @FullName, @Department, @BirthDate, @EnrollDate, @Password)";
 
-            // =========================================================================
-            // BO SANN'S CODE ZONE (Insert to Database)
-            // =========================================================================
-            // ACTION: INSERT INTO Users (...) VALUES (...)
-            // IMPORTANT: Handle Photo as Base64 String or Byte Array
-            // =========================================================================
+                    SqlCommand cmd = new SqlCommand(sql, conn);
 
-            // --- MOCK ACTION ---
-            MessageBox.Show($"[MOCK] Student Registered Successfully!\nID: {studentID}", "Success");
-            NavigationService.GoBack();
+                    cmd.Parameters.AddWithValue("@StudentID", txtStudentID.Text.Trim());
+                    cmd.Parameters.AddWithValue("@FullName", txtName.Text.Trim());
+                    cmd.Parameters.AddWithValue("@Department",
+                        (cboDepartment.SelectedItem as ComboBoxItem)?.Content.ToString());
+                    cmd.Parameters.AddWithValue("@BirthDate", dpBirthDate.SelectedDate.Value);
+                    cmd.Parameters.AddWithValue("@EnrollDate", dpEnrollDate.SelectedDate.Value);
+                    cmd.Parameters.AddWithValue("@Password", txtPassword.Password);
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+
+                MessageBox.Show("Student registered successfully!", "Success");
+                NavigationService.GoBack();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Database Error");
+            }
         }
+        // =========================================================================
+        // BO SANN'S CODE ZONE (Insert to Database)
+        // =========================================================================
+        // ACTION: INSERT INTO Users (...) VALUES (...)
+        // IMPORTANT: Handle Photo as Base64 String or Byte Array
+        // =========================================================================
+
+        // --- MOCK ACTION ---
+        //MessageBox.Show($"[MOCK] Student Registered Successfully!\nID: {studentID}", "Success");
+        //    NavigationService.GoBack();
+        //}
 
         private void btnBack_Click(object sender, RoutedEventArgs e)
         {
