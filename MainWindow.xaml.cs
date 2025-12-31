@@ -1,82 +1,114 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
+using System.Windows.Threading; 
 using Student_Attendance_System.Models;
-using Student_Attendance_System.Views;
-using Student_Attendance_System.UserData;
+using Student_Attendance_System.Views; // *** Views Folder ကို ခေါ်ထားမှ Page တွေ သုံးလို့ရမယ် ***
 
 namespace Student_Attendance_System
 {
     public partial class MainWindow : Window
     {
+        DispatcherTimer timer;
+
         public MainWindow()
         {
             InitializeComponent();
-            // Software စဖွင့်တာနဲ့ Scan Page ကို အရင်ဆုံး ပြမယ်
-            MainFrame.Navigate(new Views.ScanPage());
+            
+            // 1. နာရီစ run မယ်
+            StartClock();
+
+            // 2. App စဖွင့်ဖွင့်ချင်း Login Page ကို တန်းပြမယ်
+            MainFrame.Navigate(new LoginPage());
         }
 
-        // Login Page ကနေ လှမ်းခေါ်မယ့် Function
-        public void HandleLoginSuccess(User user)
+        // --- Date & Time Timer ---
+        private void StartClock()
         {
-            UserData.UserData.CurrentUser = user;
-
-            // ၁။ Login ခလုတ်ကို ဖျောက်မယ်
-            btnLogin.Visibility = Visibility.Collapsed;
-
-            // ၂။ Dashboard/Logout ခလုတ်တွေကို ဖော်မယ်
-            pnlUserMenu.Visibility = Visibility.Visible;
-            lblUserTitle.Text = user.Role + " Menu";
-
-            // ၃။ သက်ဆိုင်ရာ Dashboard ကို ပို့မယ်
-            if (user.Role == "Student")
-            {
-                MainFrame.Navigate(new StudentDashboardPage());
-            }
-            else if (user.Role == "Teacher")
-            {
-                MainFrame.Navigate(new TeacherDashboard());
-            }
-            else if (user.Role == "Admin")
-            {
-                MessageBox.Show("Welcome Admin!");
-            }
+            timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(1);
+            timer.Tick += Timer_Tick;
+            timer.Start();
         }
 
-        // --- EVENT HANDLERS (Error တက်နေတဲ့ Function များ) ---
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            // Format: Jan 08, 2026 | 01:20 AM
+            txtDate.Text = DateTime.Now.ToString("MMM dd, yyyy | hh:mm tt");
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            Timer_Tick(null, null); 
+        }
+
+        // =======================================================
+        // SIDEBAR BUTTON CLICK EVENTS (PAGE NAVIGATION)
+        // =======================================================
 
         private void btnLanguage_Click(object sender, RoutedEventArgs e)
         {
-            if (btnLanguage.Content.ToString() == "Language: EN")
-                btnLanguage.Content = "Language: JP";
-            else
-                btnLanguage.Content = "Language: EN";
+            // Language လဲချင်ရင် ဒီမှာ Logic ရေးရမယ်
+            MessageBox.Show("Language changed to Japanese (Mock)");
+        }
+
+        private void btnLoginMenu_Click(object sender, RoutedEventArgs e)
+        {
+            // LoginPage.xaml သို့
+            MainFrame.Navigate(new LoginPage());
+        }
+
+        private void btnRegister_Click(object sender, RoutedEventArgs e)
+        {
+            // RegisterPage.xaml သို့
+            MainFrame.Navigate(new RegisterPage());
+        }
+
+        private void btnScanMode_Click(object sender, RoutedEventArgs e)
+        {
+            // ScanPage.xaml သို့ (Webcam.xaml သုံးချင်ရင် ဒီနေရာမှာ new Webcam() ပြောင်းပါ)
+            MainFrame.Navigate(new ScanPage());
+        }
+
+        private void btnTimeTable_Click(object sender, RoutedEventArgs e)
+        {
+            // TimetablePage.xaml သို့
+            MainFrame.Navigate(new TimetablePage());
+        }
+
+        private void btnReport_Click(object sender, RoutedEventArgs e)
+        {
+            // ReportPage.xaml မရှိသေးလို့ Message Box ပြထားသည်
+            // File ဆောက်ပြီးရင်: MainFrame.Navigate(new ReportPage()); လို့ပြောင်းပါ
+            MessageBox.Show("Report Page is under construction.");
         }
 
         private void btnAbout_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Student Attendance System\nVersion 1.0\nDeveloped by our Team.", "About Us");
+            MessageBox.Show("Attendance System v1.0\nCreated for Students & Teachers.");
         }
 
-        private void btnLogin_Click(object sender, RoutedEventArgs e)
+        private void btnDevTeam_Click(object sender, RoutedEventArgs e)
         {
-            MainFrame.Navigate(new LoginPage());
+            MessageBox.Show("Developer Team:\n1. [Name]\n2. [Name]");
         }
 
-        private void btnDashboard_Click(object sender, RoutedEventArgs e)
+        // =======================================================
+        // LOGIN SUCCESS HANDLER (Dashboard ခွဲမယ့်နေရာ)
+        // =======================================================
+        public void HandleLoginSuccess(User user)
         {
-            if (UserData.UserData.CurrentUser == null) return;
-
-            if (UserData.UserData.CurrentUser.Role == "Student")
+            // User Role ပေါ်မူတည်ပြီး Dashboard အသီးသီးကို သွားမယ်
+            if (user.Role == "Teacher" || user.Role == "Admin")
+            {
+                // TeacherDashboard.xaml သို့
+                MainFrame.Navigate(new TeacherDashboard()); 
+                // Admin ဖြစ်ရင် AdminDashboard.xaml သို့ သွားချင်ရင်လည်း ဒီမှာ စစ်လို့ရ
+            }
+            else if (user.Role == "Student")
+            {
+                // StudentDashboardPage.xaml သို့
                 MainFrame.Navigate(new StudentDashboardPage());
-            else if (UserData.UserData.CurrentUser.Role == "Teacher")
-                MainFrame.Navigate(new TeacherDashboard());
-        }
-
-        private void btnLogout_Click(object sender, RoutedEventArgs e)
-        {
-            UserData.UserData.CurrentUser = null;
-            pnlUserMenu.Visibility = Visibility.Collapsed;
-            btnLogin.Visibility = Visibility.Visible;
-            MainFrame.Navigate(new LoginPage());
+            }
         }
     }
 }
