@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
-using Student_Attendance_System.UserData;
+using Student_Attendance_System.Models;
 
 namespace Student_Attendance_System.Views
 {
@@ -12,9 +12,9 @@ namespace Student_Attendance_System.Views
             InitializeComponent();
 
             // ၁။ User နာမည်ကို Header မှာ ပြမယ်
-            if (UserData.UserData.CurrentUser != null)
+            if (UserData.CurrentUser != null)
             {
-                lblUserInfo.Text = "User: " + UserData.UserData.CurrentUser.Username;
+                lblUserInfo.Text = "User: " + UserData.CurrentUser.Username;
             }
 
             // ၂။ စဖွင့်ဖွင့်ချင်း Dashboard ကို Default အနေနဲ့ ပြမယ်
@@ -48,7 +48,7 @@ namespace Student_Attendance_System.Views
         // Logout -> Login Page ကို ပြန်သွားမယ်
         private void btnLogout_Click(object sender, RoutedEventArgs e)
         {
-            UserData.UserData.CurrentUser = null;
+            UserData.CurrentUser = null;
             NavigationService.Navigate(new LoginPage());
         }
     }

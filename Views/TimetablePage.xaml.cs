@@ -98,12 +98,12 @@ namespace Student_Attendance_System.Views
             // အညိုရောင် (ပြီးသွားပြီ) ဆိုရင် ထပ်နှိပ်လို့မရတော့ဘူး
             if (color.ToString() == "#FF8D6E63") return false;
             // ဆရာမဖြစ်မှ နှိပ်ခွင့်ရှိမယ်
-            return UserData.UserData.CurrentUser?.Role == "Teacher";
+            return UserData.CurrentUser?.Role == "Teacher";
         }
 
         private void Subject_Click(object sender, RoutedEventArgs e)
         {
-            if (UserData.UserData.CurrentUser?.Role != "Teacher") return;
+            if (UserData.CurrentUser?.Role != "Teacher") return;
 
             Button btn = sender as Button;
             string subject = btn.Content.ToString();

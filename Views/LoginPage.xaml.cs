@@ -1,9 +1,6 @@
-﻿using System; // Exception အတွက်
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Navigation;
-using Microsoft.Data.SqlClient;
 using Student_Attendance_System.Models;
 using Student_Attendance_System.Services;
 
@@ -16,47 +13,41 @@ namespace Student_Attendance_System.Views
             InitializeComponent();
         }
 
-
         private void btnLogin_Click(object sender, RoutedEventArgs e)
         {
-            // 1. Inputs ကို ရယူပြီး စစ်ဆေးခြင်း
             string username = txtUsername.Text.Trim();
             string password = txtPassword.Password.Trim();
 
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
-                MessageBox.Show("Please enter username and password", "Warning");
+                MessageBox.Show("Please enter username and password",
+                                "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            // 2. AuthService ကိုသုံးပြီး Login စစ်ဆေးခြင်း
-            // (မှတ်ချက်: ဒီနေရာမှာ variable ထပ်မကြေညာတော့ဘဲ တန်းသုံးလိုက်ပါမယ်)
-            var authService = new AuthService();
-            User loggedInUser = authService.AuthenticateUser(username, password);
+            // 🔑 DATABASE AUTH
+            AuthService authService = new AuthService();
+            User user = authService.AuthenticateUser(username, password);
 
-            // 3. Login အောင်မြင်မှု ရှိ/မရှိ စစ်ဆေးခြင်း
-            if (loggedInUser != null)
+            if (user != null)
             {
-                // Global State (UserData) ထဲမှာ သိမ်းမယ်
-                UserData.UserData.CurrentUser = loggedInUser;
+                // Save login state
+                UserData.CurrentUser = user;
 
-                // Login အောင်ရင် MainWindow ကို လှမ်းပြောပြီး Dashboard Navigate လုပ်မယ်
-                if (Application.Current.MainWindow is MainWindow mainWindow)
+                // Navigate based on role
+                if (Application.Current.MainWindow is MainWindow main)
                 {
-                    mainWindow.HandleLoginSuccess(loggedInUser);
+                    main.HandleLoginSuccess(user);
                 }
             }
             else
             {
-                // Login ကျရှုံးလျှင် ပြမည့် Message
-                MessageBox.Show("Login Failed!\n\nCheck Credentials:\nStudent: C5292 / 1234\nTeacher: admin / admin",
+                MessageBox.Show("Login failed.\nInvalid username or password.",
                                 "Login Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-           
-           
-        // Register Link နှိပ်ရင် အလုပ်လုပ်နေရာ
-        private void GoToRegister_Click(object sender, MouseButtonEventArgs e)
+
+        private void GoToRegister_Click(object sender, MouseButtonEventArgs e)
         {
             NavigationService.Navigate(new RegisterPage());
         }

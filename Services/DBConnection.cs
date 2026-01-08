@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 
-namespace Student_Attendance_System.Views
+namespace Student_Attendance_System.Services
 {
     public static class DBConnection
     {

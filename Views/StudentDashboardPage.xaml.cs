@@ -16,9 +16,9 @@ namespace Student_Attendance_System.Views
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             // ၁။ User နာမည်ပြောင်းခြင်း
-            if (UserData.UserData.CurrentUser != null)
+            if (UserData.CurrentUser != null)
             {
-                txtWelcome.Text = $"{UserData.UserData.CurrentUser.FullName} さん、ようこそ！";
+                txtWelcome.Text = $"{UserData.CurrentUser.FullName} さん、ようこそ！";
             }
 
             // ၂။ Timetable ကို Dashboard ထဲမှာ Navigate လုပ်ခြင်း
@@ -31,7 +31,7 @@ namespace Student_Attendance_System.Views
         private void LoadAttendanceStats()
         {
             // App.TempAttendanceList ထဲကနေ လက်ရှိ Login ဝင်ထားတဲ့ကျောင်းသားရဲ့ data ပဲယူမယ်
-            string currentStudentID = UserData.UserData.CurrentUser?.Username;
+            string currentStudentID = UserData.CurrentUser?.Username;
             var myRecords = App.TempAttendanceList.Where(r => r.StudentID == currentStudentID).ToList();
 
             int total = myRecords.Count;
@@ -61,15 +61,15 @@ namespace Student_Attendance_System.Views
             }
 
             // Global Leave Request စာရင်းထဲ ထည့်သွင်းခြင်း
-            App.GlobalLeaveRequests.Add(new LeaveRequest
-            {
-                StudentID = UserData.UserData.CurrentUser?.Username,
-                Reason = txtLeaveReason.Text,
-                Date = DateTime.Now.ToString("yyyy/MM/dd HH:mm")
-            });
+            //App.GlobalLeaveRequests.Add(new LeaveRequest
+            //{
+            //    StudentID = UserData.CurrentUser?.Username,
+            //    Reason = txtLeaveReason.Text,
+            //    Date = DateTime.Now.ToString("yyyy/MM/dd HH:mm")
+            //});
 
-            MessageBox.Show("申請を送信しました。先生の確認をお待ちください。", "Success");
-            txtLeaveReason.Clear();
+            //MessageBox.Show("申請を送信しました。先生の確認をお待ちください。", "Success");
+            //txtLeaveReason.Clear();
         }
     }
 }
