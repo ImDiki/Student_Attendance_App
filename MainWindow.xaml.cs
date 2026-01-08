@@ -110,5 +110,22 @@ namespace Student_Attendance_System
                 MainFrame.Navigate(new StudentDashboardPage());
             }
         }
+        private void UpdateSidebarUI(string role)
+        {
+            if (role == "Student")
+            {
+                // ကျောင်းသားဆိုလျှင် ScanMode နှင့် Register ကို ဖျောက်ထားမည်
+                btnScanMode.Visibility = Visibility.Collapsed;
+                btnRegister.Visibility = Visibility.Collapsed;
+                btnTimeTable.Visibility = Visibility.Visible;
+            }
+            else if (role == "Teacher")
+            {
+                // ဆရာဆိုအကုန်မြင်
+                btnScanMode.Visibility = Visibility.Visible;
+                btnRegister.Visibility = Visibility.Visible;
+                btnTimeTable.Visibility = Visibility.Visible;
+            }
+        }
     }
 }
