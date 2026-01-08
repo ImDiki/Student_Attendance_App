@@ -4,20 +4,22 @@
              StartupUri="MainWindow.xaml">
 
     <Application.Resources>
-        <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#F0F2F5"/>
-        <SolidColorBrush x:Key="CardBackgroundBrush" Color="#FFFFFF"/>
-        <SolidColorBrush x:Key="CardBorderBrush" Color="#DDDDDD"/>
-        <SolidColorBrush x:Key="TextBrush" Color="#333333"/>
-        <SolidColorBrush x:Key="SubTextBrush" Color="#666666"/>
-        <Style TargetType="Button">
-            <Setter Property="Cursor" Value="Hand"/>
+        <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#F4F6F9"/>
+        <SolidColorBrush x:Key="CardBackgroundBrush" Color="White"/>
+        <SolidColorBrush x:Key="TextBrush" Color="#2C3E50"/>
+        <SolidColorBrush x:Key="SubTextBrush" Color="Gray"/>
+        <SolidColorBrush x:Key="CardBorderBrush" Color="#DDD"/>
+        <Style x:Key="TimetableButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="FontSize" Value="13"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#DDD"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" 
-                                CornerRadius="5" 
-                                Padding="10,5">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="5" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                     </ControlTemplate>

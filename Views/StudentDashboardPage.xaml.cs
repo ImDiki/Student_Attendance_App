@@ -1,7 +1,8 @@
-﻿using System.Windows;
+﻿using System;
+using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
-using Student_Attendance_System.UserData;
+using Student_Attendance_System.Models;
 
 namespace Student_Attendance_System.Views
 {
@@ -10,110 +11,65 @@ namespace Student_Attendance_System.Views
         public StudentDashboardPage()
         {
             InitializeComponent();
-            LoadStudentData();
         }
 
-        private void LoadStudentData()
+        private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            // ၁။ နာမည်ပြမယ်
+            // ၁။ User နာမည်ပြောင်းခြင်း
             if (UserData.UserData.CurrentUser != null)
             {
-                txtWelcome.Text = $"Welcome back, {UserData.UserData.CurrentUser.FullName}!";
+                txtWelcome.Text = $"{UserData.UserData.CurrentUser.FullName} さん、ようこそ！";
             }
 
-            // =========================================================
-            // DATA LOADING FROM MEMORY
-            // =========================================================
+            // ၂။ Timetable ကို Dashboard ထဲမှာ Navigate လုပ်ခြင်း
+            TimetableFrame.Navigate(new TimetablePage());
 
-            // List ထဲမှာ Data ရှိမရှိ စစ်မယ် (မရှိရင် 0 တွေပဲ ပြမယ်)
-            var dataList = App.TempAttendanceList;
+            // ၃။ ကိန်းဂဏန်းများ တွက်ချက်ခြင်း
+            LoadAttendanceStats();
+        }
 
-            int total = dataList.Count;
-            int present = 0;
-            int absent = 0;
+        private void LoadAttendanceStats()
+        {
+            // App.TempAttendanceList ထဲကနေ လက်ရှိ Login ဝင်ထားတဲ့ကျောင်းသားရဲ့ data ပဲယူမယ်
+            string currentStudentID = UserData.UserData.CurrentUser?.Username;
+            var myRecords = App.TempAttendanceList.Where(r => r.StudentID == currentStudentID).ToList();
 
-            // List ကို ရှင်းပြီးမှ ပြန်ထည့်မယ် (History List Update)
-            pnlHistoryList.Children.Clear();
+            int total = myRecords.Count;
+            int present = myRecords.Count(r => r.Status.Contains("Present") || r.Status.Contains("出席"));
+            int absent = total - present;
 
-            // Header ပြန်ထည့်မယ်
-            AddHeaderRow();
-
-            // Loop ပတ်ပြီး ရေတွက်မယ် + စာရင်းထုတ်မယ်
-            foreach (var record in dataList)
-            {
-                if (record.Status.Contains("Present")) present++;
-                else absent++;
-
-                // History စာရင်းထဲ အတန်းလိုက်ထည့်မယ်
-                AddHistoryRow(record.Date, record.Subject, record.Status);
-            }
-
-            // UI ဂဏန်းတွေ ပြမယ်
             txtTotal.Text = total.ToString();
             txtPresent.Text = present.ToString();
             txtAbsent.Text = absent.ToString();
 
-            // ရာခိုင်နှုန်း
             if (total > 0)
             {
-                double percentage = ((double)present / total) * 100;
-                txtPercent.Text = $"{percentage:0.0}%";
+                double rate = ((double)present / total) * 100;
+                txtPercent.Text = $"{rate:0.0}%";
+
+                // 80% အောက်ရောက်ရင် စာသားအနီပြောင်းမယ်
+                txtPercent.Foreground = rate < 80 ? System.Windows.Media.Brushes.Red : (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFromString("#2980b9");
             }
-            else
+        }
+
+        private void btnSubmitLeave_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtLeaveReason.Text))
             {
-                txtPercent.Text = "0%";
+                MessageBox.Show("申請理由を入力してください (Please enter a reason).", "Warning");
+                return;
             }
-        }
 
-        // C# Code နဲ့ UI (Grid/TextBlock) ဆောက်ပြီး ထည့်ခြင်း
-        private void AddHistoryRow(string date, string subject, string status)
-        {
-            Grid grid = new Grid();
-            grid.Margin = new Thickness(0, 5, 0, 5);
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(2, GridUnitType.Star) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            // Global Leave Request စာရင်းထဲ ထည့်သွင်းခြင်း
+            App.GlobalLeaveRequests.Add(new LeaveRequest
+            {
+                StudentID = UserData.UserData.CurrentUser?.Username,
+                Reason = txtLeaveReason.Text,
+                Date = DateTime.Now.ToString("yyyy/MM/dd HH:mm")
+            });
 
-            TextBlock txtDate = new TextBlock { Text = date };
-            TextBlock txtSubject = new TextBlock { Text = subject, FontWeight = FontWeights.SemiBold }; // Grid.Column=1 Auto
-
-            TextBlock txtStatus = new TextBlock { Text = status, FontWeight = FontWeights.Bold };
-            if (status.Contains("Present")) txtStatus.Foreground = Brushes.Green;
-            else txtStatus.Foreground = Brushes.Red;
-
-            Grid.SetColumn(txtDate, 0);
-            Grid.SetColumn(txtSubject, 1);
-            Grid.SetColumn(txtStatus, 2);
-
-            grid.Children.Add(txtDate);
-            grid.Children.Add(txtSubject);
-            grid.Children.Add(txtStatus);
-
-            pnlHistoryList.Children.Add(grid);
-        }
-
-        private void AddHeaderRow()
-        {
-            Grid grid = new Grid();
-            grid.Margin = new Thickness(0, 0, 0, 10);
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(2, GridUnitType.Star) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-
-            TextBlock t1 = new TextBlock { Text = "Date", FontWeight = FontWeights.Bold, Foreground = Brushes.Gray };
-            TextBlock t2 = new TextBlock { Text = "Subject", FontWeight = FontWeights.Bold, Foreground = Brushes.Gray };
-            TextBlock t3 = new TextBlock { Text = "Status", FontWeight = FontWeights.Bold, Foreground = Brushes.Gray };
-
-            Grid.SetColumn(t1, 0);
-            Grid.SetColumn(t2, 1);
-            Grid.SetColumn(t3, 2);
-
-            grid.Children.Add(t1);
-            grid.Children.Add(t2);
-            grid.Children.Add(t3);
-
-            pnlHistoryList.Children.Add(grid);
-            pnlHistoryList.Children.Add(new Separator { Margin = new Thickness(0, 0, 0, 10) });
+            MessageBox.Show("申請を送信しました。先生の確認をお待ちください。", "Success");
+            txtLeaveReason.Clear();
         }
     }
 }

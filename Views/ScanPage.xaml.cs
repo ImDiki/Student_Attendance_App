@@ -159,34 +159,39 @@ namespace Student_Attendance_System.Views
 
         private void CalculateAttendance(string studentID)
         {
+            // ဆရာမ Start နှိပ်ခဲ့တဲ့အချိန်နဲ့ အခု Scan ဖတ်တဲ့အချိန် ခြားနားချက်ကိုယူမယ်
             TimeSpan diff = DateTime.Now - App.CurrentActiveSessionStart;
-            string status = "";
-            string msg = "";
-            bool isError = false;
+            double minutes = diff.TotalMinutes;
 
-            if (diff.TotalMinutes <= 5)
+            string status = "";
+            string note = "";
+
+            if (minutes <= 3)
             {
-                status = "Present (出席)";
-                msg = "Identity Verified";
-                isError = false;
+                status = "Present (100%)";
+            }
+            else if (minutes <= 15)
+            {
+                status = "Late (遅刻)";
             }
             else
             {
                 status = "Absent (欠席)";
-                msg = "Time Over";
-                isError = true;
             }
 
+            // App.TempAttendanceList ထဲကို သိမ်းမယ်
             App.TempAttendanceList.Add(new AttendanceRecord
             {
                 StudentID = studentID,
-                Status = status.Contains("Present") ? "Present" : "Absent",
-                Date = DateTime.Now.ToString("yyyy-MM-dd HH:mm")
+                Subject = App.CurrentSubject,
+                Date = DateTime.Now.ToString("yyyy-MM-dd HH:mm"),
+                Status = status,
+                Note = "" // ဆရာမ ပြင်မှ ဒါက ပေါ်လာမှာ
             });
 
-            ShowResultUI(status, $"{studentID}\n{msg}", isError);
-            ResetSystemAfterDelay();
+            ShowResultUI(status, $"ID: {studentID}", status == "Absent (欠席)");
         }
+
 
         private void ShowResultUI(string status, string message, bool isError)
         {
