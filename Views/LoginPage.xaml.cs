@@ -32,8 +32,7 @@ namespace Student_Attendance_System.Views
 
             User user = null;
 
-            // --- MOCK DATA (အစမ်း) ---
-            if (username == "C5292" && password == "1234")
+            try
             {
                 user = new User { Username = "C5292", FullName = "Myat Thadar Linn", Role = "Student", Major = "IT" };
             }
@@ -42,17 +41,39 @@ namespace Student_Attendance_System.Views
                 user = new User { Username = "admin", FullName = "Head Master", Role = "Teacher" };
             }
 
-            if (user != null)
-            {
-                // Login အောင်ရင် MainWindow ကို လှမ်းပြောပြီး Sidebar တွေဖွင့်ခိုင်းမယ်
-                if (Application.Current.MainWindow is MainWindow mainWindow)
+                            using (SqlDataReader r = cmd.ExecuteReader())
+                            {
+                                if (r.Read())
+                                {
+                                    user = new User
+                                    {
+                                        Username = r["StudentID"].ToString(),
+                                        FullName = r["FullName"].ToString(),
+                                        Role = "Student",
+                                        Major = r["Department"].ToString()
+                                    };
+                                }
+                            }
+                        }
+                    }
+                }
+                // RESULT
+                if (user != null)
                 {
-                    mainWindow.HandleLoginSuccess(user);
+                    if (Application.Current.MainWindow is MainWindow mainWindow)
+                    {
+                        mainWindow.HandleLoginSuccess(user);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Invalid username or password", "Login Failed",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Login Failed!\n\nUse:\nStudent: C5292 / 1234\nTeacher: admin / admin", "Login Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, "Error");
             }
 
             // =========================================================================
@@ -166,6 +187,36 @@ namespace Student_Attendance_System.Views
             }
             */
         }
+
+        // =========================================================================
+        // BO SANN'S CODE ZONE (Database Check)
+        // =========================================================================
+
+        //User user = null;
+
+        //    // --- MOCK DATA (အစမ်း) ---
+        //    if (username == "C5292" && password == "1234")
+        //    {
+        //        user = new User { Id = 1, Username = "C5292", FullName = "Myat Thadar Linn", Role = "Student", Major = "IT" };
+        //    }
+        //    else if (username == "admin" && password == "admin")
+        //    {
+        //        user = new User { Id = 99, Username = "admin", FullName = "Head Master", Role = "Teacher" };
+        //    }
+
+        //    if (user != null)
+        //    {
+        //        // Login အောင်ရင် MainWindow ကို လှမ်းပြောပြီး Sidebar တွေဖွင့်ခိုင်းမယ်
+        //        if (Application.Current.MainWindow is MainWindow mainWindow)
+        //        {
+        //            mainWindow.HandleLoginSuccess(user);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        MessageBox.Show("Login Failed!\n\nUse:\nStudent: C5292 / 1234\nTeacher: admin / admin", "Login Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        //    }
+        //}
 
         // Register Link နှိပ်ရင် အလုပ်လုပ်နေရာ
         private void GoToRegister_Click(object sender, MouseButtonEventArgs e)
