@@ -11,6 +11,7 @@ using AForge.Video;
 using AForge.Video.DirectShow;
 using ZXing;
 using ZXing.Windows.Compatibility;
+using Student_Attendance_System.Models;
 
 namespace Student_Attendance_System.Views
 {

@@ -1,30 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Windows;
+using Student_Attendance_System.Models;
+
 
 namespace Student_Attendance_System
 {
-    // Data သိမ်းဖို့ ပုံစံခွက် (Model)
-    public class AttendanceRecord
-    {
-        public string StudentID { get; set; }
-        public string Status { get; set; } // "Present" or "Absent"
-        public string Subject { get; set; }
-        public string Date { get; set; }
-        public string Note { get; set; } = "-";
-    }
-
     public partial class App : Application
     {
-        // Session Variables
-        public static bool IsClassActive = false;
-        public static DateTime CurrentActiveSessionStart;
-        public static string CurrentSubject = "";
+        // အတန်းတက်စာရင်းကို ယာယီသိမ်းထားမည့်နေရာ
+        public static List<AttendanceRecord> TempAttendanceList { get; set; } = new List<AttendanceRecord>();
 
-        // Error CS0117 အတွက် ဒါလေးပြန်ထည့်ပေးရမယ်
-        public static int CurrentSessionID = 0;
-
-        // Dashboard မှာပြဖို့ ယာယီ Database
-        public static List<AttendanceRecord> TempAttendanceList = new List<AttendanceRecord>();
+        // လက်ရှိ အတန်းချိန် အခြေအနေ
+        public static bool IsClassActive { get; set; } = false;
+        public static string CurrentSubject { get; set; } = "";
+        public static DateTime CurrentActiveSessionStart { get; set; }
     }
 }
