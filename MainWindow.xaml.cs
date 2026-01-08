@@ -96,35 +96,18 @@ namespace Student_Attendance_System
         // LOGIN SUCCESS HANDLER (Dashboard ခွဲမယ့်နေရာ)
         // =======================================================
         public void HandleLoginSuccess(User user)
-        {
+        { 
             // User Role ပေါ်မူတည်ပြီး Dashboard အသီးသီးကို သွားမယ်
             if (user.Role == "Teacher" || user.Role == "Admin")
             {
                 // TeacherDashboard.xaml သို့
-                MainFrame.Navigate(new TeacherDashboard());
+                MainFrame.Navigate(new TeacherDashboard()); 
                 // Admin ဖြစ်ရင် AdminDashboard.xaml သို့ သွားချင်ရင်လည်း ဒီမှာ စစ်လို့ရ
             }
             else if (user.Role == "Student")
             {
                 // StudentDashboardPage.xaml သို့
                 MainFrame.Navigate(new StudentDashboardPage());
-            }
-        }
-            private void UpdateSidebarUI(string role)
-        {
-            if (role == "Student")
-            {
-                // ကျောင်းသားဆိုလျှင် ScanMode နှင့် Register ကို ဖျောက်ထားမည်
-                btnScanMode.Visibility = Visibility.Collapsed;
-                btnRegister.Visibility = Visibility.Collapsed;
-                btnTimeTable.Visibility = Visibility.Visible;
-            }
-            else if (role == "Teacher")
-            {
-                // ဆရာဆိုအကုန်မြင်
-                btnScanMode.Visibility = Visibility.Visible;
-                btnRegister.Visibility = Visibility.Visible;
-                btnTimeTable.Visibility = Visibility.Visible;
             }
         }
     }
