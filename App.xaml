@@ -3,28 +3,43 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              StartupUri="MainWindow.xaml">
 
+
+
     <Application.Resources>
         <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#F4F6F9"/>
         <SolidColorBrush x:Key="CardBackgroundBrush" Color="White"/>
         <SolidColorBrush x:Key="TextBrush" Color="#2C3E50"/>
         <SolidColorBrush x:Key="SubTextBrush" Color="Gray"/>
-        <SolidColorBrush x:Key="CardBorderBrush" Color="#DDD"/>
-        <Style x:Key="TimetableButtonStyle" TargetType="Button">
-            <Setter Property="Height" Value="50"/>
-            <Setter Property="Margin" Value="2"/>
-            <Setter Property="FontSize" Value="13"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="BorderBrush" Value="#DDD"/>
+
+        <Style x:Key="TimetableCardStyle" TargetType="Button">
+            <Setter Property="Height" Value="100"/>
+            <Setter Property="Margin" Value="6"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" CornerRadius="5" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
+                        <Grid>
+                            <Border Background="#10000000" CornerRadius="8" Margin="1,1,0,0"/>
+                            <Border x:Name="CardBorder" Background="White" CornerRadius="8" BorderThickness="0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="6"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border x:Name="SideBar" Background="{TemplateBinding Background}" CornerRadius="8,0,0,8"/>
+
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0">
+                                        <TextBlock Text="{TemplateBinding Content}" FontWeight="Bold" FontSize="13" TextWrapping="Wrap"/>
+                                        <TextBlock Text="鈴木先生" FontSize="10" Foreground="Gray" Margin="0,4,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </Grid>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
     </Application.Resources>
+
+
 </Application>

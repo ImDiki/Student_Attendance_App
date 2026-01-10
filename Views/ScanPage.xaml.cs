@@ -1,253 +1,107 @@
 ﻿using System;
-using System.Drawing;
-using System.IO;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using System.Windows.Navigation; // For Navigation
 using AForge.Video;
 using AForge.Video.DirectShow;
 using ZXing;
+using System.Drawing;
 using ZXing.Windows.Compatibility;
-using Student_Attendance_System.Models;
 
 namespace Student_Attendance_System.Views
 {
     public partial class ScanPage : Page
     {
-        FilterInfoCollection filterInfoCollection;
-        VideoCaptureDevice videoCaptureDevice;
-
-        private bool _isProcessing = false;
-        private string _scannerBuffer = "";
-        private DateTime _lastKeystroke = DateTime.Now;
+        private FilterInfoCollection videoDevices;
+        private VideoCaptureDevice videoSource;
+        private DispatcherTimer timer;
 
         public ScanPage()
         {
             InitializeComponent();
-            Loaded += ScanPage_Loaded;
-            Unloaded += Page_Unloaded;
+            SetupCamera();
+            UpdateStatistics(); // အောက်ခြေက Card ဂဏန်းလေးတွေ Update လုပ်ရန်
         }
 
-        private void ScanPage_Loaded(object sender, RoutedEventArgs e)
+        private void SetupCamera()
         {
-            this.Focus();
-            filterInfoCollection = new FilterInfoCollection(FilterCategory.VideoInputDevice);
-        }
-
-        // --- KEYBOARD INPUT ---
-        private void Page_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (_isProcessing) return;
-            TimeSpan elapsed = DateTime.Now - _lastKeystroke;
-            if (elapsed.TotalMilliseconds > 100) _scannerBuffer = "";
-            _lastKeystroke = DateTime.Now;
-
-            if (e.Key == Key.Enter)
+            videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
+            if (videoDevices.Count > 0)
             {
-                if (!string.IsNullOrWhiteSpace(_scannerBuffer))
-                {
-                    StartVerificationProcess(_scannerBuffer);
-                    _scannerBuffer = "";
-                }
+                videoSource = new VideoCaptureDevice(videoDevices[0].MonikerString);
+                videoSource.NewFrame += new NewFrameEventHandler(videoSource_NewFrame);
             }
-            else { _scannerBuffer += GetCharFromKey(e.Key); }
-        }
-
-        private string GetCharFromKey(Key key)
-        {
-            if (key >= Key.D0 && key <= Key.D9) return ((int)key - (int)Key.D0).ToString();
-            if (key >= Key.NumPad0 && key <= Key.NumPad9) return ((int)key - (int)Key.NumPad0).ToString();
-            if (key >= Key.A && key <= Key.Z) return key.ToString();
-            return "";
-        }
-
-        // --- WEBCAM & BUTTONS ---
-        private void btnStart_Click(object sender, RoutedEventArgs e)
-        {
-            this.Focus();
-            if (filterInfoCollection == null || filterInfoCollection.Count == 0)
+            else
             {
-                MessageBox.Show("No Camera Found!", "Error");
-                return;
+                MessageBox.Show("No camera found.");
             }
-            pnlStart.Visibility = Visibility.Collapsed;
-
-            string selectedCameraMoniker = "";
-            foreach (FilterInfo device in filterInfoCollection)
-            {
-                if (device.Name.Contains("USB") || device.Name.Contains("WebCam"))
-                {
-                    selectedCameraMoniker = device.MonikerString;
-                    break;
-                }
-            }
-            if (string.IsNullOrEmpty(selectedCameraMoniker)) selectedCameraMoniker = filterInfoCollection[0].MonikerString;
-
-            videoCaptureDevice = new VideoCaptureDevice(selectedCameraMoniker);
-            videoCaptureDevice.NewFrame += VideoCaptureDevice_NewFrame;
-            videoCaptureDevice.Start();
         }
 
-        // *** NEW: RETURN TO DASHBOARD ***
-        private void btnReview_Click(object sender, RoutedEventArgs e)
-        {
-            if (videoCaptureDevice != null && videoCaptureDevice.IsRunning)
-            {
-                videoCaptureDevice.SignalToStop();
-                videoCaptureDevice.WaitForStop();
-            }
-
-            // Dashboard ကို ပြန်ခေါ်မယ် (Tab 2 ဖွင့်ခိုင်းမယ်)
-            TeacherDashboard dashboard = new TeacherDashboard();
-            dashboard.OpenManagerTab = true;
-            NavigationService.Navigate(dashboard);
-        }
-
-        private void VideoCaptureDevice_NewFrame(object sender, NewFrameEventArgs eventArgs)
+        // Camera ကလာတဲ့ Frame တွေကို Image control မှာ ပြပေးခြင်း
+        private void videoSource_NewFrame(object sender, NewFrameEventArgs eventArgs)
         {
             try
             {
                 Bitmap bitmap = (Bitmap)eventArgs.Frame.Clone();
-                BitmapImage bitmapImage = BitmapToImageSource(bitmap);
-                Dispatcher.Invoke(() => imgWebcam.Source = bitmapImage);
+                Dispatcher.Invoke(() =>
+                {
+                    CameraPreview.Source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+                        bitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                });
 
-                if (_isProcessing) return;
-
+                // QR Code ကို စစ်ဆေးခြင်း
                 BarcodeReader reader = new BarcodeReader();
-                reader.Options.TryHarder = true;
                 var result = reader.Decode(bitmap);
-
                 if (result != null)
                 {
-                    string decodedText = result.Text;
-                    Dispatcher.Invoke(() => StartVerificationProcess(decodedText));
+                    Dispatcher.Invoke(() => HandleScanSuccess(result.Text));
                 }
             }
             catch { }
         }
 
-        private void StartVerificationProcess(string studentID)
+        private void btnStart_Click(object sender, RoutedEventArgs e)
         {
-            if (_isProcessing) return;
-            _isProcessing = true;
-
-            if (!App.IsClassActive)
+            if (videoSource != null && !videoSource.IsRunning)
             {
-                ShowResultUI("No Active Class", "Wait for teacher", true);
-                ResetSystemAfterDelay();
-                return;
+                videoSource.Start();
+                ((Button)sender).Content = "Stop Scanning";
             }
-
-            ResultBorder.Visibility = Visibility.Visible;
-            ResultBorder.Background = System.Windows.Media.Brushes.LightBlue;
-            lblResultStatus.Text = "Card Detected";
-            lblResultStatus.Foreground = System.Windows.Media.Brushes.Black;
-            lblResultMessage.Text = $"ID: {studentID}\nVerifying Identity...";
-
-            DispatcherTimer faceCheckTimer = new DispatcherTimer();
-            faceCheckTimer.Interval = TimeSpan.FromSeconds(2);
-            faceCheckTimer.Tick += (s, args) =>
+            else if (videoSource != null && videoSource.IsRunning)
             {
-                faceCheckTimer.Stop();
-                CalculateAttendance(studentID); // Mock Success
-            };
-            faceCheckTimer.Start();
-        }
-
-        private void CalculateAttendance(string studentID)
-        {
-            // ဆရာမ Start နှိပ်ခဲ့တဲ့အချိန်နဲ့ အခု Scan ဖတ်တဲ့အချိန် ခြားနားချက်ကိုယူမယ်
-            TimeSpan diff = DateTime.Now - App.CurrentActiveSessionStart;
-            double minutes = diff.TotalMinutes;
-
-            string status = "";
-            string note = "";
-
-            if (minutes <= 3)
-            {
-                status = "Present (100%)";
-            }
-            else if (minutes <= 15)
-            {
-                status = "Late (遅刻)";
-            }
-            else
-            {
-                status = "Absent (欠席)";
-            }
-
-            // App.TempAttendanceList ထဲကို သိမ်းမယ်
-            App.TempAttendanceList.Add(new AttendanceRecord
-            {
-                StudentID = studentID,
-                Subject = App.CurrentSubject,
-                Date = DateTime.Now.ToString("yyyy-MM-dd HH:mm"),
-                Status = status,
-                Note = "" // ဆရာမ ပြင်မှ ဒါက ပေါ်လာမှာ
-            });
-
-            ShowResultUI(status, $"ID: {studentID}", status == "Absent (欠席)");
-        }
-
-
-        private void ShowResultUI(string status, string message, bool isError)
-        {
-            ResultBorder.Visibility = Visibility.Visible;
-            lblResultStatus.Text = status;
-            lblResultMessage.Text = message;
-            lblCurrentTime.Text = DateTime.Now.ToString("HH:mm:ss");
-
-            if (isError)
-            {
-                ResultBorder.Background = System.Windows.Media.Brushes.Red;
-                lblResultStatus.Foreground = System.Windows.Media.Brushes.White;
-            }
-            else
-            {
-                ResultBorder.Background = System.Windows.Media.Brushes.LightGreen;
-                lblResultStatus.Foreground = System.Windows.Media.Brushes.Black;
+                videoSource.Stop();
+                ((Button)sender).Content = "Start Scanning";
             }
         }
 
-        private void ResetSystemAfterDelay()
+        // Scan အောင်မြင်သွားတဲ့အခါ လုပ်ဆောင်မည့် Logic
+        private void HandleScanSuccess(string scannedText)
         {
-            DispatcherTimer timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(3);
-            timer.Tick += (s, args) =>
+            videoSource.Stop();
+            MessageBox.Show($"出席を確認しました: {scannedText}", "Success");
+
+            // Dashboard ကို အလိုလိုပြန်သွားစေခြင်း (Scan တန်းလန်းကြီး မကျန်ခဲ့အောင်)
+            if (this.NavigationService.CanGoBack)
             {
-                ResultBorder.Visibility = Visibility.Collapsed;
-                this.Focus();
-                _isProcessing = false;
-                timer.Stop();
-            };
-            timer.Start();
+                this.NavigationService.GoBack();
+            }
         }
 
+        private void UpdateStatistics()
+        {
+            // ဒီနေရာမှာ ကျောင်းသားစာရင်းနဲ့ Attendance status အလိုက် ဂဏန်းတွေကို Update လုပ်ပေးပါ
+            // ဥပမာ- CheckedInCount.Text = App.AttendanceToday.Count.ToString();
+        }
+
+        // Page ကနေ ထွက်သွားရင် Camera ကို ပိတ်ပေးခြင်း
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            if (videoCaptureDevice != null && videoCaptureDevice.IsRunning)
+            if (videoSource != null && videoSource.IsRunning)
             {
-                videoCaptureDevice.SignalToStop();
-                videoCaptureDevice.WaitForStop();
-            }
-        }
-
-        private BitmapImage BitmapToImageSource(Bitmap bitmap)
-        {
-            using (MemoryStream memory = new MemoryStream())
-            {
-                bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
-                memory.Position = 0;
-                BitmapImage bitmapimage = new BitmapImage();
-                bitmapimage.BeginInit();
-                bitmapimage.StreamSource = memory;
-                bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapimage.EndInit();
-                bitmapimage.Freeze();
-                return bitmapimage;
+                videoSource.Stop();
             }
         }
     }

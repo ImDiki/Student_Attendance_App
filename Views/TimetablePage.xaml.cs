@@ -12,130 +12,105 @@ namespace Student_Attendance_System.Views
         public TimetablePage()
         {
             InitializeComponent();
-            // Initial load အနေနဲ့ နောက်ဆုံးတက်နေတဲ့ 後期 (Latter Term) ကို ပြမယ်
-            LoadLatterTerm();
+            cboTerm.SelectedIndex = App.SelectedTermIndex;
+            LoadTimetable();
         }
 
         private void cboTerm_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (dgFullTimetable == null) return;
-
-            if (cboTerm.SelectedIndex == 1) LoadLatterTerm();
-            else LoadFormerTerm();
+            if (TimetableGrid == null) return;
+            App.SelectedTermIndex = cboTerm.SelectedIndex;
+            LoadTimetable();
         }
 
-        private void LoadLatterTerm()
+        private void LoadTimetable()
         {
-            // image_57b450.jpg ထဲက 2025年度 1Cクラス 後期時間割
-            var list = new List<TimetableRow>();
-
-            // CreateRow(အချိန်စာသား, တနင်္လာ, အင်္ဂါ, ဗုဒ္ဓဟူး, ကြာသပတေး, သောကြာ, အချိန်ပိုင်းနံပါတ်, စမည့်နာရီ, မိနစ်, ပြီးမည့်နာရီ, မိနစ်)
-            list.Add(CreateRow("09:10-10:40\n(1限目)", "テスト技法", "ビジネスアプリ II", "PG実践 I", "プログラミング II", "ゼミナール I", 1, 9, 10, 10, 40));
-            list.Add(CreateRow("10:50-12:20\n(2限目)", "テスト技法", "システム開発基礎", "PG実践 I", "プログラミング II", "データベース技術", 2, 10, 50, 12, 20));
-            list.Add(CreateRow("13:10-14:40\n(3限目)", "データ構造 II", "-", "コミ技", "キャリアデザイン", "データベース技術", 3, 13, 10, 14, 40));
-            list.Add(CreateRow("14:50-16:20\n(4限目)", "資格対策/日本 IV", "-", "-", "資格対策/日本 II", "就職特別指導", 4, 14, 50, 16, 20));
-
-            dgFullTimetable.ItemsSource = list;
-        }
-
-        private void LoadFormerTerm()
-        {
-            // image_57b450.jpg ထဲက 2025年度 1Cクラス 前期時間割
-            var list = new List<TimetableRow>();
-            list.Add(CreateRow("09:10-10:40\n(1限目)", "ネット＆セキュ", "ビジネスアプリ I", "コンシステム", "マネジメント", "データ構造 I", 1, 9, 10, 10, 40));
-            list.Add(CreateRow("10:50-12:20\n(2限目)", "ネット＆セキュ", "プログラミング I", "コンシステム", "日本表現法", "マネジメント", 2, 10, 50, 12, 20));
-            dgFullTimetable.ItemsSource = list;
-        }
-
-        private TimetableRow CreateRow(string time, string mon, string tue, string wed, string thu, string fri, int p, int h1, int m1, int h2, int m2)
-        {
-            var row = new TimetableRow { Time = time, Monday = mon, Tuesday = tue, Wednesday = wed, Thursday = thu, Friday = fri };
-
-            // တစ်နေ့ချင်းစီအတွက် လက်ရှိအချိန်နဲ့ တိုက်စစ်ပြီး အရောင်သတ်မှတ်မယ်
-            row.MonColor = GetStatusColor(mon, "Monday", p, h1, m1, h2, m2);
-            row.IsMonEnabled = CanStart(row.MonColor);
-
-            row.TueColor = GetStatusColor(tue, "Tuesday", p, h1, m1, h2, m2);
-            row.IsTueEnabled = CanStart(row.TueColor);
-
-            row.WedColor = GetStatusColor(wed, "Wednesday", p, h1, m1, h2, m2);
-            row.IsWedEnabled = CanStart(row.WedColor);
-
-            row.ThuColor = GetStatusColor(thu, "Thursday", p, h1, m1, h2, m2);
-            row.IsThuEnabled = CanStart(row.ThuColor);
-
-            row.FriColor = GetStatusColor(fri, "Friday", p, h1, m1, h2, m2);
-            row.IsFriEnabled = CanStart(row.FriColor);
-
-            return row;
-        }
-        private Brush GetStatusColor(string subject, string day, int p, int h1, int m1, int h2, int m2)
-        {
-            if (subject == "-" || string.IsNullOrEmpty(subject)) return Brushes.Transparent;
-
-            DateTime now = DateTime.Now;
-            string currentDay = now.DayOfWeek.ToString(); // Monday, Tuesday...
-
-            // ၁။ လက်ရှိနေ့ (ဥပမာ- 木曜日) ဖြစ်ပါက Column တစ်ခုလုံးကို Highlight မှိန်မှိန်လေးပြမယ်
-            if (currentDay == day)
+            // Clear current cards (except headers)
+            for (int i = TimetableGrid.Children.Count - 1; i >= 0; i--)
             {
-                // လက်ရှိတက်နေဆဲ အချိန်ပိုင်းဖြစ်ပါက ပိုလင်းသောအရောင်ပြမယ်
-                DateTime start = new DateTime(now.Year, now.Month, now.Day, h1, m1, 0);
-                DateTime end = new DateTime(now.Year, now.Month, now.Day, h2, m2, 0);
-
-                if (now >= start && now <= end)
-                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFE0B2")); // လက်ရှိအတန်း (လိမ္မော်နုရောင်)
-
-                return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F5F5F5")); // ယနေ့ Column (မီးခိုးနုရောင်မှိန်မှိန်)
+                if (Grid.GetRow(TimetableGrid.Children[i]) > 0)
+                    TimetableGrid.Children.RemoveAt(i);
             }
 
-            // ၂။ ကျန်တဲ့နေ့တွေနဲ့ ပြီးသွားတဲ့အတန်းတွေအားလုံးကို အဖြူရောင်ပဲထားမယ်
-            return Brushes.White;
+            // Data based on 2025年度 1Cクラス
+            if (App.SelectedTermIndex == 1) // Latter Term (後期)
+            {
+                AddRow(1, "09:10-10:40", "テスト技法", "ビジネスアプリ II", "PG実践 I", "プログラミング II", "ゼミナール I", 10, 40);
+                AddRow(2, "10:50-12:20", "テスト技法", "システム開発基礎", "PG実践 I", "プログラミング II", "データベース技術", 12, 20);
+                AddRow(3, "13:10-14:40", "データ構造 II", "-", "コミ技", "キャリアデザイン", "データベース技術", 14, 40);
+                AddRow(4, "14:50-16:20", "資格対策/日本 IV", "-", "-", "資格対策/日本 II", "就職特別指導", 16, 20);
+            }
+            else // Former Term (前期)
+            {
+                AddRow(1, "09:10-10:40", "ネット＆セキュ", "ビジネスアプリ I", "コンシステム", "マネジメント", "データ構造 I", 10, 40);
+                AddRow(2, "10:50-12:20", "ネット＆セキュ", "プログラミング I", "コンシステム", "日本表現法", "マネジメント", 12, 20);
+            }
         }
 
-        private bool CanStart(Brush color)
+        private void AddRow(int row, string time, string mon, string tue, string wed, string thu, string fri, int endH, int endM)
         {
-            // အညိုရောင် (ပြီးသွားပြီ) ဆိုရင် ထပ်နှိပ်လို့မရတော့ဘူး
-            if (color.ToString() == "#FF8D6E63") return false;
-            // ဆရာမဖြစ်မှ နှိပ်ခွင့်ရှိမယ်
-            return UserData.UserData.CurrentUser?.Role == "Teacher";
+            // Time Label
+            var lbl = new TextBlock { Text = $"{row}限\n{time}", HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, FontSize = 12, Foreground = Brushes.Gray };
+            Grid.SetRow(lbl, row); Grid.SetColumn(lbl, 0);
+            TimetableGrid.Children.Add(lbl);
+
+            // Add Cards for each day
+            AddCard(row, 1, mon, "Monday", endH, endM);
+            AddCard(row, 2, tue, "Tuesday", endH, endM);
+            AddCard(row, 3, wed, "Wednesday", endH, endM);
+            AddCard(row, 4, thu, "Thursday", endH, endM);
+            AddCard(row, 5, fri, "Friday", endH, endM);
+        }
+
+        private void AddCard(int row, int col, string subject, string day, int endH, int endM)
+        {
+            if (subject == "-" || string.IsNullOrEmpty(subject)) return;
+
+            // Automatic Color Logic
+            DateTime now = DateTime.Now;
+            DateTime endTime = new DateTime(now.Year, now.Month, now.Day, endH, endM, 0);
+            string key = $"{now:yyyyMMdd}_{day}_{row}";
+
+            Brush sideColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3182CE")); // Default Blue Sidebar
+
+            // ၁။ အတန်းချိန်ပြီးသွားလျှင် သို့မဟုတ် စတင်ပြီးသားဖြစ်လျှင် အညိုရောင်ပြောင်းရန်
+            if (now > endTime || App.StartedPeriods.Contains(key))
+            {
+                sideColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#8D6E63")); // Brown Sidebar
+            }
+            // ၂။ ယနေ့အတွက် လက်ရှိအတန်းဖြစ်ပါက လိမ္မော်ရောင်ပြရန်
+            else if (now.DayOfWeek.ToString() == day)
+            {
+                sideColor = Brushes.Orange; // Orange Sidebar
+            }
+
+            var btn = new Button
+            {
+                Content = subject,
+                Style = (Style)Application.Current.Resources["TimetableCardStyle"],
+                Background = sideColor, // This binds to SideBar background in template
+                Tag = key // Store key for click logic
+            };
+            btn.Click += Subject_Click;
+
+            Grid.SetRow(btn, row); Grid.SetColumn(btn, col);
+            TimetableGrid.Children.Add(btn);
         }
 
         private void Subject_Click(object sender, RoutedEventArgs e)
         {
             if (UserData.UserData.CurrentUser?.Role != "Teacher") return;
 
-            Button btn = sender as Button;
-            string subject = btn.Content.ToString();
+            var btn = sender as Button;
+            if (btn.Background.ToString() == "#FF8D6E63") return; // ပြီးသွားလျှင် နှိပ်မရ
 
-            if (MessageBox.Show($"{subject} の授業を開始しますか？", "授業開始", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            if (MessageBox.Show($"{btn.Content} を開始しますか？", "確認", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
                 App.IsClassActive = true;
-                App.CurrentActiveSessionStart = DateTime.Now;
-                App.CurrentSubject = subject;
-                // နဂို logic အတိုင်း ScanPage ကို သွားမယ်
-                this.NavigationService.Navigate(new ScanPage());
+                App.CurrentSubject = btn.Content.ToString();
+                App.StartedPeriods.Add(btn.Tag.ToString()); // Mark as started
+                this.NavigationService.Navigate(new ScanPage()); // Dashboard navigation fix included
             }
         }
-    }
-
-    public class TimetableRow
-    {
-        public string Time { get; set; }
-        public string Monday { get; set; }
-        public string Tuesday { get; set; }
-        public string Wednesday { get; set; }
-        public string Thursday { get; set; }
-        public string Friday { get; set; }
-        public bool IsMonEnabled { get; set; }
-        public bool IsTueEnabled { get; set; }
-        public bool IsWedEnabled { get; set; }
-        public bool IsThuEnabled { get; set; }
-        public bool IsFriEnabled { get; set; }
-        public Brush MonColor { get; set; }
-        public Brush TueColor { get; set; }
-        public Brush WedColor { get; set; }
-        public Brush ThuColor { get; set; }
-        public Brush FriColor { get; set; }
     }
 }
