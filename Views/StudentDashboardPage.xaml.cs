@@ -61,15 +61,15 @@ namespace Student_Attendance_System.Views
             }
 
             // Global Leave Request စာရင်းထဲ ထည့်သွင်းခြင်း
-            //App.GlobalLeaveRequests.Add(new LeaveRequest
-            //{
-            //    StudentID = UserData.CurrentUser?.Username,
-            //    Reason = txtLeaveReason.Text,
-            //    Date = DateTime.Now.ToString("yyyy/MM/dd HH:mm")
-            //});
+            App.GlobalLeaveRequests.Add(new LeaveRequest
+            {
+                StudentID = UserData.CurrentUser?.Username,
+                Reason = txtLeaveReason.Text,
+                Date = DateTime.Now.ToString("yyyy/MM/dd HH:mm")
+            });
 
-            //MessageBox.Show("申請を送信しました。先生の確認をお待ちください。", "Success");
-            //txtLeaveReason.Clear();
+            MessageBox.Show("申請を送信しました。先生の確認をお待ちください。", "Success");
+            txtLeaveReason.Clear();
         }
     }
 }
