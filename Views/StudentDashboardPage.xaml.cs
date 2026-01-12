@@ -2,7 +2,9 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.Data.SqlClient;
 using Student_Attendance_System.Models;
+using Student_Attendance_System.Services;
 
 namespace Student_Attendance_System.Views
 {
@@ -52,6 +54,25 @@ namespace Student_Attendance_System.Views
             }
         }
 
+        //private void btnSubmitLeave_Click(object sender, RoutedEventArgs e)
+        //{
+        //    if (string.IsNullOrWhiteSpace(txtLeaveReason.Text))
+        //    {
+        //        MessageBox.Show("申請理由を入力してください (Please enter a reason).", "Warning");
+        //        return;
+        //    }
+
+        //    // Global Leave Request စာရင်းထဲ ထည့်သွင်းခြင်း
+        //    App.GlobalLeaveRequests.Add(new LeaveRequest
+        //    {
+        //        StudentID = UserData.CurrentUser?.Username,
+        //        Reason = txtLeaveReason.Text,
+        //        Date = DateTime.Now.ToString("yyyy/MM/dd HH:mm")
+        //    });
+
+        //    MessageBox.Show("申請を送信しました。先生の確認をお待ちください。", "Success");
+        //    txtLeaveReason.Clear();
+        //}
         private void btnSubmitLeave_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtLeaveReason.Text))
@@ -60,13 +81,22 @@ namespace Student_Attendance_System.Views
                 return;
             }
 
-            // Global Leave Request စာရင်းထဲ ထည့်သွင်းခြင်း
-            App.GlobalLeaveRequests.Add(new LeaveRequest
+            using (SqlConnection con = DBConnection.GetConnection())
             {
-                StudentID = UserData.CurrentUser?.Username,
-                Reason = txtLeaveReason.Text,
-                Date = DateTime.Now.ToString("yyyy/MM/dd HH:mm")
-            });
+                con.Open();
+
+                string sql = @"
+            INSERT INTO LeaveRequests (StudentID, Reason)
+            VALUES (@StudentID, @Reason)";
+
+                using (SqlCommand cmd = new SqlCommand(sql, con))
+                {
+                    cmd.Parameters.AddWithValue("@StudentID", UserData.CurrentUser.Username);
+                    cmd.Parameters.AddWithValue("@Reason", txtLeaveReason.Text);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
 
             MessageBox.Show("申請を送信しました。先生の確認をお待ちください。", "Success");
             txtLeaveReason.Clear();
