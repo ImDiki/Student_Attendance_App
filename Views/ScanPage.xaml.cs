@@ -3,27 +3,72 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media; // <--- ဒါရှိမှ Brushes error ပျောက်မှာ
+using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using System.Windows.Threading;
+using System.Drawing;
 using AForge.Video;
 using AForge.Video.DirectShow;
-using ZXing;
-using System.Drawing;
-using ZXing.Windows.Compatibility;
 
 namespace Student_Attendance_System.Views
 {
+    public class StudentMock
+    {
+        public string BarcodeID { get; set; }
+        public string Name { get; set; }
+        public string StudentID { get; set; }
+    }
+
     public partial class ScanPage : Page
     {
         private FilterInfoCollection videoDevices;
         private VideoCaptureDevice videoSource;
-        private DispatcherTimer timer;
+
+        private List<StudentMock> mockStudentDb = new List<StudentMock>()
+        {
+            new StudentMock { BarcodeID = "C5292", Name = "MYAT THADAR LINN", StudentID = "C5292" },
+            new StudentMock { BarcodeID = "123456789", Name = "DIKI", StudentID = "D001" }
+        };
 
         public ScanPage()
         {
             InitializeComponent();
             SetupCamera();
-            UpdateStatistics(); // အောက်ခြေက Card ဂဏန်းလေးတွေ Update လုပ်ရန်
+            this.Loaded += (s, e) => txtScannerInput.Focus(); // Page Load တာနဲ့ Focus ပေးမယ်
+        }
+
+        private void txtScannerInput_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter) // Scanner က Enter ခေါက်လိုက်တဲ့အခါ
+            {
+                string id = txtScannerInput.Text.Trim().ToUpper();
+                ProcessScan(id);
+                txtScannerInput.Clear();
+                txtScannerInput.Focus();
+            }
+        }
+
+        private void ProcessScan(string id)
+        {
+            var student = mockStudentDb.FirstOrDefault(s => s.BarcodeID.ToUpper() == id);
+
+            if (student != null)
+            {
+                lblScannedName.Text = student.Name;
+                lblScannedID.Text = student.StudentID;
+                AttendanceBadge.Visibility = Visibility.Visible;
+                lblStatusMessage.Text = "Success!";
+                lblStatusMessage.Foreground =System.Windows.Media. Brushes.Green; // Namespace ပါမှ အလုပ်လုပ်မယ်
+                System.Media.SystemSounds.Beep.Play();
+            }
+            else
+            {
+                lblScannedName.Text = "Not Found!";
+                lblScannedID.Text = id;
+                AttendanceBadge.Visibility = Visibility.Collapsed;
+                lblStatusMessage.Text = "Card not registered!";
+                lblStatusMessage.Foreground = System.Windows.Media.Brushes.Red;
+            }
         }
 
         private void SetupCamera()
@@ -32,77 +77,29 @@ namespace Student_Attendance_System.Views
             if (videoDevices.Count > 0)
             {
                 videoSource = new VideoCaptureDevice(videoDevices[0].MonikerString);
-                videoSource.NewFrame += new NewFrameEventHandler(videoSource_NewFrame);
+                videoSource.NewFrame += (s, e) => {
+                    try
+                    {
+                        Bitmap bitmap = (Bitmap)e.Frame.Clone();
+                        Dispatcher.Invoke(() => {
+                            CameraPreview.Source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+                                bitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                        });
+                    }
+                    catch { }
+                };
             }
-            else
-            {
-                MessageBox.Show("No camera found.");
-            }
-        }
-
-        // Camera ကလာတဲ့ Frame တွေကို Image control မှာ ပြပေးခြင်း
-        private void videoSource_NewFrame(object sender, NewFrameEventArgs eventArgs)
-        {
-            try
-            {
-                Bitmap bitmap = (Bitmap)eventArgs.Frame.Clone();
-                Dispatcher.Invoke(() =>
-                {
-                    CameraPreview.Source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
-                        bitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-                });
-
-                // QR Code ကို စစ်ဆေးခြင်း
-                BarcodeReader reader = new BarcodeReader();
-                var result = reader.Decode(bitmap);
-                if (result != null)
-                {
-                    Dispatcher.Invoke(() => HandleScanSuccess(result.Text));
-                }
-            }
-            catch { }
         }
 
         private void btnStart_Click(object sender, RoutedEventArgs e)
         {
-            if (videoSource != null && !videoSource.IsRunning)
-            {
-                videoSource.Start();
-                ((Button)sender).Content = "Stop Scanning";
-            }
-            else if (videoSource != null && videoSource.IsRunning)
-            {
-                videoSource.Stop();
-                ((Button)sender).Content = "Start Scanning";
-            }
+            if (videoSource != null && !videoSource.IsRunning) videoSource.Start();
+            txtScannerInput.Focus(); // ခလုတ်နှိပ်ပြီးတိုင်း Focus ပြန်ယူမယ်
         }
 
-        // Scan အောင်မြင်သွားတဲ့အခါ လုပ်ဆောင်မည့် Logic
-        private void HandleScanSuccess(string scannedText)
+        private void Page_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            videoSource.Stop();
-            MessageBox.Show($"出席を確認しました: {scannedText}", "Success");
-
-            // Dashboard ကို အလိုလိုပြန်သွားစေခြင်း (Scan တန်းလန်းကြီး မကျန်ခဲ့အောင်)
-            if (this.NavigationService.CanGoBack)
-            {
-                this.NavigationService.GoBack();
-            }
-        }
-
-        private void UpdateStatistics()
-        {
-            // ဒီနေရာမှာ ကျောင်းသားစာရင်းနဲ့ Attendance status အလိုက် ဂဏန်းတွေကို Update လုပ်ပေးပါ
-            // ဥပမာ- CheckedInCount.Text = App.AttendanceToday.Count.ToString();
-        }
-
-        // Page ကနေ ထွက်သွားရင် Camera ကို ပိတ်ပေးခြင်း
-        private void Page_Unloaded(object sender, RoutedEventArgs e)
-        {
-            if (videoSource != null && videoSource.IsRunning)
-            {
-                videoSource.Stop();
-            }
+            txtScannerInput.Focus(); // တခြားနေရာနှိပ်မိရင် Focus ပြန်ယူမယ်
         }
     }
 }
