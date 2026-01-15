@@ -12,6 +12,8 @@ using AForge.Video.DirectShow;
 using ZXing;
 using ZXing.Windows.Compatibility;
 using Student_Attendance_System.Models;
+using Microsoft.Data.SqlClient;
+using Student_Attendance_System.Services;
 
 namespace Student_Attendance_System.Views
 {
@@ -157,9 +159,43 @@ namespace Student_Attendance_System.Views
             faceCheckTimer.Start();
         }
 
+        //private void CalculateAttendance(string studentID)
+        //{
+        //    // ဆရာမ Start နှိပ်ခဲ့တဲ့အချိန်နဲ့ အခု Scan ဖတ်တဲ့အချိန် ခြားနားချက်ကိုယူမယ်
+        //    TimeSpan diff = DateTime.Now - App.CurrentActiveSessionStart;
+        //    double minutes = diff.TotalMinutes;
+
+        //    string status = "";
+        //    string note = "";
+
+        //    if (minutes <= 3)
+        //    {
+        //        status = "Present (100%)";
+        //    }
+        //    else if (minutes <= 15)
+        //    {
+        //        status = "Late (遅刻)";
+        //    }
+        //    else
+        //    {
+        //        status = "Absent (欠席)";
+        //    }
+
+        //    // App.TempAttendanceList ထဲကို သိမ်းမယ်
+        //    App.TempAttendanceList.Add(new AttendanceRecord
+        //    {
+        //        StudentID = studentID,
+        //        Subject = App.CurrentSubject,
+        //        Date = DateTime.Now.ToString("yyyy-MM-dd HH:mm"),
+        //        Status = status,
+        //        Note = "" // ဆရာမ ပြင်မှ ဒါက ပေါ်လာမှာ
+        //    });
+
+        //    ShowResultUI(status, $"ID: {studentID}", status == "Absent (欠席)");
+        //}
+
         private void CalculateAttendance(string studentID)
         {
-            // ဆရာမ Start နှိပ်ခဲ့တဲ့အချိန်နဲ့ အခု Scan ဖတ်တဲ့အချိန် ခြားနားချက်ကိုယူမယ်
             TimeSpan diff = DateTime.Now - App.CurrentActiveSessionStart;
             double minutes = diff.TotalMinutes;
 
@@ -168,28 +204,62 @@ namespace Student_Attendance_System.Views
 
             if (minutes <= 3)
             {
-                status = "Present (100%)";
+                status = "Present";
             }
             else if (minutes <= 15)
             {
-                status = "Late (遅刻)";
+                status = "Late";
             }
             else
             {
-                status = "Absent (欠席)";
+                status = "Absent";
             }
 
-            // App.TempAttendanceList ထဲကို သိမ်းမယ်
+            string today = DateTime.Now.ToString("yyyy-MM-dd");
+
+            // 1️ DUPLICATE CHECK (MEMORY)
+            var existing = App.TempAttendanceList.FirstOrDefault(a =>
+                a.StudentID == studentID &&
+                a.Subject == App.CurrentSubject &&
+                a.Date.StartsWith(today)
+            );
+
+            if (existing != null)
+            {
+                ShowResultUI("Already Scanned", $"ID: {studentID}", true);
+                _isProcessing = false;
+                return;
+            }
+
+            // 2️ SAVE TO DATABASE
+            using (SqlConnection con = DBConnection.GetConnection())
+            {
+                con.Open();
+
+                string sql = @"INSERT INTO Attendance
+                       (StudentID, Subject, ScanTime, Status)
+                       VALUES (@StudentID, @Subject, @Time, @Status)";
+
+                using (SqlCommand cmd = new SqlCommand(sql, con))
+                {
+                    cmd.Parameters.AddWithValue("@StudentID", studentID);
+                    cmd.Parameters.AddWithValue("@Subject", App.CurrentSubject);
+                    cmd.Parameters.AddWithValue("@Time", DateTime.Now);
+                    cmd.Parameters.AddWithValue("@Status", status);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
             App.TempAttendanceList.Add(new AttendanceRecord
             {
                 StudentID = studentID,
                 Subject = App.CurrentSubject,
                 Date = DateTime.Now.ToString("yyyy-MM-dd HH:mm"),
                 Status = status,
-                Note = "" // ဆရာမ ပြင်မှ ဒါက ပေါ်လာမှာ
+                Note = ""
             });
 
-            ShowResultUI(status, $"ID: {studentID}", status == "Absent (欠席)");
+            ShowResultUI(status, $"ID: {studentID}", status == "Absent");
         }
 
 

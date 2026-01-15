@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Microsoft.Data.SqlClient;
 using Student_Attendance_System.Models;
+using Student_Attendance_System.Services;
 
 namespace Student_Attendance_System.Views
 {
@@ -19,7 +21,160 @@ namespace Student_Attendance_System.Views
             txtCurrentDate.Text = DateTime.Now.ToString("yyyy年MM月dd日 (ddd)");
             LoadDailyPeriods();
             RefreshList();
+
+            LoadLeaveRequests(); 
         }
+        private void ApproveLeave_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateLeaveStatus("Approved");
+        }
+
+        private void RejectLeave_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateLeaveStatus("Rejected");
+        }
+        //private void UpdateLeaveStatus(string status)
+        //{
+        //    if (dgLeaveRequests.SelectedItem is not LeaveRequest req)
+        //    {
+        //        MessageBox.Show("申請を選択してください");
+        //        return;
+        //    }
+
+        //    using (SqlConnection con = DBConnection.GetConnection())
+        //    {
+        //        con.Open();
+        //        string sql = "UPDATE LeaveRequests SET Status=@Status WHERE RequestID=@ID";
+
+        //        using (SqlCommand cmd = new SqlCommand(sql, con))
+        //        {
+        //            cmd.Parameters.AddWithValue("@Status", status);
+        //            cmd.Parameters.AddWithValue("@ID", req.RequestID);
+        //            cmd.ExecuteNonQuery();
+        //        }
+        //    }
+
+        //    LoadLeaveRequests();
+        //}
+        private void UpdateLeaveStatus(string status)
+        {
+            if (dgLeaveRequests.SelectedItem is not LeaveRequest req)
+            {
+                MessageBox.Show("申請を選択してください");
+                return;
+            }
+
+            // 1️⃣ Update LeaveRequest status
+            using (SqlConnection con = DBConnection.GetConnection())
+            {
+                con.Open();
+                string sql = "UPDATE LeaveRequests SET Status=@Status WHERE RequestID=@ID";
+
+                using (SqlCommand cmd = new SqlCommand(sql, con))
+                {
+                    cmd.Parameters.AddWithValue("@Status", status);
+                    cmd.Parameters.AddWithValue("@ID", req.RequestID);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+
+            // 2️⃣ IF APPROVED
+            if (status == "Approved")
+            {
+                string today = DateTime.Now.ToString("yyyy-MM-dd");
+
+                // 1️⃣ CHECK: already exists in 出席管理?
+                var existing = App.TempAttendanceList.FirstOrDefault(a =>
+                    a.StudentID == req.StudentID &&
+                    a.Subject == App.CurrentSubject &&
+                    a.Date.StartsWith(today)
+                );
+
+                // 2️⃣ IF NOT EXISTS → CREATE IT (公欠)
+                if (existing == null)
+                {
+                    // 👉 ADD TO 出席管理 (MEMORY)
+                    App.TempAttendanceList.Add(new AttendanceRecord
+                    {
+                        StudentID = req.StudentID,
+                        Subject = App.CurrentSubject,
+                        Date = DateTime.Now.ToString("yyyy-MM-dd HH:mm"),
+                        Status = "Present",
+                        Note = "欠席届 承認（公欠）"
+                    });
+
+                    // 👉 SAVE TO Attendance TABLE
+                    using (SqlConnection con = DBConnection.GetConnection())
+                    {
+                        con.Open();
+                        string sql = @"INSERT INTO Attendance
+                           (StudentID, Subject, ScanTime, Status)
+                           VALUES (@StudentID, @Subject, @Time, @Status)";
+
+                        using (SqlCommand cmd = new SqlCommand(sql, con))
+                        {
+                            cmd.Parameters.AddWithValue("@StudentID", req.StudentID);
+                            cmd.Parameters.AddWithValue("@Subject", App.CurrentSubject);
+                            cmd.Parameters.AddWithValue("@Time", DateTime.Now);
+                            cmd.Parameters.AddWithValue("@Status", "Present");
+
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+
+                    // 👉 UPDATE Students TABLE (attendance counters)
+                    using (SqlConnection con = DBConnection.GetConnection())
+                    {
+                        con.Open();
+                        string sql = @"UPDATE Students SET TotalClasses = TotalClasses + 1, PresentClasses = PresentClasses + 1 WHERE StudentID = @StudentID";
+
+                        using (SqlCommand cmd = new SqlCommand(sql, con))
+                        {
+                            cmd.Parameters.AddWithValue("@StudentID", req.StudentID);
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+
+                    // 👉 UPDATE Students TABLE (attendance counters)
+                    using (SqlConnection con = DBConnection.GetConnection())
+                    {
+                        con.Open();
+                        string sql = @"
+                UPDATE Students
+                SET 
+                    TotalClasses = TotalClasses + 1,
+                    PresentClasses = PresentClasses + 1
+                WHERE StudentID = @StudentID";
+
+                        using (SqlCommand cmd = new SqlCommand(sql, con))
+                        {
+                            cmd.Parameters.AddWithValue("@StudentID", req.StudentID);
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                }
+            }
+
+
+            // 🔹 C. UPDATE STUDENT ATTENDANCE COUNTERS
+            using (SqlConnection con = DBConnection.GetConnection())
+                {
+                    con.Open();
+                    string sql = @"
+                UPDATE Students
+                SET 
+                    TotalClasses = TotalClasses + 1,
+                    PresentClasses = PresentClasses + 1
+                WHERE StudentID = @StudentID";
+
+                    using (SqlCommand cmd = new SqlCommand(sql, con))
+                    {
+                        cmd.Parameters.AddWithValue("@StudentID", req.StudentID);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+
 
         private void LoadDailyPeriods()
         {
@@ -93,6 +248,38 @@ namespace Student_Attendance_System.Views
                 _ => new List<(string, string)>()
             };
         }
+        private void LoadLeaveRequests()
+        {
+            List<LeaveRequest> list = new List<LeaveRequest>();
+
+            using (SqlConnection con = DBConnection.GetConnection())
+            {
+                con.Open();
+                string sql = @"SELECT * FROM LeaveRequests
+                       WHERE Status = 'Pending'
+                       ORDER BY RequestDate DESC";
+
+                using (SqlCommand cmd = new SqlCommand(sql, con))
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        list.Add(new LeaveRequest
+                        {
+                            RequestID = (int)reader["RequestID"],
+                            StudentID = reader["StudentID"].ToString(),
+                            Reason = reader["Reason"].ToString(),
+                            Status = reader["Status"].ToString(),
+                            RequestDate = Convert.ToDateTime(reader["RequestDate"])
+                        });
+                    }
+                }
+            }
+
+            dgLeaveRequests.ItemsSource = list;
+        }
+
+
 
         private void RefreshList() { dgAttendance.ItemsSource = null; dgAttendance.ItemsSource = App.TempAttendanceList; }
         private void btnMarkPresent_Click(object sender, RoutedEventArgs e) { /* Update Present Logic */ RefreshList(); }

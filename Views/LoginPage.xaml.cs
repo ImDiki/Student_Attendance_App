@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Text.RegularExpressions;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Student_Attendance_System.Models;
@@ -18,10 +19,44 @@ namespace Student_Attendance_System.Views
             string username = txtUsername.Text.Trim();
             string password = txtPassword.Password.Trim();
 
+            // Empty check
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
                 MessageBox.Show("Please enter username and password",
                                 "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // Username validation (A–Z, a–z, 0–9 only)
+            if (!Regex.IsMatch(username, @"^[A-Za-z0-9]+$"))
+            {
+                MessageBox.Show(
+                    "Username can contain only letters and numbers.\nCapital and small letters are different.",
+                    "Invalid Username",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                return;
+            }
+
+            // Password validation
+            if (password.Length < 8)
+            {
+                MessageBox.Show(
+                    "Password must be at least 8 characters long.",
+                    "Weak Password",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                return;
+            }
+
+            // Must contain at least 1 letter and 1 number
+            if (!Regex.IsMatch(password, @"^(?=.*[A-Za-z])(?=.*\d).+$"))
+            {
+                MessageBox.Show(
+                    "Password must contain at least one letter and one number.",
+                    "Weak Password",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
                 return;
             }
 
@@ -31,10 +66,8 @@ namespace Student_Attendance_System.Views
 
             if (user != null)
             {
-                // Save login state
                 UserData.CurrentUser = user;
 
-                // Navigate based on role
                 if (Application.Current.MainWindow is MainWindow main)
                 {
                     main.HandleLoginSuccess(user);
@@ -42,10 +75,14 @@ namespace Student_Attendance_System.Views
             }
             else
             {
-                MessageBox.Show("Login failed.\nInvalid username or password.",
-                                "Login Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    "Login failed.\nInvalid username or password.",
+                    "Login Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
         }
+
 
         private void GoToRegister_Click(object sender, MouseButtonEventArgs e)
         {
