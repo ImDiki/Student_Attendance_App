@@ -42,7 +42,7 @@ ZXing.Net: For QR code decoding and generation
 AForge.Video: For camera and webcam integration
 
 🛠️ Installation & Setup
-Clone the repository: git clone https://github.com/ImDiki/Student_Attendance_System.git
+Clone the repository: git clone https://github.com/ImDiki/Student_Attendance_App.git
 
 Open the solution file .sln in Visual Studio 2022.
 
