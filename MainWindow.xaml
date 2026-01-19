@@ -9,16 +9,22 @@
         <Style x:Key="MenuButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="#34495E"/>
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Margin" Value="0,5"/>
-            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Margin" Value="0,4"/>
+            <Setter Property="FontSize" Value="13"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" CornerRadius="8" Padding="15,0">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="6" Padding="15,0">
                             <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
                         </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#4E6A85"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -32,7 +38,7 @@
         </Grid.ColumnDefinitions>
 
         <Border Grid.Column="0" Background="#2C3E50">
-            <Grid Margin="15">
+            <Grid Margin="12">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
@@ -40,32 +46,44 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel Grid.Row="0">
-                    <Border Background="#34495E" CornerRadius="5" Padding="10" Margin="0,0,0,15">
-                        <TextBlock x:Name="txtDate" Text="Checking Date..." Foreground="#ECF0F1" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    <Border Background="#34495E" CornerRadius="5" Padding="8" Margin="0,0,0,12">
+                        <TextBlock x:Name="txtDate" Text="Checking Date..." 
+                                   Foreground="#ECF0F1" FontSize="12" FontWeight="Bold" 
+                                   HorizontalAlignment="Center"/>
                     </Border>
-                    <Image Source="/Assets/Owl.png" Height="80" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-                    <TextBlock x:Name="txtWelcome" Text="WELCOME" Foreground="White" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20" TextWrapping="Wrap" TextAlignment="Center"/>
-                    <Separator Background="Gray" Margin="0,0,0,20"/>
+
+                    <Image Source="/Assets/Owl.png" Height="65" HorizontalAlignment="Center" Margin="0,5"/>
+
+                    <TextBlock x:Name="txtWelcome" Text="WELCOME" Foreground="White" 
+                               FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" 
+                               Margin="0,8,0,12" TextWrapping="Wrap" TextAlignment="Center"/>
+                    <Separator Background="#30FFFFFF" Margin="0,5,0,15"/>
                 </StackPanel>
 
-                <StackPanel Grid.Row="1">
-                    <Button x:Name="btnLanguage" Content="🌐 Language: ENG / JP" Height="45" Style="{StaticResource MenuButtonStyle}" Click="btnLanguage_Click"/>
-                    <Button x:Name="btnLoginMenu" Content="🔑 Login" Height="45" Style="{StaticResource MenuButtonStyle}" Click="btnLoginMenu_Click"/>
-                    <Button x:Name="btnRegister" Content="📝 Register" Height="45" Style="{StaticResource MenuButtonStyle}" Click="btnRegister_Click"/>
-                    <Button x:Name="btnScanMode" Content="📷 Scan / Webcam" Height="45" Style="{StaticResource MenuButtonStyle}" Click="btnScanMode_Click"/>
-                    <Button x:Name="btnTimeTable" Content="📅 Time Table" Height="45" Style="{StaticResource MenuButtonStyle}" Click="btnTimeTable_Click"/>
-                    <Button x:Name="btnReport" Content="📊 Report" Height="45" Style="{StaticResource MenuButtonStyle}" Click="btnReport_Click"/>
-                </StackPanel>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden">
+                    <StackPanel>
+                        <Button x:Name="btnLanguage" Content="🌐 Language: ENG / JP" Height="42" Style="{StaticResource MenuButtonStyle}" Click="btnLanguage_Click"/>
 
-                <StackPanel Grid.Row="2">
-                    <Separator Background="Gray" Margin="0,20"/>
-                    <Button x:Name="btnAbout" Content="ℹ️ About Us" Height="40" Background="Transparent" Foreground="LightGray" BorderThickness="0" HorizontalContentAlignment="Left" Click="btnAbout_Click"/>
-                    <Button x:Name="btnDevTeam" Content="👨‍💻 Developer Team" Height="40" Background="Transparent" Foreground="LightGray" BorderThickness="0" HorizontalContentAlignment="Left" Click="btnDevTeam_Click"/>
+                        <Button x:Name="btnLoginMenu" Content="🔑 Login" Height="42" Style="{StaticResource MenuButtonStyle}" Click="btnLoginMenu_Click"/>
+
+                        <Button x:Name="btnRegister" Content="📝 Register" Height="42" Style="{StaticResource MenuButtonStyle}" Click="btnRegister_Click"/>
+                        <Button x:Name="btnScanMode" Content="📷 Scan / Webcam" Height="42" Style="{StaticResource MenuButtonStyle}" Click="btnScanMode_Click"/>
+                        <Button x:Name="btnTimeTable" Content="📅 Time Table" Height="42" Style="{StaticResource MenuButtonStyle}" Click="btnTimeTable_Click"/>
+                        <Button x:Name="btnReport" Content="📊 Report" Height="42" Style="{StaticResource MenuButtonStyle}" Click="btnReport_Click"/>
+
+                        <Button x:Name="btnLogout" Content="🚪 Logout" Height="42" Style="{StaticResource MenuButtonStyle}" Click="btnLogout_Click" Visibility="Collapsed"/>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <StackPanel Grid.Row="2" Margin="0,15,0,0">
+                    <Separator Background="#30FFFFFF" Margin="0,0,0,10"/>
+                    <Button x:Name="btnAbout" Content="ℹ️ About Us" Height="38" Style="{StaticResource MenuButtonStyle}" Click="btnAbout_Click"/>
+                    <Button x:Name="btnDevTeam" Content="👨‍💻 Developer Team" Height="38" Style="{StaticResource MenuButtonStyle}" Click="btnDevTeam_Click"/>
                 </StackPanel>
             </Grid>
         </Border>
 
-        <Grid Grid.Column="1" Background="#ECF0F1">
+        <Grid Grid.Column="1" Background="#F8FAFC">
             <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden"/>
         </Grid>
     </Grid>
