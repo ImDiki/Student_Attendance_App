@@ -48,7 +48,7 @@
 
                     <Image Source="/Assets/Owl.png" Height="80" HorizontalAlignment="Center" Margin="0,0,0,10"/>
 
-                    <TextBlock Text="WELCOME" Foreground="White" FontSize="22" FontWeight="Bold" 
+                    <TextBlock x:Name="txtWelcome" Text="WELCOME" Foreground="White" FontSize="22" FontWeight="Bold" 
                                HorizontalAlignment="Center" Margin="0,0,0,20"/>
 
                     <Separator Background="Gray" Margin="0,0,0,20"/>
@@ -74,6 +74,5 @@
         <Grid Grid.Column="1" Background="#ECF0F1">
             <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden"/>
         </Grid>
-
     </Grid>
 </Window>

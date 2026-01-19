@@ -1,130 +1,86 @@
 ﻿using System;
 using System.Windows;
-using System.Windows.Threading; 
-using Student_Attendance_System.Models;
-using Student_Attendance_System.Views; // *** Views Folder ကို ခေါ်ထားမှ Page တွေ သုံးလို့ရမယ် ***
+using System.Windows.Threading;
+using Student_Attendance_System.Views;
+using Student_Attendance_System.Interfaces;// Page တွေရှိတဲ့ Folder Path ကို သေချာအောင် စစ်ပေးပါ
 
 namespace Student_Attendance_System
 {
     public partial class MainWindow : Window
     {
-        DispatcherTimer timer;
+        private bool _isJapanese = false;
 
         public MainWindow()
         {
             InitializeComponent();
-            
-            // 1. နာရီစ run မယ်
-            StartClock();
-
-            // 2. App စဖွင့်ဖွင့်ချင်း Login Page ကို တန်းပြမယ်
-            MainFrame.Navigate(new LoginPage());
-        }
-
-        // --- Date & Time Timer ---
-        private void StartClock()
-        {
-            timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(1);
-            timer.Tick += Timer_Tick;
-            timer.Start();
-        }
-
-        private void Timer_Tick(object sender, EventArgs e)
-        {
-            // Format: Jan 08, 2026 | 01:20 AM
-            txtDate.Text = DateTime.Now.ToString("MMM dd, yyyy | hh:mm tt");
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            Timer_Tick(null, null); 
-        }
+            // ၁။ အချိန်ကို Real-time ပြဖို့ Timer ပေးမယ်
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(1);
+            timer.Tick += Timer_Tick;
+            timer.Start();
 
-        // =======================================================
-        // SIDEBAR BUTTON CLICK EVENTS (PAGE NAVIGATION)
-        // =======================================================
-
-        private void btnLanguage_Click(object sender, RoutedEventArgs e)
-        {
-            // Language လဲချင်ရင် ဒီမှာ Logic ရေးရမယ်
-            MessageBox.Show("Language changed to Japanese (Mock)");
-        }
-
-        private void btnLoginMenu_Click(object sender, RoutedEventArgs e)
-        {
-            // LoginPage.xaml သို့
+            // ၂။ App စဖွင့်တာနဲ့ Login Page ကို တန်းပြမယ်
             MainFrame.Navigate(new LoginPage());
         }
 
-        private void btnRegister_Click(object sender, RoutedEventArgs e)
+        private void Timer_Tick(object sender, EventArgs e)
         {
-            // RegisterPage.xaml သို့
-            MainFrame.Navigate(new RegisterPage());
+            // ဂျပန်စာဆိုရင် ဂျပန် format နဲ့ပြမယ်
+            if (_isJapanese)
+                txtDate.Text = DateTime.Now.ToString("yyyy年MM月dd日 (ddd) HH:mm:ss");
+            else
+                txtDate.Text = DateTime.Now.ToString("yyyy/MM/dd (ddd) hh:mm:ss tt");
         }
 
-        private void btnScanMode_Click(object sender, RoutedEventArgs e)
+        // --- Navigation ---
+        private void btnLoginMenu_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new LoginPage());
+        private void btnRegister_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new RegisterPage());
+        private void btnScanMode_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ScanPage());
+        private void btnTimeTable_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new TimetablePage());
+        private void btnReport_Click(object sender, RoutedEventArgs e) { /* MainFrame.Navigate(new ReportPage()); */ }
+        private void btnAbout_Click(object sender, RoutedEventArgs e) { /* MainFrame.Navigate(new AboutPage()); */ }
+        private void btnDevTeam_Click(object sender, RoutedEventArgs e) { /* MainFrame.Navigate(new DevTeamPage()); */ }
+
+        // --- Language Toggle ---
+        private void btnLanguage_Click(object sender, RoutedEventArgs e)
         {
-            // ScanPage.xaml သို့ (Webcam.xaml သုံးချင်ရင် ဒီနေရာမှာ new Webcam() ပြောင်းပါ)
-            MainFrame.Navigate(new ScanPage());
+            LanguageSettings.Language =!LanguageSettings.Language;
+            UpdateLanguage();
         }
 
-        private void btnTimeTable_Click(object sender, RoutedEventArgs e)
+        private void UpdateLanguage()
         {
-            // TimetablePage.xaml သို့
-            MainFrame.Navigate(new TimetablePage());
-        }
-
-        private void btnReport_Click(object sender, RoutedEventArgs e)
-        {
-            // ReportPage.xaml မရှိသေးလို့ Message Box ပြထားသည်
-            // File ဆောက်ပြီးရင်: MainFrame.Navigate(new ReportPage()); လို့ပြောင်းပါ
-            MessageBox.Show("Report Page is under construction.");
-        }
-
-        private void btnAbout_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("Attendance System v1.0\nCreated for Students & Teachers.");
-        }
-
-        private void btnDevTeam_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("Developer Team:\n1. [Name]\n2. [Name]");
-        }
-
-        // =======================================================
-        // LOGIN SUCCESS HANDLER (Dashboard ခွဲမယ့်နေရာ)
-        // =======================================================
-        public void HandleLoginSuccess(User user)
-        {
-            // User Role ပေါ်မူတည်ပြီး Dashboard အသီးသီးကို သွားမယ်
-            if (user.Role == "Teacher" || user.Role == "Admin")
+            if (_isJapanese)
             {
-                // TeacherDashboard.xaml သို့
-                MainFrame.Navigate(new TeacherDashboard());
-                // Admin ဖြစ်ရင် AdminDashboard.xaml သို့ သွားချင်ရင်လည်း ဒီမှာ စစ်လို့ရ
+                txtWelcome.Text = "ようこそ";
+                btnLoginMenu.Content = "🔑 ログイン (Login)";
+                btnRegister.Content = "📝 新規登録 (Register)";
+                btnScanMode.Content = "📷 スキャンモード";
+                btnTimeTable.Content = "📅 タイムテーブル";
+                btnReport.Content = "📊 レポート";
+                btnAbout.Content = "ℹ️ アプリについて";
+                btnDevTeam.Content = "👨‍💻 開発チーム";
+                btnLanguage.Content = "🌐 言語: JP / ENG";
             }
-            else if (user.Role == "Student")
+            else
             {
-                // StudentDashboardPage.xaml သို့
-                MainFrame.Navigate(new StudentDashboardPage());
+                txtWelcome.Text = "WELCOME";
+                btnLoginMenu.Content = "🔑 Login";
+                btnRegister.Content = "📝 Register";
+                btnScanMode.Content = "📷 Scan / Webcam";
+                btnTimeTable.Content = "📅 Time Table";
+                btnReport.Content = "📊 Report";
+                btnAbout.Content = "ℹ️ About Us";
+                btnDevTeam.Content = "👨‍💻 Developer Team";
+                btnLanguage.Content = "🌐 Language: ENG / JP";
             }
-        }
-            private void UpdateSidebarUI(string role)
-        {
-            if (role == "Student")
+            if(MainFrame.Content is ILanguageSwitchable  Currentpage)
             {
-                // ကျောင်းသားဆိုလျှင် ScanMode နှင့် Register ကို ဖျောက်ထားမည်
-                btnScanMode.Visibility = Visibility.Collapsed;
-                btnRegister.Visibility = Visibility.Collapsed;
-                btnTimeTable.Visibility = Visibility.Visible;
-            }
-            else if (role == "Teacher")
-            {
-                // ဆရာဆိုအကုန်မြင်
-                btnScanMode.Visibility = Visibility.Visible;
-                btnRegister.Visibility = Visibility.Visible;
-                btnTimeTable.Visibility = Visibility.Visible;
+               Currentpage.ChangeLanguage(LanguageSettings.Language);
             }
         }
     }

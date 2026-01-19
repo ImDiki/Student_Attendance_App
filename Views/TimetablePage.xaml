@@ -11,53 +11,67 @@
             </LinearGradientBrush>
         </Grid.Background>
 
-        <Grid Margin="25">
+        <Grid Margin="20">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Text="1Cクラス 時間割" FontSize="28" FontWeight="ExtraBold" Foreground="#1A202C"/>
+            <TextBlock x:Name="txtTitle" Grid.Row="0" Text="時間割 (Timetable)" FontSize="26" FontWeight="ExtraBold" Foreground="#1A202C"/>
 
-            <Border Grid.Row="1" Background="#80FFFFFF" CornerRadius="12" Margin="0,15,0,20" Padding="15">
+            <Border Grid.Row="1" Background="#80FFFFFF" CornerRadius="12" Margin="0,10,0,15" Padding="15">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="学期選択: " VerticalAlignment="Center" FontSize="15" FontWeight="Medium"/>
-                    <ComboBox x:Name="cboTerm" Width="160" Height="32" SelectionChanged="cboTerm_SelectionChanged">
-                        <ComboBoxItem Content="前期 (Former Term)"/>
-                        <ComboBoxItem Content="後期 (Latter Term)" IsSelected="True"/>
+                    <TextBlock x:Name="lblYearSelect" Text="学年: " VerticalAlignment="Center" FontSize="14" Margin="0,0,5,0"/>
+                    <ComboBox x:Name="cboYear" Width="100" Height="30" Margin="0,0,15,0" SelectionChanged="Filter_Changed">
+                        <ComboBoxItem Content="1st Year" Tag="1"/>
+                        <ComboBoxItem Content="2nd Year" Tag="2"/>
+                        <ComboBoxItem Content="3rd Year" Tag="3"/>
+                        <ComboBoxItem Content="4th Year" Tag="4" IsSelected="True"/>
                     </ComboBox>
-                    <TextBlock x:Name="txtTodayInfo" Text="本日: 木曜日" Margin="30,0,0,0" VerticalAlignment="Center" FontSize="15" FontWeight="Bold" Foreground="#3182CE"/>
+
+                    <TextBlock x:Name="lblClassSelect" Text="クラス: " VerticalAlignment="Center" FontSize="14" Margin="0,0,5,0"/>
+                    <ComboBox x:Name="cboClass" Width="80" Height="30" Margin="0,0,15,0" SelectionChanged="Filter_Changed">
+                        <ComboBoxItem Content="A"/>
+                        <ComboBoxItem Content="B"/>
+                        <ComboBoxItem Content="C" IsSelected="True"/>
+                        <ComboBoxItem Content="D"/>
+                        <ComboBoxItem Content="E"/>
+                    </ComboBox>
+                    <TextBlock x:Name="lblTermSelect" Text="学期: " VerticalAlignment="Center" FontSize="14" FontWeight="Medium" Margin="0,0,5,0"/>
+                    <ComboBox x:Name="cboTerm" Width="120" Height="30" SelectionChanged="Filter_Changed">
+                        <ComboBoxItem Content="前期 (Former)"/>
+                        <ComboBoxItem Content="後期 (Latter)" IsSelected="True"/>
+                    </ComboBox>
+
+                    <TextBlock x:Name="txtTodayInfo" Text="Today" Margin="25,0,0,0" VerticalAlignment="Center" FontSize="14" FontWeight="Bold" Foreground="#3182CE"/>
                 </StackPanel>
             </Border>
 
-            <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                <Grid x:Name="TimetableGrid" Background="Transparent">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="80"/>
-                        <ColumnDefinition Width="200"/>
-                        <ColumnDefinition Width="200"/>
-                        <ColumnDefinition Width="200"/>
-                        <ColumnDefinition Width="200"/>
-                        <ColumnDefinition Width="200"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="50"/>
-                        <RowDefinition Height="120"/>
-                        <RowDefinition Height="120"/>
-                        <RowDefinition Height="120"/>
-                        <RowDefinition Height="120"/>
-                    </Grid.RowDefinitions>
+            <Grid x:Name="TimetableGrid" Grid.Row="2" Background="White">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="70"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-                    <TextBlock Text="時限" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="#4A5568"/>
-                    <TextBlock Text="月 (Mon)" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="#4A5568"/>
-                    <TextBlock Text="火 (Tue)" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="#4A5568"/>
-                    <TextBlock Text="水 (Wed)" Grid.Column="3" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="#4A5568"/>
-                    <TextBlock Text="木 (Thu)" Grid.Column="4" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="#4A5568"/>
-                    <TextBlock Text="金 (Fri)" Grid.Column="5" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="#4A5568"/>
-
-                </Grid>
-            </ScrollViewer>
+                <TextBlock x:Name="hPeriod" Text="時限" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+                <TextBlock x:Name="hMon" Text="月" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+                <TextBlock x:Name="hTue" Text="火" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+                <TextBlock x:Name="hWed" Text="水" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+                <TextBlock x:Name="hThu" Text="木" Grid.Column="4" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+                <TextBlock x:Name="hFri" Text="金" Grid.Column="5" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+            </Grid>
         </Grid>
     </Grid>
 </Page>

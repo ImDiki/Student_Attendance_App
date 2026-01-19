@@ -12,20 +12,20 @@
 
             <StackPanel VerticalAlignment="Center">
 
-                <TextBlock Text="WELCOME" FontSize="28" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
-                <TextBlock Text="Sign in to continue" FontSize="14" HorizontalAlignment="Center" Margin="0,5,0,30" Foreground="{StaticResource SubTextBrush}"/>
+                <TextBlock x:Name="txtTitle" Text="WELCOME" FontSize="28" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{StaticResource TextBrush}"/>
+                <TextBlock x:Name="txtSubTitle" Text="Sign in to continue" FontSize="14" HorizontalAlignment="Center" Margin="0,5,0,30" Foreground="{StaticResource SubTextBrush}"/>
 
-                <TextBlock Text="Username" FontWeight="SemiBold" Foreground="{StaticResource SubTextBrush}" Margin="0,0,0,5"/>
+                <TextBlock x:Name="lblUsername" Text="Username" FontWeight="SemiBold" Foreground="{StaticResource SubTextBrush}" Margin="0,0,0,5"/>
                 <TextBox x:Name="txtUsername" Height="35" VerticalContentAlignment="Center" Padding="5,0"/>
 
-                <TextBlock Text="Password" FontWeight="SemiBold" Foreground="{StaticResource SubTextBrush}" Margin="0,15,0,5"/>
+                <TextBlock x:Name="lblPassword" Text="Password" FontWeight="SemiBold" Foreground="{StaticResource SubTextBrush}" Margin="0,15,0,5"/>
                 <PasswordBox x:Name="txtPassword" Height="35" VerticalContentAlignment="Center" Padding="5,0"/>
 
                 <Button x:Name="btnLogin" Content="LOGIN" Height="45" Margin="0,30,0,0" 
                         Background="#2980b9" Foreground="White" FontSize="14" FontWeight="Bold"
                         Click="btnLogin_Click"/>
 
-                <TextBlock Text="No account? Register here." 
+                <TextBlock x:Name="txtRegisterLink" Text="No account? Register here." 
                            Foreground="#2980b9" 
                            Cursor="Hand" 
                            HorizontalAlignment="Center" 

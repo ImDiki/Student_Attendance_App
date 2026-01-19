@@ -2,112 +2,196 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
-using Student_Attendance_System.Models;
+using Student_Attendance_System.Interfaces;
 
 namespace Student_Attendance_System.Views
 {
-    public partial class TimetablePage : Page
+    public partial class TimetablePage : Page, ILanguageSwitchable
     {
+        private string[] mockSubjects = { "PG実践", "プログラミング", "データベース", "Webデザイン", "システム開発", "資格対策", "日本事情", "ビジネス" };
+
         public TimetablePage()
         {
             InitializeComponent();
-            cboTerm.SelectedIndex = App.SelectedTermIndex;
+
+            // ၁။ Language Setting ကို အရင်ယူမယ်
+            ChangeLanguage(LanguageSettings.Language);
+
+            // ၂။ Login Status ကို စစ်ပြီး UI ကို Lock/Unlock လုပ်မယ်
+            CheckUserAccess();
+
+            UpdateTodayInfo();
             LoadTimetable();
         }
 
-        private void cboTerm_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void CheckUserAccess()
         {
-            if (TimetableGrid == null) return;
-            App.SelectedTermIndex = cboTerm.SelectedIndex;
-            LoadTimetable();
+            var user = UserData.UserData.CurrentUser;
+
+            // ကျောင်းသား Login ဝင်ထားတယ်ဆိုရင်
+            if (user != null && user.Role == "Student")
+            {
+                // သူနဲ့ဆိုင်တဲ့ Year Level ကို Select လုပ်မယ် (Tag သုံးပြီး ရှာတာပါ)
+                foreach (ComboBoxItem item in cboYear.Items)
+                {
+                    if (item.Tag?.ToString() == user.YearLevel.ToString())
+                    {
+                        cboYear.SelectedItem = item;
+                        break;
+                    }
+                }
+
+                // သူ့ရဲ့ အခန်း (A, B, C...) ကို Select လုပ်မယ်
+                foreach (ComboBoxItem item in cboClass.Items)
+                {
+                    if (item.Content.ToString() == user.AssignedClass)
+                    {
+                        cboClass.SelectedItem = item;
+                        break;
+                    }
+                }
+
+                // ကျောင်းသားဆိုရင် သူ့အတန်းပဲ သူကြည့်ရမယ် (ရွေးလို့မရအောင် ပိတ်ထားမယ်)
+                cboYear.IsEnabled = false;
+                cboClass.IsEnabled = false;
+            }
+            else
+            {
+                // Login မဝင်ထားရင် (Guest) အကုန်ရွေးကြည့်လို့ရအောင် ဖွင့်ပေးထားမယ်
+                cboYear.IsEnabled = true;
+                cboClass.IsEnabled = true;
+            }
+        }
+
+        private void UpdateTodayInfo()
+        {
+            DateTime today = DateTime.Now;
+            if (LanguageSettings.Language) // Japanese Mode
+            {
+                txtTodayInfo.Text = $"本日: {today.ToString("yyyy年MM月dd日 (dddd)")}";
+            }
+            else // English Mode
+            {
+                txtTodayInfo.Text = $"Today: {today.ToString("dddd, MMM dd, yyyy")}";
+            }
+        }
+
+        public void ChangeLanguage(bool isJapanese)
+        {
+            if (isJapanese)
+            {
+                txtTitle.Text = "時間割 (Time Table)";
+                lblClassSelect.Text = "クラス選択: ";
+                lblTermSelect.Text = "学期: ";
+                hPeriod.Text = "時限";
+                hMon.Text = "月"; hTue.Text = "火"; hWed.Text = "水"; hThu.Text = "木"; hFri.Text = "金";
+            }
+            else
+            {
+                txtTitle.Text = "Time Table";
+                lblClassSelect.Text = "Class Select: ";
+                lblTermSelect.Text = "Term: ";
+                hPeriod.Text = "Period";
+                hMon.Text = "Mon"; hTue.Text = "Tue"; hWed.Text = "Wed"; hThu.Text = "Thu"; hFri.Text = "Fri";
+            }
+            UpdateTodayInfo();
+        }
+
+        private void Filter_Changed(object sender, SelectionChangedEventArgs e)
+        {
+            if (TimetableGrid != null) LoadTimetable();
         }
 
         private void LoadTimetable()
         {
-            // Clear current cards (except headers)
+            // Clear current cards except headers
             for (int i = TimetableGrid.Children.Count - 1; i >= 0; i--)
             {
                 if (Grid.GetRow(TimetableGrid.Children[i]) > 0)
                     TimetableGrid.Children.RemoveAt(i);
             }
 
-            // Data based on 2025年度 1Cクラス
-            if (App.SelectedTermIndex == 1) // Latter Term (後期)
+            // Year, Class, Term ၃ ခုလုံးကို ပေါင်းပြီး Seed လုပ်မယ်
+            // ဒါမှ 1A နဲ့ 4C ရဲ့ timetable တွေက လုံးဝမတူဘဲ ထွက်လာမှာပါ
+            int yearIndex = cboYear.SelectedIndex;
+            int classIndex = cboClass.SelectedIndex;
+            int termIndex = cboTerm.SelectedIndex;
+
+            Random rnd = new Random(yearIndex * 100 + classIndex * 10 + termIndex);
+
+            string selectedClass = (cboClass.SelectedItem as ComboBoxItem)?.Content.ToString();
+
+            AddRow(1, "09:10", rnd, selectedClass);
+            AddRow(2, "10:50", rnd, selectedClass);
+            AddRow(3, "13:10", rnd, selectedClass);
+            AddRow(4, "14:50", rnd, selectedClass);
+        }
+
+        private void AddRow(int row, string startTime, Random rnd, string className)
+        {
+            var border = new Border { BorderBrush = Brushes.LightGray, BorderThickness = new Thickness(0, 0, 1, 1) };
+            var lbl = new TextBlock
             {
-                AddRow(1, "09:10-10:40", "テスト技法", "ビジネスアプリ II", "PG実践 I", "プログラミング II", "ゼミナール I", 10, 40);
-                AddRow(2, "10:50-12:20", "テスト技法", "システム開発基礎", "PG実践 I", "プログラミング II", "データベース技術", 12, 20);
-                AddRow(3, "13:10-14:40", "データ構造 II", "-", "コミ技", "キャリアデザイン", "データベース技術", 14, 40);
-                AddRow(4, "14:50-16:20", "資格対策/日本 IV", "-", "-", "資格対策/日本 II", "就職特別指導", 16, 20);
-            }
-            else // Former Term (前期)
+                Text = $"{row}\n{startTime}",
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                FontSize = 11,
+                Foreground = Brushes.Gray,
+                TextAlignment = TextAlignment.Center
+            };
+            border.Child = lbl;
+            Grid.SetRow(border, row); Grid.SetColumn(border, 0);
+            TimetableGrid.Children.Add(border);
+
+            for (int col = 1; col <= 5; col++)
             {
-                AddRow(1, "09:10-10:40", "ネット＆セキュ", "ビジネスアプリ I", "コンシステム", "マネジメント", "データ構造 I", 10, 40);
-                AddRow(2, "10:50-12:20", "ネット＆セキュ", "プログラミング I", "コンシステム", "日本表現法", "マネジメント", 12, 20);
+                // Random Subject Generation
+                string subject = rnd.Next(10) > 2 ? mockSubjects[rnd.Next(mockSubjects.Length)] : "-";
+                AddCard(row, col, subject);
             }
         }
 
-        private void AddRow(int row, string time, string mon, string tue, string wed, string thu, string fri, int endH, int endM)
+        private void AddCard(int row, int col, string subject)
         {
-            // Time Label
-            var lbl = new TextBlock { Text = $"{row}限\n{time}", HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, FontSize = 12, Foreground = Brushes.Gray };
-            Grid.SetRow(lbl, row); Grid.SetColumn(lbl, 0);
-            TimetableGrid.Children.Add(lbl);
-
-            // Add Cards for each day
-            AddCard(row, 1, mon, "Monday", endH, endM);
-            AddCard(row, 2, tue, "Tuesday", endH, endM);
-            AddCard(row, 3, wed, "Wednesday", endH, endM);
-            AddCard(row, 4, thu, "Thursday", endH, endM);
-            AddCard(row, 5, fri, "Friday", endH, endM);
-        }
-
-        private void AddCard(int row, int col, string subject, string day, int endH, int endM)
-        {
-            if (subject == "-" || string.IsNullOrEmpty(subject))
+            var border = new Border
             {
-                // အတန်းမရှိတဲ့နေရာမှာ အဖြူကွက်လပ်လေးတွေ ဖြစ်စေရန်
-                var blank = new Border { BorderBrush = Brushes.LightGray, BorderThickness = new Thickness(0.5) };
-                Grid.SetRow(blank, row); Grid.SetColumn(blank, col);
-                TimetableGrid.Children.Add(blank);
+                BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#CBD5E0")),
+                BorderThickness = new Thickness(0, 0, 1, 1)
+            };
+
+            if (subject == "-")
+            {
+                Grid.SetRow(border, row); Grid.SetColumn(border, col);
+                TimetableGrid.Children.Add(border);
                 return;
             }
 
-            // ဘာသာရပ်အလိုက် အရောင်သတ်မှတ်ခြင်း
-            Brush cardColor = Brushes.White; // Default
-            if (subject.Contains("プログラミング")) cardColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EBF8FF")); // Light Blue
-            else if (subject.Contains("テスト")) cardColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF5F5")); // Light Red
-            else if (subject.Contains("DB")) cardColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F0FFF4")); // Light Green
-            else if (subject.Contains("PG")) cardColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FAF5FF")); // Light Purple
-
-            var btn = new Button
+            // Button ကို သုံးထားပေမယ့် IsEnabled = false လုပ်ထားရင် Click လို့မရတော့ဘူး (Read-only view)
+            Button btn = new Button
             {
                 Content = subject,
-                Style = (Style)Application.Current.Resources["TimetableCardStyle"],
-                Background = cardColor, // ကတ်တစ်ခုလုံးကို အရောင်ခြယ်ပါသည်
-                VerticalAlignment = VerticalAlignment.Stretch,
-                HorizontalAlignment = HorizontalAlignment.Stretch
+                Margin = new Thickness(2),
+                FontSize = 12,
+                Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(GetColor(subject))),
+                BorderThickness = new Thickness(0),
+                Cursor = Cursors.Arrow,
+                IsHitTestVisible = false // Click လို့ လုံးဝမရအောင် လုပ်တာပါ
             };
-            btn.Click += Subject_Click;
 
-            Grid.SetRow(btn, row); Grid.SetColumn(btn, col);
-            TimetableGrid.Children.Add(btn);
+            border.Child = btn;
+            Grid.SetRow(border, row); Grid.SetColumn(border, col);
+            TimetableGrid.Children.Add(border);
         }
 
-        private void Subject_Click(object sender, RoutedEventArgs e)
+        private string GetColor(string sub)
         {
-            if (UserData.UserData.CurrentUser?.Role != "Teacher") return;
-
-            var btn = sender as Button;
-            if (btn.Background.ToString() == "#FF8D6E63") return; // ပြီးသွားလျှင် နှိပ်မရ
-
-            if (MessageBox.Show($"{btn.Content} を開始しますか？", "確認", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-            {
-                App.IsClassActive = true;
-                App.CurrentSubject = btn.Content.ToString();
-                App.StartedPeriods.Add(btn.Tag.ToString()); // Mark as started
-                this.NavigationService.Navigate(new ScanPage()); // Dashboard navigation fix included
-            }
+            if (sub.Contains("プロ")) return "#EBF8FF";
+            if (sub.Contains("資格")) return "#FFF5F5";
+            if (sub.Contains("データ") || sub.Contains("DB")) return "#F0FFF4";
+            if (sub.Contains("PG")) return "#FAF5FF";
+            return "#FFFFFF";
         }
     }
 }

@@ -14,5 +14,7 @@ namespace Student_Attendance_System.Models
         public string Role { get; set; } // "Student", "Teacher", "Admin"
         public string FullName { get; set; }
         public string Major { get; set; }
+        public int YearLevel { get; set; }
+        public string AssignedClass { get; set; }
     }
 }

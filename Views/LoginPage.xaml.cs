@@ -1,62 +1,92 @@
-﻿using System; // Exception အတွက်
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Navigation;
-using Microsoft.Data.SqlClient;
+using Student_Attendance_System.Interfaces;
 using Student_Attendance_System.Models;
 using Student_Attendance_System.Services;
 
+
 namespace Student_Attendance_System.Views
 {
-    public partial class LoginPage : Page
+    public partial class LoginPage : Page, ILanguageSwitchable
     {
+        // Language state ကို သိဖို့ variable တစ်ခု ထားပါမယ်
+
+
         public LoginPage()
         {
             InitializeComponent();
+            ChangeLanguage(LanguageSettings.Language);
         }
 
+        // ILanguageSwitchable ကနေလာတဲ့ Method ကို အကောင်အထည်ဖော်ခြင်း
+        public void ChangeLanguage(bool isJapanese)
+        {
+
+
+            if (isJapanese)
+            {
+                // Japanese UI
+                txtTitle.Text = "ようこそ";
+                txtTitle.Focus();
+                txtSubTitle.Text = "サインインして続行してください";
+                lblUsername.Text = "ユーザー名";
+                lblPassword.Text = "パスワード";
+                btnLogin.Content = "ログイン";
+                txtRegisterLink.Text = "アカウントをお持ちでない方はこちら";
+            }
+            else
+            {
+                // English UI
+                txtTitle.Text = "WELCOME";
+                txtTitle.Focus();
+                txtSubTitle.Text = "Sign in to Continue";
+                lblUsername.Text = "Username";
+                lblPassword.Text = "Password";
+                btnLogin.Content = "Login";
+                txtRegisterLink.Text = "Don't have an account? Register here";
+            }
+        }
 
         private void btnLogin_Click(object sender, RoutedEventArgs e)
         {
-            // 1. Inputs ကို ရယူပြီး စစ်ဆေးခြင်း
             string username = txtUsername.Text.Trim();
             string password = txtPassword.Password.Trim();
 
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
-                MessageBox.Show("Please enter username and password", "Warning");
+                string msg = LanguageSettings.Language ? "ユーザー名とパスワードを入力してください" : "Please enter username and password";
+                MessageBox.Show(msg, "Warning");
                 return;
             }
 
-            // 2. AuthService ကိုသုံးပြီး Login စစ်ဆေးခြင်း
-            // (မှတ်ချက်: ဒီနေရာမှာ variable ထပ်မကြေညာတော့ဘဲ တန်းသုံးလိုက်ပါမယ်)
             var authService = new AuthService();
             User loggedInUser = authService.AuthenticateUser(username, password);
 
-            // 3. Login အောင်မြင်မှု ရှိ/မရှိ စစ်ဆေးခြင်း
             if (loggedInUser != null)
             {
-                // Global State (UserData) ထဲမှာ သိမ်းမယ်
                 UserData.UserData.CurrentUser = loggedInUser;
 
-                // Login အောင်ရင် MainWindow ကို လှမ်းပြောပြီး Dashboard Navigate လုပ်မယ်
                 if (Application.Current.MainWindow is MainWindow mainWindow)
                 {
-                    mainWindow.HandleLoginSuccess(loggedInUser);
+                    // MainWindow ကနေ Dashboard ကို သွားမယ့် method ကို လှမ်းခေါ်ခြင်း
+                    // mainWindow.HandleLoginSuccess(loggedInUser);
                 }
             }
             else
             {
-                // Login ကျရှုံးလျှင် ပြမည့် Message
-                MessageBox.Show("Login Failed!\n\nCheck Credentials:\nStudent: C5292 / 1234\nTeacher: admin / admin",
-                                "Login Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                string errorTitle = LanguageSettings.Language ? "ログインエラー" : "Login Error";
+                string errorMsg = LanguageSettings.Language
+                    ? "ログインに失敗しました！\n資格情報を確認してください。"
+                    : "Login Failed!\n\nCheck Credentials:\nStudent: C5292 / 1234\nTeacher: admin / admin";
+
+                MessageBox.Show(errorMsg, errorTitle, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-           
-           
-        // Register Link နှိပ်ရင် အလုပ်လုပ်နေရာ
-        private void GoToRegister_Click(object sender, MouseButtonEventArgs e)
+
+        private void GoToRegister_Click(object sender, MouseButtonEventArgs e)
         {
             NavigationService.Navigate(new RegisterPage());
         }
