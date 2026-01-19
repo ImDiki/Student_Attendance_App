@@ -2,14 +2,13 @@
 using System.Windows;
 using System.Windows.Threading;
 using Student_Attendance_System.Views;
-using Student_Attendance_System.Interfaces;// Page တွေရှိတဲ့ Folder Path ကို သေချာအောင် စစ်ပေးပါ
+using Student_Attendance_System.Interfaces;
+using Student_Attendance_System.Models;
 
 namespace Student_Attendance_System
 {
     public partial class MainWindow : Window
     {
-        private bool _isJapanese = false;
-
         public MainWindow()
         {
             InitializeComponent();
@@ -17,71 +16,60 @@ namespace Student_Attendance_System
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            // ၁။ အချိန်ကို Real-time ပြဖို့ Timer ပေးမယ်
             DispatcherTimer timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(1);
-            timer.Tick += Timer_Tick;
+            timer.Tick += (s, ev) => {
+                txtDate.Text = LanguageSettings.Language ? DateTime.Now.ToString("yyyy年MM月dd日 (ddd) HH:mm:ss") : DateTime.Now.ToString("yyyy/MM/dd (ddd) hh:mm:ss tt");
+            };
             timer.Start();
-
-            // ၂။ App စဖွင့်တာနဲ့ Login Page ကို တန်းပြမယ်
             MainFrame.Navigate(new LoginPage());
         }
 
-        private void Timer_Tick(object sender, EventArgs e)
+        public void HandleLoginSuccess(User user)
         {
-            // ဂျပန်စာဆိုရင် ဂျပန် format နဲ့ပြမယ်
-            if (_isJapanese)
-                txtDate.Text = DateTime.Now.ToString("yyyy年MM月dd日 (ddd) HH:mm:ss");
-            else
-                txtDate.Text = DateTime.Now.ToString("yyyy/MM/dd (ddd) hh:mm:ss tt");
+            txtWelcome.Text = user.FullName.ToUpper();
+            btnLoginMenu.Content = LanguageSettings.Language ? "🚪 ログアウト" : "🚪 Logout";
+
+            if (user.Role == "Student") MainFrame.Navigate(new TimetablePage()); // သို့မဟုတ် StudentDashboard
+            else MainFrame.Navigate(new ScanPage()); // သို့မဟုတ် TeacherDashboard
         }
 
-        // --- Navigation ---
-        private void btnLoginMenu_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new LoginPage());
-        private void btnRegister_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new RegisterPage());
-        private void btnScanMode_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ScanPage());
-        private void btnTimeTable_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new TimetablePage());
-        private void btnReport_Click(object sender, RoutedEventArgs e) { /* MainFrame.Navigate(new ReportPage()); */ }
-        private void btnAbout_Click(object sender, RoutedEventArgs e) { /* MainFrame.Navigate(new AboutPage()); */ }
-        private void btnDevTeam_Click(object sender, RoutedEventArgs e) { /* MainFrame.Navigate(new DevTeamPage()); */ }
+        private void btnLoginMenu_Click(object sender, RoutedEventArgs e)
+        {
+            if (UserData.UserData.CurrentUser != null)
+            {
+                UserData.UserData.CurrentUser = null;
+                UpdateLanguage();
+                MainFrame.Navigate(new LoginPage());
+                MessageBox.Show(LanguageSettings.Language ? "ログアウトしました" : "Logged out successfully!");
+            }
+            else MainFrame.Navigate(new LoginPage());
+        }
 
-        // --- Language Toggle ---
         private void btnLanguage_Click(object sender, RoutedEventArgs e)
         {
-            LanguageSettings.Language =!LanguageSettings.Language;
+            LanguageSettings.Language = !LanguageSettings.Language;
             UpdateLanguage();
         }
 
         private void UpdateLanguage()
         {
-            if (_isJapanese)
-            {
-                txtWelcome.Text = "ようこそ";
-                btnLoginMenu.Content = "🔑 ログイン (Login)";
-                btnRegister.Content = "📝 新規登録 (Register)";
-                btnScanMode.Content = "📷 スキャンモード";
-                btnTimeTable.Content = "📅 タイムテーブル";
-                btnReport.Content = "📊 レポート";
-                btnAbout.Content = "ℹ️ アプリについて";
-                btnDevTeam.Content = "👨‍💻 開発チーム";
-                btnLanguage.Content = "🌐 言語: JP / ENG";
-            }
-            else
-            {
-                txtWelcome.Text = "WELCOME";
-                btnLoginMenu.Content = "🔑 Login";
-                btnRegister.Content = "📝 Register";
-                btnScanMode.Content = "📷 Scan / Webcam";
-                btnTimeTable.Content = "📅 Time Table";
-                btnReport.Content = "📊 Report";
-                btnAbout.Content = "ℹ️ About Us";
-                btnDevTeam.Content = "👨‍💻 Developer Team";
-                btnLanguage.Content = "🌐 Language: ENG / JP";
-            }
-            if(MainFrame.Content is ILanguageSwitchable  Currentpage)
-            {
-               Currentpage.ChangeLanguage(LanguageSettings.Language);
-            }
+            bool isJp = LanguageSettings.Language;
+            if (UserData.UserData.CurrentUser == null) txtWelcome.Text = isJp ? "ようこそ" : "WELCOME";
+            btnLoginMenu.Content = UserData.UserData.CurrentUser != null ? (isJp ? "🚪 ログアウト" : "🚪 Logout") : (isJp ? "🔑 ログイン" : "🔑 Login");
+            btnRegister.Content = isJp ? "📝 新規登録" : "📝 Register";
+            btnScanMode.Content = isJp ? "📷 スキャンモード" : "📷 Scan / Webcam";
+            btnTimeTable.Content = isJp ? "📅 タイムテーブル" : "📅 Time Table";
+            btnLanguage.Content = isJp ? "🌐 言語: JP / ENG" : "🌐 Language: ENG / JP";
+
+            if (MainFrame.Content is ILanguageSwitchable page) page.ChangeLanguage(isJp);
         }
+
+        private void btnRegister_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new RegisterPage());
+        private void btnScanMode_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ScanPage());
+        private void btnTimeTable_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new TimetablePage());
+        private void btnReport_Click(object sender, RoutedEventArgs e) { }
+        private void btnAbout_Click(object sender, RoutedEventArgs e) { }
+        private void btnDevTeam_Click(object sender, RoutedEventArgs e) { }
     }
 }
