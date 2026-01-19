@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using Microsoft.Data.SqlClient;
 using Student_Attendance_System.Models;
 using Student_Attendance_System.Services;
@@ -30,49 +31,71 @@ namespace Student_Attendance_System.Views
             LoadAttendanceStats();
         }
 
+        //private void LoadAttendanceStats()
+        //{
+        //    // App.TempAttendanceList ထဲကနေ လက်ရှိ Login ဝင်ထားတဲ့ကျောင်းသားရဲ့ data ပဲယူမယ်
+        //    string currentStudentID = UserData.CurrentUser?.Username;
+        //    var myRecords = App.TempAttendanceList.Where(r => r.StudentID == currentStudentID).ToList();
+
+        //    int total = myRecords.Count;
+        //    int present = myRecords.Count(r => r.Status.Contains("Present") || r.Status.Contains("出席"));
+        //    int absent = total - present;
+
+        //    txtTotal.Text = total.ToString();
+        //    txtPresent.Text = present.ToString();
+        //    txtAbsent.Text = absent.ToString();
+
+        //    if (total > 0)
+        //    {
+        //        double rate = ((double)present / total) * 100;
+        //        txtPercent.Text = $"{rate:0.0}%";
+
+        //        // 80% အောက်ရောက်ရင် စာသားအနီပြောင်းမယ်
+        //        txtPercent.Foreground = rate < 80 ? System.Windows.Media.Brushes.Red : (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFromString("#2980b9");
+        //    }
+        //}
         private void LoadAttendanceStats()
         {
-            // App.TempAttendanceList ထဲကနေ လက်ရှိ Login ဝင်ထားတဲ့ကျောင်းသားရဲ့ data ပဲယူမယ်
-            string currentStudentID = UserData.CurrentUser?.Username;
-            var myRecords = App.TempAttendanceList.Where(r => r.StudentID == currentStudentID).ToList();
+            if (UserData.CurrentUser == null) return;
 
-            int total = myRecords.Count;
-            int present = myRecords.Count(r => r.Status.Contains("Present") || r.Status.Contains("出席"));
-            int absent = total - present;
+            string studentId = UserData.CurrentUser.Username; // StudentID
 
-            txtTotal.Text = total.ToString();
-            txtPresent.Text = present.ToString();
-            txtAbsent.Text = absent.ToString();
-
-            if (total > 0)
+            using (SqlConnection con = DBConnection.GetConnection())
             {
-                double rate = ((double)present / total) * 100;
-                txtPercent.Text = $"{rate:0.0}%";
+                con.Open();
 
-                // 80% အောက်ရောက်ရင် စာသားအနီပြောင်းမယ်
-                txtPercent.Foreground = rate < 80 ? System.Windows.Media.Brushes.Red : (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFromString("#2980b9");
+                string sql = @"
+SELECT TotalClasses, PresentClasses
+FROM Students
+WHERE StudentID COLLATE Latin1_General_CS_AS = @StudentID";
+
+                using (SqlCommand cmd = new SqlCommand(sql, con))
+                {
+                    cmd.Parameters.AddWithValue("@StudentID", studentId);
+
+                    using (SqlDataReader r = cmd.ExecuteReader())
+                    {
+                        if (!r.Read()) return;
+
+                        int total = (int)r["TotalClasses"];
+                        int present = (int)r["PresentClasses"];
+                        int absent = total - present;
+
+                        txtTotal.Text = total.ToString();
+                        txtPresent.Text = present.ToString();
+                        txtAbsent.Text = absent.ToString();
+
+                        double rate = total > 0 ? (double)present / total * 100 : 0;
+                        txtPercent.Text = $"{rate:0.0}%";
+                        txtPercent.Foreground = rate < 80 ? Brushes.Red : (Brush)new BrushConverter().ConvertFromString("#2980b9");
+                    }
+                }
             }
         }
 
-        //private void btnSubmitLeave_Click(object sender, RoutedEventArgs e)
-        //{
-        //    if (string.IsNullOrWhiteSpace(txtLeaveReason.Text))
-        //    {
-        //        MessageBox.Show("申請理由を入力してください (Please enter a reason).", "Warning");
-        //        return;
-        //    }
 
-        //    // Global Leave Request စာရင်းထဲ ထည့်သွင်းခြင်း
-        //    App.GlobalLeaveRequests.Add(new LeaveRequest
-        //    {
-        //        StudentID = UserData.CurrentUser?.Username,
-        //        Reason = txtLeaveReason.Text,
-        //        Date = DateTime.Now.ToString("yyyy/MM/dd HH:mm")
-        //    });
 
-        //    MessageBox.Show("申請を送信しました。先生の確認をお待ちください。", "Success");
-        //    txtLeaveReason.Clear();
-        //}
+
         private void btnSubmitLeave_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtLeaveReason.Text))

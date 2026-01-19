@@ -64,32 +64,29 @@ namespace Student_Attendance_System.Views
 
         private void AddCard(int row, int col, string subject, string day, int endH, int endM)
         {
-            if (subject == "-" || string.IsNullOrEmpty(subject)) return;
-
-            // Automatic Color Logic
-            DateTime now = DateTime.Now;
-            DateTime endTime = new DateTime(now.Year, now.Month, now.Day, endH, endM, 0);
-            string key = $"{now:yyyyMMdd}_{day}_{row}";
-
-            Brush sideColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3182CE")); // Default Blue Sidebar
-
-            // ၁။ အတန်းချိန်ပြီးသွားလျှင် သို့မဟုတ် စတင်ပြီးသားဖြစ်လျှင် အညိုရောင်ပြောင်းရန်
-            if (now > endTime || App.StartedPeriods.Contains(key))
+            if (subject == "-" || string.IsNullOrEmpty(subject))
             {
-                sideColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#8D6E63")); // Brown Sidebar
+                // အတန်းမရှိတဲ့နေရာမှာ အဖြူကွက်လပ်လေးတွေ ဖြစ်စေရန်
+                var blank = new Border { BorderBrush = Brushes.LightGray, BorderThickness = new Thickness(0.5) };
+                Grid.SetRow(blank, row); Grid.SetColumn(blank, col);
+                TimetableGrid.Children.Add(blank);
+                return;
             }
-            // ၂။ ယနေ့အတွက် လက်ရှိအတန်းဖြစ်ပါက လိမ္မော်ရောင်ပြရန်
-            else if (now.DayOfWeek.ToString() == day)
-            {
-                sideColor = Brushes.Orange; // Orange Sidebar
-            }
+
+            // ဘာသာရပ်အလိုက် အရောင်သတ်မှတ်ခြင်း
+            Brush cardColor = Brushes.White; // Default
+            if (subject.Contains("プログラミング")) cardColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EBF8FF")); // Light Blue
+            else if (subject.Contains("テスト")) cardColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF5F5")); // Light Red
+            else if (subject.Contains("DB")) cardColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F0FFF4")); // Light Green
+            else if (subject.Contains("PG")) cardColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FAF5FF")); // Light Purple
 
             var btn = new Button
             {
                 Content = subject,
                 Style = (Style)Application.Current.Resources["TimetableCardStyle"],
-                Background = sideColor, // This binds to SideBar background in template
-                Tag = key // Store key for click logic
+                Background = cardColor, // ကတ်တစ်ခုလုံးကို အရောင်ခြယ်ပါသည်
+                VerticalAlignment = VerticalAlignment.Stretch,
+                HorizontalAlignment = HorizontalAlignment.Stretch
             };
             btn.Click += Subject_Click;
 

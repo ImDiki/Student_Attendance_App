@@ -33,6 +33,7 @@ namespace Student_Attendance_System.Views
         {
             UpdateLeaveStatus("Rejected");
         }
+
         //private void UpdateLeaveStatus(string status)
         //{
         //    if (dgLeaveRequests.SelectedItem is not LeaveRequest req)
@@ -41,6 +42,7 @@ namespace Student_Attendance_System.Views
         //        return;
         //    }
 
+        //    // 1️⃣ Update LeaveRequest status
         //    using (SqlConnection con = DBConnection.GetConnection())
         //    {
         //        con.Open();
@@ -54,8 +56,104 @@ namespace Student_Attendance_System.Views
         //        }
         //    }
 
-        //    LoadLeaveRequests();
-        //}
+        //    // 2️⃣ IF APPROVED
+        //    if (status == "Approved")
+        //    {
+        //        string today = DateTime.Now.ToString("yyyy-MM-dd");
+
+        //        // 1️⃣ CHECK: already exists in 出席管理?
+        //        var existing = App.TempAttendanceList.FirstOrDefault(a =>
+        //            a.StudentID == req.StudentID &&
+        //            a.Subject == App.CurrentSubject &&
+        //            a.Date.StartsWith(today)
+        //        );
+
+        //        // 2️⃣ IF NOT EXISTS → CREATE IT (公欠)
+        //        if (existing == null)
+        //        {
+        //            // 👉 ADD TO 出席管理 (MEMORY)
+        //            App.TempAttendanceList.Add(new AttendanceRecord
+        //            {
+        //                StudentID = req.StudentID,
+        //                Subject = App.CurrentSubject,
+        //                Date = DateTime.Now.ToString("yyyy-MM-dd HH:mm"),
+        //                Status = "Present",
+        //                Note = "欠席届 承認（公欠）"
+        //            });
+
+        //            // 👉 SAVE TO Attendance TABLE
+        //            using (SqlConnection con = DBConnection.GetConnection())
+        //            {
+        //                con.Open();
+        //                string sql = @"INSERT INTO Attendance
+        //                   (StudentID, Subject, ScanTime, Status)
+        //                   VALUES (@StudentID, @Subject, @Time, @Status)";
+
+        //                using (SqlCommand cmd = new SqlCommand(sql, con))
+        //                {
+        //                    cmd.Parameters.AddWithValue("@StudentID", req.StudentID);
+        //                    cmd.Parameters.AddWithValue("@Subject", App.CurrentSubject);
+        //                    cmd.Parameters.AddWithValue("@Time", DateTime.Now);
+        //                    cmd.Parameters.AddWithValue("@Status", "Present");
+
+        //                    cmd.ExecuteNonQuery();
+        //                }
+        //            }
+
+        //            // 👉 UPDATE Students TABLE (attendance counters)
+        //            using (SqlConnection con = DBConnection.GetConnection())
+        //            {
+        //                con.Open();
+        //                string sql = @"UPDATE Students SET TotalClasses = TotalClasses + 1, PresentClasses = PresentClasses + 1 WHERE StudentID = @StudentID";
+
+        //                using (SqlCommand cmd = new SqlCommand(sql, con))
+        //                {
+        //                    cmd.Parameters.AddWithValue("@StudentID", req.StudentID);
+        //                    cmd.ExecuteNonQuery();
+        //                }
+        //            }
+
+        //            // 👉 UPDATE Students TABLE (attendance counters)
+        //            using (SqlConnection con = DBConnection.GetConnection())
+        //            {
+        //                con.Open();
+        //                string sql = @"
+        //        UPDATE Students
+        //        SET 
+        //            TotalClasses = TotalClasses + 1,
+        //            PresentClasses = PresentClasses + 1
+        //        WHERE StudentID = @StudentID";
+
+        //                using (SqlCommand cmd = new SqlCommand(sql, con))
+        //                {
+        //                    cmd.Parameters.AddWithValue("@StudentID", req.StudentID);
+        //                    cmd.ExecuteNonQuery();
+        //                }
+        //            }
+        //        }
+        //    }
+
+
+        //    // 🔹 C. UPDATE STUDENT ATTENDANCE COUNTERS
+        //    using (SqlConnection con = DBConnection.GetConnection())
+        //        {
+        //            con.Open();
+        //            string sql = @"
+        //        UPDATE Students
+        //        SET 
+        //            TotalClasses = TotalClasses + 1,
+        //            PresentClasses = PresentClasses + 1
+        //        WHERE StudentID = @StudentID";
+
+        //            using (SqlCommand cmd = new SqlCommand(sql, con))
+        //            {
+        //                cmd.Parameters.AddWithValue("@StudentID", req.StudentID);
+        //                cmd.ExecuteNonQuery();
+        //            }
+        //        }
+        //    }
+
+
         private void UpdateLeaveStatus(string status)
         {
             if (dgLeaveRequests.SelectedItem is not LeaveRequest req)
@@ -78,22 +176,21 @@ namespace Student_Attendance_System.Views
                 }
             }
 
-            // 2️⃣ IF APPROVED
+            // ======================
+            // APPROVED → PRESENT
+            // ======================
             if (status == "Approved")
             {
-                string today = DateTime.Now.ToString("yyyy-MM-dd");
-
-                // 1️⃣ CHECK: already exists in 出席管理?
-                var existing = App.TempAttendanceList.FirstOrDefault(a =>
+                // Prevent duplicate
+                var exists = App.TempAttendanceList.FirstOrDefault(a =>
                     a.StudentID == req.StudentID &&
                     a.Subject == App.CurrentSubject &&
-                    a.Date.StartsWith(today)
+                    a.Date.StartsWith(DateTime.Now.ToString("yyyy-MM-dd"))
                 );
 
-                // 2️⃣ IF NOT EXISTS → CREATE IT (公欠)
-                if (existing == null)
+                if (exists == null)
                 {
-                    // 👉 ADD TO 出席管理 (MEMORY)
+                    // 出席管理 (memory)
                     App.TempAttendanceList.Add(new AttendanceRecord
                     {
                         StudentID = req.StudentID,
@@ -103,48 +200,14 @@ namespace Student_Attendance_System.Views
                         Note = "欠席届 承認（公欠）"
                     });
 
-                    // 👉 SAVE TO Attendance TABLE
-                    using (SqlConnection con = DBConnection.GetConnection())
-                    {
-                        con.Open();
-                        string sql = @"INSERT INTO Attendance
-                           (StudentID, Subject, ScanTime, Status)
-                           VALUES (@StudentID, @Subject, @Time, @Status)";
-
-                        using (SqlCommand cmd = new SqlCommand(sql, con))
-                        {
-                            cmd.Parameters.AddWithValue("@StudentID", req.StudentID);
-                            cmd.Parameters.AddWithValue("@Subject", App.CurrentSubject);
-                            cmd.Parameters.AddWithValue("@Time", DateTime.Now);
-                            cmd.Parameters.AddWithValue("@Status", "Present");
-
-                            cmd.ExecuteNonQuery();
-                        }
-                    }
-
-                    // 👉 UPDATE Students TABLE (attendance counters)
-                    using (SqlConnection con = DBConnection.GetConnection())
-                    {
-                        con.Open();
-                        string sql = @"UPDATE Students SET TotalClasses = TotalClasses + 1, PresentClasses = PresentClasses + 1 WHERE StudentID = @StudentID";
-
-                        using (SqlCommand cmd = new SqlCommand(sql, con))
-                        {
-                            cmd.Parameters.AddWithValue("@StudentID", req.StudentID);
-                            cmd.ExecuteNonQuery();
-                        }
-                    }
-
-                    // 👉 UPDATE Students TABLE (attendance counters)
+                    // DB → PresentClasses +1 ONLY
                     using (SqlConnection con = DBConnection.GetConnection())
                     {
                         con.Open();
                         string sql = @"
-                UPDATE Students
-                SET 
-                    TotalClasses = TotalClasses + 1,
-                    PresentClasses = PresentClasses + 1
-                WHERE StudentID = @StudentID";
+UPDATE Students
+SET PresentClasses = PresentClasses + 1
+WHERE StudentID = @StudentID";
 
                         using (SqlCommand cmd = new SqlCommand(sql, con))
                         {
@@ -155,25 +218,40 @@ namespace Student_Attendance_System.Views
                 }
             }
 
-
-            // 🔹 C. UPDATE STUDENT ATTENDANCE COUNTERS
-            using (SqlConnection con = DBConnection.GetConnection())
+            // ======================
+            // REJECTED → ABSENT
+            // ======================
+            if (status == "Rejected")
+            {
+                // 出席管理 (ABSENT only, no DB counter change)
+                App.TempAttendanceList.Add(new AttendanceRecord
                 {
-                    con.Open();
-                    string sql = @"
-                UPDATE Students
-                SET 
-                    TotalClasses = TotalClasses + 1,
-                    PresentClasses = PresentClasses + 1
-                WHERE StudentID = @StudentID";
+                    StudentID = req.StudentID,
+                    Subject = App.CurrentSubject,
+                    Date = DateTime.Now.ToString("yyyy-MM-dd HH:mm"),
+                    Status = "Absent",
+                    Note = "欠席届 却下"
+                });
+            }
 
-                    using (SqlCommand cmd = new SqlCommand(sql, con))
-                    {
-                        cmd.Parameters.AddWithValue("@StudentID", req.StudentID);
-                        cmd.ExecuteNonQuery();
-                    }
+            LoadLeaveRequests();
+            RefreshList();
+        }
+
+
+        private void IncreaseTotalClassesForAllStudents()
+        {
+            using (SqlConnection con = DBConnection.GetConnection())
+            {
+                con.Open();
+                string sql = "UPDATE Students SET TotalClasses = TotalClasses + 1";
+                using (SqlCommand cmd = new SqlCommand(sql, con))
+                {
+                    cmd.ExecuteNonQuery();
                 }
             }
+        }
+
 
 
         private void LoadDailyPeriods()
@@ -220,6 +298,21 @@ namespace Student_Attendance_System.Views
             }
         }
 
+        //private void StartClass_Click(object sender, RoutedEventArgs e)
+        //{
+        //    var btn = sender as Button;
+        //    dynamic data = btn.Tag;
+
+        //    if (MessageBox.Show($"{data.Subj} の授業を開始しますか？", "確認", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+        //    {
+        //        App.IsClassActive = true;
+        //        App.CurrentActiveSessionStart = DateTime.Now;
+        //        App.CurrentSubject = data.Subj;
+        //        App.StartedPeriods.Add(data.Key);
+        //        this.NavigationService.Navigate(new ScanPage());
+        //    }
+        //}
+
         private void StartClass_Click(object sender, RoutedEventArgs e)
         {
             var btn = sender as Button;
@@ -231,9 +324,14 @@ namespace Student_Attendance_System.Views
                 App.CurrentActiveSessionStart = DateTime.Now;
                 App.CurrentSubject = data.Subj;
                 App.StartedPeriods.Add(data.Key);
+
+                // ✅ IMPORTANT: TotalClasses +1 (everyone absent by default)
+                IncreaseTotalClassesForAllStudents();
+
                 this.NavigationService.Navigate(new ScanPage());
             }
         }
+
 
         private List<(string Time, string Subj)> GetLatterTermSchedule(DayOfWeek day)
         {
