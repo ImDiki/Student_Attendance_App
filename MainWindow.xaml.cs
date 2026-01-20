@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Threading;
+using System.Windows.Controls;
 using Student_Attendance_System.Views;
 using Student_Attendance_System.Interfaces;
 using Student_Attendance_System.Models;
-using System.Xml.Serialization;
 
 namespace Student_Attendance_System
 {
@@ -28,45 +28,43 @@ namespace Student_Attendance_System
             };
             timer.Start();
 
+            UpdateLanguage(); // Start with correct language display
             MainFrame.Navigate(new LoginPage());
         }
+
         private void btnHomeLogo_Click(object sender, RoutedEventArgs e)
         {
             MainFrame.Navigate(new LoginPage());
-
         }
-        // --- Hamburger Click Logic ---
+
         private void btnHamburger_Click(object sender, RoutedEventArgs e)
         {
             if (isSideBarExpanded)
             {
-                // Sidebar ကို ကျုံ့မယ် (Icon mode)
-                SidebarBorder.Width = 75;
+                SidebarBorder.Width = 85;
                 SideInfoPanel.Visibility = Visibility.Collapsed;
-                BottomPanel.Visibility = Visibility.Visible; // Developer button တွေ မပျောက်အောင်
-                ToggleLabels(Visibility.Collapsed);
+                ToggleSidebarUI(Visibility.Collapsed, HorizontalAlignment.Center);
             }
             else
             {
-                // Sidebar ကို ပြန်ချဲ့မယ် (Full mode)
-                SidebarBorder.Width = 255;
+                SidebarBorder.Width = 260;
                 SideInfoPanel.Visibility = Visibility.Visible;
-                ToggleLabels(Visibility.Visible);
+                ToggleSidebarUI(Visibility.Visible, HorizontalAlignment.Left);
             }
             isSideBarExpanded = !isSideBarExpanded;
         }
 
-        private void ToggleLabels(Visibility visibility)
+        private void ToggleSidebarUI(Visibility vis, HorizontalAlignment align)
         {
-            lblLang.Visibility = visibility;
-            lblLogin.Visibility = visibility;
-            lblReg.Visibility = visibility;
-            lblScan.Visibility = visibility;
-            lblTable.Visibility = visibility;
-            lblReport.Visibility = visibility;
-            lblLogout.Visibility = visibility;
-            lblAbout.Visibility = visibility;
-            lblDev.Visibility = visibility;
+            lblLang.Visibility = lblLogin.Visibility = lblReg.Visibility =
+            lblScan.Visibility = lblTable.Visibility = lblReport.Visibility =
+            lblLogout.Visibility = lblAbout.Visibility = lblDev.Visibility = vis;
+
+            pnlLang.HorizontalAlignment = pnlLogin.HorizontalAlignment =
+            pnlReg.HorizontalAlignment = pnlScan.HorizontalAlignment =
+            pnlTable.HorizontalAlignment = pnlReport.HorizontalAlignment =
+            pnlLogout.HorizontalAlignment = pnlAbout.HorizontalAlignment =
+            pnlDev.HorizontalAlignment = align;
         }
 
         public void HandleLoginSuccess(User user)
@@ -75,8 +73,11 @@ namespace Student_Attendance_System
             btnLoginMenu.Visibility = Visibility.Collapsed;
             btnLogout.Visibility = Visibility.Visible;
 
-            if (user.Role == "Student") MainFrame.Navigate(new TimetablePage());
-            else MainFrame.Navigate(new ScanPage());
+            // Role redirection as per your request
+            if (user.Role == "Student")
+                MainFrame.Navigate(new StudentDashboardPage());
+            else
+                MainFrame.Navigate(new TeacherDashboard());
         }
 
         private void btnLogout_Click(object sender, RoutedEventArgs e)
@@ -113,12 +114,13 @@ namespace Student_Attendance_System
             if (MainFrame.Content is ILanguageSwitchable page) page.ChangeLanguage(isJp);
         }
 
+        // Methods that were missing in your original CS causing errors:
         private void btnLoginMenu_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new LoginPage());
         private void btnRegister_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new RegisterPage());
         private void btnScanMode_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ScanPage());
         private void btnTimeTable_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new TimetablePage());
-        private void btnReport_Click(object sender, RoutedEventArgs e) { /* Navigate to Report */ }
-        private void btnAbout_Click(object sender, RoutedEventArgs e) { /* Navigate to About */ }
-        private void btnDevTeam_Click(object sender, RoutedEventArgs e) { /* Navigate to DevTeam */ }
+        private void btnReport_Click(object sender, RoutedEventArgs e) { }
+        private void btnAbout_Click(object sender, RoutedEventArgs e) => MessageBox.Show(LanguageSettings.Language ? "情報" : "About System");
+        private void btnDevTeam_Click(object sender, RoutedEventArgs e) => MessageBox.Show("Developer Team Console");
     }
 }

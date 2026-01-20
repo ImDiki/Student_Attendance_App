@@ -2,36 +2,56 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using Student_Attendance_System.Models;
+using Student_Attendance_System.Interfaces;
 
 namespace Student_Attendance_System.Views
 {
-    public partial class StudentDashboardPage : Page
+    public partial class StudentDashboardPage : Page, ILanguageSwitchable
     {
         public StudentDashboardPage()
         {
             InitializeComponent();
+            // Language ကို စတင်သတ်မှတ်ခြင်း
+            ChangeLanguage(LanguageSettings.Language);
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            // ၁။ User နာမည်ပြောင်းခြင်း
+            // ၁။ User နာမည်ကို Dashboard မှာပြခြင်း
             if (UserData.UserData.CurrentUser != null)
             {
-                txtWelcome.Text = $"{UserData.UserData.CurrentUser.FullName} さん、ようこそ！";
+                string greeting = LanguageSettings.Language ? "さん、ようこそ！" : " ,Welcome back!";
+                txtWelcome.Text = $"{UserData.UserData.CurrentUser.FullName}{greeting}";
             }
 
-            // ၂။ Timetable ကို Dashboard ထဲမှာ Navigate လုပ်ခြင်း
+            // ၂။ Timetable ကို Frame ထဲမှာ Navigate လုပ်ခြင်း
             TimetableFrame.Navigate(new TimetablePage());
 
             // ၃။ ကိန်းဂဏန်းများ တွက်ချက်ခြင်း
             LoadAttendanceStats();
         }
 
+        public void ChangeLanguage(bool isJapanese)
+        {
+            txtWelcomeSub.Text = isJapanese ? "出席状況を確認してください。" : "Check your attendance status.";
+            lblPresent.Text = isJapanese ? "出席 (Present)" : "Present";
+            lblAbsent.Text = isJapanese ? "欠席 (Absent)" : "Absent";
+            lblRateTitle.Text = isJapanese ? "総合出席率" : "Overall Attendance Rate";
+            lblRateSub.Text = isJapanese ? "進級には80%以上必要です。" : "You need 80% to pass.";
+            lblTimetable.Text = isJapanese ? "今週の時間割" : "Weekly Timetable";
+            lblLeaveTitle.Text = isJapanese ? "欠席・遅刻届" : "Leave / Late Request";
+            lblReason.Text = isJapanese ? "申請理由:" : "Reason for Leave:";
+            btnSubmit.Content = isJapanese ? "申請を送信する" : "Submit Request";
+        }
+
         private void LoadAttendanceStats()
         {
-            // App.TempAttendanceList ထဲကနေ လက်ရှိ Login ဝင်ထားတဲ့ကျောင်းသားရဲ့ data ပဲယူမယ်
+            // Mock Data List ထဲကနေ လက်ရှိ Login ဝင်ထားတဲ့ကျောင်းသားရဲ့ data ပဲယူမယ်
             string currentStudentID = UserData.UserData.CurrentUser?.Username;
+
+            // App.TempAttendanceList ကနေ စစ်ထုတ်ခြင်း
             var myRecords = App.TempAttendanceList.Where(r => r.StudentID == currentStudentID).ToList();
 
             int total = myRecords.Count;
@@ -48,7 +68,7 @@ namespace Student_Attendance_System.Views
                 txtPercent.Text = $"{rate:0.0}%";
 
                 // 80% အောက်ရောက်ရင် စာသားအနီပြောင်းမယ်
-                txtPercent.Foreground = rate < 80 ? System.Windows.Media.Brushes.Red : (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFromString("#2980b9");
+                txtPercent.Foreground = rate < 80 ? Brushes.Red : (Brush)new BrushConverter().ConvertFromString("#38BDF8");
             }
         }
 
@@ -56,11 +76,12 @@ namespace Student_Attendance_System.Views
         {
             if (string.IsNullOrWhiteSpace(txtLeaveReason.Text))
             {
-                MessageBox.Show("申請理由を入力してください (Please enter a reason).", "Warning");
+                string msg = LanguageSettings.Language ? "理由を入力してください" : "Please enter a reason.";
+                MessageBox.Show(msg, "Warning");
                 return;
             }
 
-            // Global Leave Request စာရင်းထဲ ထည့်သွင်းခြင်း
+            // Global Leave Request စာရင်းထဲ Mock ထည့်သွင်းခြင်း
             App.GlobalLeaveRequests.Add(new LeaveRequest
             {
                 StudentID = UserData.UserData.CurrentUser?.Username,
@@ -68,7 +89,8 @@ namespace Student_Attendance_System.Views
                 Date = DateTime.Now.ToString("yyyy/MM/dd HH:mm")
             });
 
-            MessageBox.Show("申請を送信しました。先生の確認をお待ちください。", "Success");
+            string successMsg = LanguageSettings.Language ? "申請を送信しました。" : "Request submitted successfully!";
+            MessageBox.Show(successMsg, "Success");
             txtLeaveReason.Clear();
         }
     }

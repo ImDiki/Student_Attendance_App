@@ -10,8 +10,14 @@ namespace Student_Attendance_System.Views
 {
     public partial class LoginPage : Page, ILanguageSwitchable
     {
-        public LoginPage() { InitializeComponent(); ChangeLanguage(LanguageSettings.Language); }
+        public LoginPage()
+        {
+            InitializeComponent();
+            // App-wide language settings ကို စတင်အသုံးပြုခြင်း
+            ChangeLanguage(LanguageSettings.Language);
+        }
 
+        // --- ILanguageSwitchable Implementation ---
         public void ChangeLanguage(bool isJapanese)
         {
             txtTitle.Text = isJapanese ? "ようこそ" : "WELCOME";
@@ -27,7 +33,13 @@ namespace Student_Attendance_System.Views
         {
             string user = txtUsername.Text.Trim();
             string pass = txtPassword.Password.Trim();
-            if (string.IsNullOrEmpty(user) || string.IsNullOrEmpty(pass)) return;
+
+            if (string.IsNullOrEmpty(user) || string.IsNullOrEmpty(pass))
+            {
+                string msg = LanguageSettings.Language ? "すべての項目を入力してください" : "Please fill in all fields.";
+                MessageBox.Show(msg, "System Status");
+                return;
+            }
 
             var auth = new AuthService();
             User loggedInUser = auth.AuthenticateUser(user, pass);
@@ -35,11 +47,16 @@ namespace Student_Attendance_System.Views
             if (loggedInUser != null)
             {
                 UserData.UserData.CurrentUser = loggedInUser;
-                if (Application.Current.MainWindow is MainWindow main) main.HandleLoginSuccess(loggedInUser);
+
+                // MainWindow ဆီသို့ Success ဖြစ်ကြောင်း လှမ်းခေါ်ပြီး Role အလိုက် Redirect လုပ်ခိုင်းခြင်း
+                if (Application.Current.MainWindow is MainWindow main)
+                {
+                    main.HandleLoginSuccess(loggedInUser);
+                }
             }
             else
             {
-                MessageBox.Show(LanguageSettings.Language ? "ログインに失敗しました" : "Login Failed!");
+                MessageBox.Show(LanguageSettings.Language ? "ログインに失敗しました" : "Login Failed!", "Auth Error");
             }
         }
 
@@ -48,6 +65,9 @@ namespace Student_Attendance_System.Views
             MessageBox.Show(LanguageSettings.Language ? "教務課に連絡してください" : "Please contact the admin office.");
         }
 
-        private void GoToRegister_Click(object sender, MouseButtonEventArgs e) => NavigationService.Navigate(new RegisterPage());
+        private void GoToRegister_Click(object sender, MouseButtonEventArgs e)
+        {
+            NavigationService.Navigate(new RegisterPage());
+        }
     }
 }

@@ -3,45 +3,42 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              StartupUri="MainWindow.xaml">
 
-
-
     <Application.Resources>
-        <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#F4F6F9"/>
-        <SolidColorBrush x:Key="CardBackgroundBrush" Color="White"/>
-        <SolidColorBrush x:Key="TextBrush" Color="#2C3E50"/>
-        <SolidColorBrush x:Key="SubTextBrush" Color="Gray"/>
-
-        <Style x:Key="TimetableCardStyle" TargetType="Button">
-            <Setter Property="VerticalAlignment" Value="Stretch"/>
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-            <Setter Property="Margin" Value="0"/>
-            <Setter Property="Padding" Value="0"/>
+        <Style x:Key="TechInputStyle" TargetType="Control">
+            <Setter Property="Background" Value="#1A000000"/>
+            <Setter Property="Foreground" Value="#E2E8F0"/>
+            <Setter Property="BorderBrush" Value="#33FFFFFF"/>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border BorderBrush="#E2E8F0" BorderThickness="0.5" Background="{TemplateBinding Background}">
-                            <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5">
-                                <StackPanel>
-                                    <TextBlock Text="{TemplateBinding Content}" 
-                                       FontWeight="Bold" 
-                                       FontSize="13" 
-                                       TextWrapping="Wrap" 
-                                       TextAlignment="Center"
-                                       Foreground="#2D3748"/>
-                                    <TextBlock Text="鈴木先生" 
-                                       FontSize="10" 
-                                       Foreground="#718096" 
-                                       Margin="0,4,0,0" 
-                                       TextAlignment="Center"/>
-                                </StackPanel>
-                            </Grid>
+                    <ControlTemplate TargetType="Control">
+                        <Border Background="{TemplateBinding Background}" 
+                            BorderBrush="{TemplateBinding BorderBrush}" 
+                            BorderThickness="1" CornerRadius="8">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="10,5" VerticalAlignment="Center"/>
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
 
-    </Application.Resources>
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="#1A000000"/>
+            <Setter Property="Foreground" Value="#E2E8F0"/>
+            <Setter Property="BorderBrush" Value="#33FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Style.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#1E293B" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.WindowTextBrushKey}" Color="White" />
+            </Style.Resources>
+        </Style>
 
+        <Style TargetType="DatePicker">
+            <Setter Property="Background" Value="#1A000000"/>
+            <Setter Property="Foreground" Value="#E2E8F0"/>
+            <Style.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#1E293B" />
+            </Style.Resources>
+        </Style>
+    </Application.Resources>
 
 </Application>

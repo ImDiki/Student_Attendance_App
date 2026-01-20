@@ -17,12 +17,13 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="8" Padding="10,8">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="12" Padding="10,8">
                             <ContentPresenter/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#3D4E60"/>
+                                <Setter TargetName="border" Property="Background" Value="#1AFFFFFF"/>
+                                <Setter Property="Foreground" Value="#06B6D4"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -31,13 +32,21 @@
         </Style>
     </Window.Resources>
 
-    <Grid Background="#F8FAFC">
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#0F172A" Offset="0"/>
+                <GradientStop Color="#1E293B" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition x:Name="SidebarColumn" Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Border x:Name="SidebarBorder" Grid.Column="0" Width="260" Background="#2C3E50">
+        <Border x:Name="SidebarBorder" Grid.Column="0" Width="260" Margin="15" CornerRadius="20" 
+                Background="#0DFFFFFF" BorderThickness="1" BorderBrush="#26FFFFFF">
             <Grid Margin="10">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -46,130 +55,127 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel Grid.Row="0">
-                    <Grid Margin=" 0,0,0,10">
-                        <Button x:Name="btnHamburger" Content="≡" FontSize="32" Foreground="White" FontWeight="DemiBold" 
-                          Style="{StaticResource MenuButtonStyle}" BorderThickness="0" HorizontalAlignment="Right" Click="btnHamburger_Click" Margin="15,5,0,10"/>
-
-                        
+                    <Grid Margin="0,0,0,10">
+                        <Button x:Name="btnHamburger" Content="≡" FontSize="32" Foreground="#06B6D4" 
+                                FontWeight="Bold" Style="{StaticResource MenuButtonStyle}" 
+                                HorizontalAlignment="Right" Click="btnHamburger_Click" Margin="0,5,15,10"/>
                     </Grid>
+
                     <StackPanel x:Name="SideInfoPanel">
-                        <Border Background="#34495E" CornerRadius="5" Padding="5" Margin="0,0,0,10">
-                            <TextBlock x:Name="txtDate" Foreground="#ECF0F1" FontSize="15" HorizontalAlignment="Center"/>
+                        <Border Background="#334155" CornerRadius="8" Padding="10" Margin="0,0,0,10">
+                            <TextBlock x:Name="txtDate" Foreground="White" FontSize="13" HorizontalAlignment="Center"/>
                         </Border>
-                        <Border x:Name="btnHomeLogo_Clic">
-                        <Image Source="/Assets/Owl.png" Height="45" Margin="0,5"/>
-                        </Border>
+
+                        <Button x:Name="btnHomeLogo" Background="Transparent" BorderThickness="0" Click="btnHomeLogo_Click" Cursor="Hand">
+                            <Image Source="/Assets/Owl.png" Height="45" Margin="0,5"/>
+                        </Button>
+
                         <TextBlock x:Name="txtWelcome" Text="WELCOME" Foreground="White" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,15"/>
+                        <Separator Background="#26FFFFFF" Margin="10,0,10,15"/>
                     </StackPanel>
                 </StackPanel>
 
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden">
                     <StackPanel x:Name="MenuStack">
                         <Button Style="{StaticResource MenuButtonStyle}" Click="btnLanguage_Click">
-                            <Grid>
+                            <Grid x:Name="pnlLang">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="35"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="🌐" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <TextBlock x:Name="lblLang" Text="Language: ENG / JP" Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                <TextBlock Text="🌐" FontSize="18" HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="lblLang" Text="Language: ENG / JP" Grid.Column="1" Margin="10,0,0,0"/>
                             </Grid>
                         </Button>
 
                         <Button x:Name="btnLoginMenu" Style="{StaticResource MenuButtonStyle}" Click="btnLoginMenu_Click">
-                            <Grid>
+                            <Grid x:Name="pnlLogin">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="35"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="🔑" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <TextBlock x:Name="lblLogin" Text="Login" Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                <TextBlock Text="🔑" FontSize="18" HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="lblLogin" Text="Login" Grid.Column="1" Margin="10,0,0,0"/>
                             </Grid>
                         </Button>
 
                         <Button x:Name="btnRegister" Style="{StaticResource MenuButtonStyle}" Click="btnRegister_Click">
-                            <Grid>
+                            <Grid x:Name="pnlReg">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="35"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="📝" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <TextBlock x:Name="lblReg" Text="Register" Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                <TextBlock Text="📝" FontSize="18" HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="lblReg" Text="Register" Grid.Column="1" Margin="10,0,0,0"/>
                             </Grid>
                         </Button>
 
                         <Button x:Name="btnScanMode" Style="{StaticResource MenuButtonStyle}" Click="btnScanMode_Click">
-                            <Grid>
+                            <Grid x:Name="pnlScan">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="35"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="📷" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <TextBlock x:Name="lblScan" Text="Scan / Webcam" Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                <TextBlock Text="📷" FontSize="18" HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="lblScan" Text="Scan / Webcam" Grid.Column="1" Margin="10,0,0,0"/>
                             </Grid>
                         </Button>
 
                         <Button x:Name="btnTimeTable" Style="{StaticResource MenuButtonStyle}" Click="btnTimeTable_Click">
-                            <Grid>
+                            <Grid x:Name="pnlTable">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="35"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="📅" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <TextBlock x:Name="lblTable" Text="Time Table" Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                <TextBlock Text="📅" FontSize="18" HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="lblTable" Text="Time Table" Grid.Column="1" Margin="10,0,0,0"/>
                             </Grid>
                         </Button>
 
                         <Button x:Name="btnReport" Style="{StaticResource MenuButtonStyle}" Click="btnReport_Click">
-                            <Grid>
+                            <Grid x:Name="pnlReport">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="35"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-
-                                <TextBlock Text="📊" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-
-                                <TextBlock x:Name="lblReport" 
-                   Text="Report" 
-                   Grid.Column="1" 
-                   VerticalAlignment="Center" 
-                   Margin="10,0,0,0"/>
+                                <TextBlock Text="📊" FontSize="18" HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="lblReport" Text="Report" Grid.Column="1" Margin="10,0,0,0"/>
                             </Grid>
                         </Button>
 
                         <Button x:Name="btnLogout" Visibility="Collapsed" Style="{StaticResource MenuButtonStyle}" Click="btnLogout_Click">
-                            <Grid>
+                            <Grid x:Name="pnlLogout">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="35"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="🚪" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <TextBlock x:Name="lblLogout" Text="Logout" Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                <TextBlock Text="🚪" FontSize="18" HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="lblLogout" Text="Logout" Grid.Column="1" Margin="10,0,0,0"/>
                             </Grid>
                         </Button>
                     </StackPanel>
                 </ScrollViewer>
 
                 <StackPanel Grid.Row="2" x:Name="BottomPanel">
-                    <Separator Background="#30FFFFFF" Margin="0,5,0,10"/>
+                    <Separator Background="#26FFFFFF" Margin="10,5,10,10"/>
                     <Button Style="{StaticResource MenuButtonStyle}" Click="btnAbout_Click">
-                        <Grid>
+                        <Grid x:Name="pnlAbout">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="35"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="ℹ️" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBlock x:Name="lblAbout" Text="About Us" Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                            <TextBlock Text="ℹ️" FontSize="18" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="lblAbout" Text="About Us" Grid.Column="1" Margin="10,0,0,0"/>
                         </Grid>
                     </Button>
                     <Button Style="{StaticResource MenuButtonStyle}" Click="btnDevTeam_Click">
-                        <Grid>
+                        <Grid x:Name="pnlDev">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="35"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="👨‍💻" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <TextBlock x:Name="lblDev" Text="Developer Team" Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                            <TextBlock Text="👨‍💻" FontSize="18" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="lblDev" Text="Developer Team" Grid.Column="1" Margin="10,0,0,0"/>
                         </Grid>
                     </Button>
                 </StackPanel>

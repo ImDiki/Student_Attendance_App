@@ -1,94 +1,102 @@
 ﻿<Page x:Class="Student_Attendance_System.Views.RegisterPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      Title="Register" Background="{StaticResource WindowBackgroundBrush}">
+      Title="Register" Background="Transparent">
 
     <Grid>
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <Border Background="White" Width="900" Height="650" CornerRadius="10" Margin="0,20">
-                <Border.Effect>
-                    <DropShadowEffect BlurRadius="15" Opacity="0.2"/>
-                </Border.Effect>
+        <Border Width="950" Height="720" CornerRadius="30" BorderThickness="1" BorderBrush="#33FFFFFF" Padding="40">
+            <Border.Background>
+                <SolidColorBrush Color="Black" Opacity="0.3"/>
+            </Border.Background>
 
-                <Grid Margin="30">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1.5*"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.7*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Column="0" Margin="0,0,30,0">
-                        <TextBlock x:Name="txtRegTitle" Text="NEW STUDENT REGISTRATION" FontSize="22" FontWeight="Bold" Foreground="{StaticResource TextBrush}" Margin="0,0,0,5"/>
-                        <TextBlock x:Name="txtRegSubTitle" Text="Fill in details as shown on Student ID Card" FontSize="12" Foreground="Gray" Margin="0,0,0,20"/>
+                <StackPanel Grid.Column="0" Margin="0,0,30,0">
+                    <TextBlock x:Name="txtRegTitle" Text="NEW STUDENT REGISTRATION" FontSize="26" FontWeight="Bold" Foreground="White" Margin="0,0,0,25"/>
 
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="1*"/>
-                                <ColumnDefinition Width="1*"/>
-                            </Grid.ColumnDefinitions>
-
-                            <StackPanel Margin="0,0,10,0">
-                                <TextBlock x:Name="lblStuId" Text="Student ID (学籍番号)" FontWeight="SemiBold"/>
-                                <TextBox x:Name="txtStudentID" Height="35" Margin="0,5,0,15" Padding="5" ToolTip="Example: C1234"/>
-                            </StackPanel>
-
-                            <StackPanel Grid.Column="1" Margin="0,0,10,0">
-                                <TextBlock x:Name="lblYear" Text="Year (学年)" FontWeight="SemiBold"/>
-                                <ComboBox x:Name="cboYear" Height="35" Margin="0,5,0,15">
-                                    <ComboBoxItem Content="1st Year" Tag="1" IsSelected="True"/>
-                                    <ComboBoxItem Content="2nd Year" Tag="2"/>
-                                    <ComboBoxItem Content="3rd Year" Tag="3"/>
-                                    <ComboBoxItem Content="4th Year" Tag="4"/>
-                                </ComboBox>
-                            </StackPanel>
-                        </Grid>
-
-                        <TextBlock x:Name="lblName" Text="Full Name (氏名)" FontWeight="SemiBold"/>
-                        <TextBox x:Name="txtName" Height="35" Margin="0,5,0,15" Padding="5" ToolTip="Example: MG MG"/>
-
-                        <TextBlock x:Name="lblDept" Text="Department (学科)" FontWeight="SemiBold"/>
-                        <ComboBox x:Name="cboDepartment" Height="35" Margin="0,5,0,15">
-                            <ComboBoxItem Content="情報システム開発 (Information Systems Dev)" IsSelected="True"/>
-                            <ComboBoxItem Content="Webデザイン (Web Design)"/>
-                            <ComboBoxItem Content="ゲームクリエイター (Game Creator)"/>
-                            <ComboBoxItem Content="ITビジネス (IT Business)"/>
-                        </ComboBox>
-
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="1*"/>
-                                <ColumnDefinition Width="1*"/>
-                            </Grid.ColumnDefinitions>
-
-                            <StackPanel Margin="0,0,10,0">
-                                <TextBlock x:Name="lblBirth" Text="Birth Date (生年月日)" FontWeight="SemiBold"/>
-                                <DatePicker x:Name="dpBirthDate" Height="35" Margin="0,5,0,15"/>
-                            </StackPanel>
-
-                            <StackPanel Grid.Column="1">
-                                <TextBlock x:Name="lblEnroll" Text="Enrollment Date (入学日)" FontWeight="SemiBold"/>
-                                <DatePicker x:Name="dpEnrollDate" Height="35" Margin="0,5,0,15"/>
-                            </StackPanel>
-                        </Grid>
-
-                        <Separator Margin="0,10"/>
-                        <TextBlock x:Name="lblPass" Text="System Password" FontWeight="SemiBold" Foreground="#2980b9"/>
-                        <PasswordBox x:Name="txtPassword" Height="35" Margin="0,5,0,20"/>
-
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
-                            <Button x:Name="btnCancel" Content="Cancel" Width="100" Height="40" Background="#95a5a6" Foreground="White" Margin="0,0,10,0" Click="btnBack_Click"/>
-                            <Button x:Name="btnSave" Content="Save Student" Width="150" Height="40" Background="#27ae60" Foreground="White" Click="btnSave_Click"/>
+                    <Grid Margin="0,0,0,15">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="0.7*"/>
+                            <ColumnDefinition Width="0.7*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                            <TextBlock x:Name="lblStuId" Text="Student ID" Foreground="#94A3B8"/>
+                            <TextBox x:Name="txtStudentID" Style="{StaticResource TechInputStyle}" Height="38"/>
                         </StackPanel>
-                    </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="5,0,5,0">
+                            <TextBlock x:Name="lblYear" Text="Year (学年)" Foreground="#94A3B8"/>
+                            <ComboBox x:Name="cboYear" Height="38">
+                                <ComboBoxItem Content="1st Year" IsSelected="True"/>
+                                <ComboBoxItem Content="2nd Year"/>
+                                <ComboBoxItem Content="3rd Year"/>
+                                <ComboBoxItem Content="4th Year"/>
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Margin="5,0,0,0">
+                            <TextBlock x:Name="lblClass" Text="Class" Foreground="#94A3B8"/>
+                            <ComboBox x:Name="cboClass" Height="38">
+                                <ComboBoxItem Content="A"/>
+                                <ComboBoxItem Content="B"/>
+                                <ComboBoxItem Content="C" IsSelected="True"/>
+                                <ComboBoxItem Content="D"/>
+                                <ComboBoxItem Content="E"/>
+                            </ComboBox>
+                        </StackPanel>
+                    </Grid>
 
-                    <StackPanel Grid.Column="1" VerticalAlignment="Top">
-                        <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Height="300" Background="#EEE">
-                            <Image x:Name="imgCamera" Stretch="Uniform"/>
-                        </Border>
-                        <Button x:Name="btnCaptureText" Content="Capture Face Photo" Height="40" Margin="0,15,0,0" Background="#2980b9" Foreground="White" Click="btnCapture_Click"/>
-                        <TextBlock Text="* Capture photo for face recognition." FontSize="12" Foreground="Red" Margin="0,10,0,0" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="lblName" Text="Full Name" Foreground="#94A3B8" Margin="0,10,0,5"/>
+                    <TextBox x:Name="txtName" Style="{StaticResource TechInputStyle}" Height="38" Margin="0,0,0,15"/>
+
+                    <TextBlock x:Name="lblDept" Text="Department (学科 / 専攻)" Foreground="#94A3B8" Margin="0,10,0,5"/>
+                    <ComboBox x:Name="cboDepartment" Height="38">
+                        <ComboBoxItem Content="ITスペシャリスト専攻 (IT Specialist) - 4 Years" IsSelected="True"/>
+                        <ComboBoxItem Content="ネットワークセキュリティ専攻 (Network Security) - 4 Years"/>
+                        <ComboBoxItem Content="システムエンジニア専攻 (Systems Engineer) - 3 Years"/>
+                        <ComboBoxItem Content="ネットワークエンジニア専攻 (Network Engineer) - 3 Years"/>
+                        <ComboBoxItem Content="Webエンジニア専攻 (Web Engineer) - 3 Years"/>
+                        <ComboBoxItem Content="テクニカルコース (Technical Course) - 2 Years"/>
+                        <ComboBoxItem Content="ネットワークシステムコース (Network Systems Course) - 2 Years"/>
+                    </ComboBox>
+
+                    <Grid Margin="0,15,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                            <TextBlock x:Name="lblBirth" Text="Birth Date" Foreground="#94A3B8"/>
+                            <DatePicker x:Name="dpBirthDate" Height="38"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                            <TextBlock x:Name="lblEnroll" Text="Enrollment Date" Foreground="#94A3B8"/>
+                            <DatePicker x:Name="dpEnrollDate" Height="38"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock x:Name="lblPass" Text="System Password" Foreground="#06B6D4" Margin="0,15,0,5" FontWeight="SemiBold"/>
+                    <PasswordBox x:Name="txtPassword" Style="{StaticResource TechInputStyle}" Height="38"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,25,0,0">
+                        <Button x:Name="btnCancel" Content="Cancel" Width="110" Height="42" Background="#334155" Foreground="White" Margin="0,0,15,0" Click="btnBack_Click"/>
+                        <Button x:Name="btnSave" Content="Save Student" Width="160" Height="42" Background="#10B981" Foreground="White" FontWeight="Bold" Click="btnSave_Click"/>
                     </StackPanel>
-                </Grid>
-            </Border>
-        </ScrollViewer>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Top">
+                    <Border BorderBrush="#33FFFFFF" BorderThickness="1" CornerRadius="20" Height="340" Background="#1A000000" Margin="0,60,0,25">
+                        <Grid>
+                            <TextBlock Text="👤" FontSize="100" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.1" Foreground="White"/>
+                            <Image x:Name="imgCamera" Stretch="Uniform"/>
+                        </Grid>
+                    </Border>
+                    <Button x:Name="btnCaptureText" Content="Capture Photo" Height="50" Background="#2563EB" Foreground="White" Click="btnCapture_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
     </Grid>
 </Page>

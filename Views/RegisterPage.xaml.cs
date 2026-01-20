@@ -2,121 +2,90 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
-using Microsoft.Data.SqlClient;
+using Student_Attendance_System.Models;
 using Student_Attendance_System.Interfaces;
 
 namespace Student_Attendance_System.Views
 {
     public partial class RegisterPage : Page, ILanguageSwitchable
     {
-        private bool _isJapanese = false;
-
         public RegisterPage()
         {
             InitializeComponent();
-
-            // App-wide language ကို စတင်စစ်ဆေးခြင်း
-            ChangeLanguage(LanguageSettings.Language);
-
+            // Enrollment Date ကို ယနေ့ရက်စွဲ အလိုအလျောက် သတ်မှတ်ပေးခြင်း
             dpEnrollDate.SelectedDate = DateTime.Today;
-            dpBirthDate.DisplayDate = new DateTime(2005, 1, 1);
+
+            // App-wide Language settings နှင့် ချိတ်ဆက်ခြင်း
+            ChangeLanguage(LanguageSettings.Language);
         }
 
-        // --- ILanguageSwitchable Implementation ---
+        // --- ILanguageSwitchable Implementation: ENG/JP ပြောင်းလဲခြင်း ---
         public void ChangeLanguage(bool isJapanese)
         {
-            _isJapanese = isJapanese;
-            UpdatePageUI();
+            // Title & Labels
+            txtRegTitle.Text = isJapanese ? "新規学生登録" : "NEW STUDENT REGISTRATION";
+           
+            lblStuId.Text = isJapanese ? "学籍番号" : "Student ID";
+            lblYear.Text = isJapanese ? "学年" : "Year (Grade)";
+            lblClass.Text = isJapanese ? "クラス" : "Class";
+            lblName.Text = isJapanese ? "氏名" : "Full Name";
+            lblDept.Text = isJapanese ? "専攻 / 学科" : "Department / Major";
+            lblBirth.Text = isJapanese ? "生年月日" : "Birth Date";
+            lblEnroll.Text = isJapanese ? "入学日" : "Enrollment Date";
+            lblPass.Text = isJapanese ? "パスワード" : "System Password";
+
+            // Buttons
+            btnSave.Content = isJapanese ? "登録する" : "Save Student";
+            btnCancel.Content = isJapanese ? "キャンセル" : "Cancel";
+            btnCaptureText.Content = isJapanese ? "顔写真を撮影" : "Capture Photo";
+
+            // Major List Language Sync (Duration များ အလိုအလျောက်ပြောင်းရန်)
+            UpdateMajorList(isJapanese);
         }
 
-        private void UpdatePageUI()
+        private void UpdateMajorList(bool isJapanese)
         {
-            if (_isJapanese)
-            {
-                txtRegTitle.Text = "新規学生登録";
-                txtRegSubTitle.Text = "学生証の通りに詳細を入力してください";
-                lblStuId.Text = "学籍番号 (Student ID)";
-             
-                lblYear.Text = "学年 (Year Level)"; // အသစ်ထည့်ထားသော label
-                lblName.Text = "氏名 (Full Name)";
-                lblDept.Text = "学科 (Department)";
-                lblBirth.Text = "生年月日 (Birth Date)";
-                lblEnroll.Text = "入学日 (Enrollment Date)";
-                lblPass.Text = "システムパスワード";
-                btnCancel.Content = "キャンセル";
-                btnSave.Content = "学生を登録する";
-                btnCaptureText.Content = "顔写真を撮影する";
-            }
-            else
-            {
-                txtRegTitle.Text = "NEW STUDENT REGISTRATION";
-                txtRegSubTitle.Text = "Fill in details as shown on Student ID Card";
-                lblStuId.Text = "Student ID (学籍番号)";
-           
-                lblYear.Text = "Year (学年)"; // အသစ်ထည့်ထားသော label
-                lblName.Text = "Full Name (氏名)";
-                lblDept.Text = "Department (学科)";
-                lblBirth.Text = "Birth Date (生年月日)";
-                lblEnroll.Text = "Enrollment Date (入学日)";
-                lblPass.Text = "System Password";
-                btnCancel.Content = "Cancel";
-                btnSave.Content = "Save Student";
-                btnCaptureText.Content = "Capture Face Photo";
-            }
+            // ComboBox ထဲက Major များကို ဘရိုပေးထားသော စာရင်းအတိုင်း Language ညှိပေးခြင်း
+            int selectedIndex = cboDepartment.SelectedIndex != -1 ? cboDepartment.SelectedIndex : 0;
+            cboDepartment.Items.Clear();
+
+            string y4 = isJapanese ? "4年" : "4 Years";
+            string y3 = isJapanese ? "3年" : "3 Years";
+            string y2 = isJapanese ? "2年" : "2 Years";
+
+            cboDepartment.Items.Add(new ComboBoxItem { Content = $"ITスペシャリスト専攻 (IT Specialist) - {y4}" });
+            cboDepartment.Items.Add(new ComboBoxItem { Content = $"ネットワークセキュリティ専攻 (Network Security) - {y4}" });
+            cboDepartment.Items.Add(new ComboBoxItem { Content = $"システムエンジニア専攻 (Systems Engineer) - {y3}" });
+            cboDepartment.Items.Add(new ComboBoxItem { Content = $"ネットワークエンジニア専攻 (Network Engineer) - {y3}" });
+            cboDepartment.Items.Add(new ComboBoxItem { Content = $"Webエンジニア専攻 (Web Engineer) - {y3}" });
+            cboDepartment.Items.Add(new ComboBoxItem { Content = $"テクニカルコース (Technical Course) - {y2}" });
+            cboDepartment.Items.Add(new ComboBoxItem { Content = $"ネットワークシステムコース (Network Systems) - {y2}" });
+
+            cboDepartment.SelectedIndex = selectedIndex;
         }
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
-            // Validation
-            if (string.IsNullOrWhiteSpace(txtStudentID.Text) ||
-                string.IsNullOrWhiteSpace(txtName.Text) ||
-                string.IsNullOrWhiteSpace(txtPassword.Password))
+            // Front-end Validation (အခြေခံစစ်ဆေးချက်)
+            if (string.IsNullOrWhiteSpace(txtName.Text) || string.IsNullOrWhiteSpace(txtStudentID.Text))
             {
-                string msg = _isJapanese ? "すべての必須項目を入力してください！" : "Please fill all required fields!";
-                MessageBox.Show(msg, "Warning");
+                string msg = LanguageSettings.Language ? "必要事項を入力してください" : "Please fill required fields.";
+                MessageBox.Show(msg, "Validation");
                 return;
             }
 
-            try
+            // Create Mock User for Redirect (Database မပါဘဲ Dashboard သို့ တိုက်ရိုက်ပို့ရန်)
+            var mockUser = new User
             {
-                // DB Connection string ကို ကိုယ့် project အလိုက် ပြန်စစ်ပါ
-                using (SqlConnection conn = DBConnection.GetConnection())
-                {
-                    // YearLevel နဲ့ AssignedClass (Major) ကိုပါ သိမ်းမယ်
-                    string sql = @"INSERT INTO Students 
-                                 (StudentID, FullName, YearLevel, AssignedClass, Department, BirthDate, EnrollmentDate, CardBarcode, PasswordHash) 
-                                 VALUES 
-                                 (@SID, @Name, @Year, @Class, @Dept, @Birth, @Enroll, @Barcode, @Pass)";
+                FullName = txtName.Text.Trim(),
+                Username = txtStudentID.Text.Trim(),
+                Role = "Student"
+            };
 
-                    SqlCommand cmd = new SqlCommand(sql, conn);
-                    cmd.Parameters.AddWithValue("@SID", txtStudentID.Text.Trim());
-                    cmd.Parameters.AddWithValue("@Name", txtName.Text.Trim());
-
-                    // ComboBox မှ Year Level ကို Tag (1, 2, 3, 4) အနေနဲ့ ယူခြင်း
-                    int year = int.Parse(((ComboBoxItem)cboYear.SelectedItem).Tag.ToString());
-                    cmd.Parameters.AddWithValue("@Year", year);
-
-                    // Student ID ရဲ့ နောက်ဆုံးစာလုံး သို့မဟုတ် major ကို AssignedClass အဖြစ် သိမ်းခြင်း
-                    // ဥပမာ- C ခန်း ဆိုရင် "C"
-                    cmd.Parameters.AddWithValue("@Class", "C");
-
-                    cmd.Parameters.AddWithValue("@Dept", ((ComboBoxItem)cboDepartment.SelectedItem).Content.ToString());
-                    cmd.Parameters.AddWithValue("@Birth", dpBirthDate.SelectedDate ?? DateTime.Now);
-                    cmd.Parameters.AddWithValue("@Enroll", dpEnrollDate.SelectedDate ?? DateTime.Now);
-                  
-                    cmd.Parameters.AddWithValue("@Pass", txtPassword.Password);
-
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
-                }
-
-                string successMsg = _isJapanese ? "登録が完了しました！" : "Student registered successfully!";
-                MessageBox.Show(successMsg, "Success");
-                NavigationService.GoBack();
-            }
-            catch (Exception ex)
+            // MainWindow ရှိ HandleLoginSuccess ကို လှမ်းခေါ်ခြင်း
+            if (Application.Current.MainWindow is MainWindow main)
             {
-                MessageBox.Show("Database Error: " + ex.Message, "Error");
+                main.HandleLoginSuccess(mockUser);
             }
         }
 
@@ -124,8 +93,9 @@ namespace Student_Attendance_System.Views
 
         private void btnCapture_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(_isJapanese ? "カメラ機能を起動します..." : "Starting Camera...");
-            // Webcam logic ကို ဒီမှာ ဆက်ရေးလို့ရပါပြီ
+            // Camera Mock Logic
+            string msg = LanguageSettings.Language ? "カメラを起動しています..." : "Starting Camera for Mock Capture...";
+            MessageBox.Show(msg, "Device");
         }
     }
 }

@@ -4,21 +4,33 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Student_Attendance_System.Models;
+using Student_Attendance_System.Interfaces;
 
 namespace Student_Attendance_System.Views
 {
-
-
-    public partial class TeacherDashboard : Page
+    public partial class TeacherDashboard : Page, ILanguageSwitchable
     {
-        public bool OpenManagerTab { get; set; } = false;
-        public TeacherDashboard() { InitializeComponent(); }
+        public TeacherDashboard() { InitializeComponent(); ChangeLanguage(LanguageSettings.Language); }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            txtCurrentDate.Text = DateTime.Now.ToString("yyyy年MM月dd日 (ddd)");
+            txtCurrentDate.Text = LanguageSettings.Language
+                ? DateTime.Now.ToString("yyyy年MM月dd日 (ddd)")
+                : DateTime.Now.ToString("yyyy/MM/dd (ddd)");
             LoadDailyPeriods();
             RefreshList();
+        }
+
+        public void ChangeLanguage(bool isJapanese)
+        {
+            txtTitle.Text = isJapanese ? "先生用ポータル" : "Teacher Portal";
+            tabClass.Header = isJapanese ? " 📅 本日の授業開始 " : " 📅 Start Today's Class ";
+            tabManage.Header = isJapanese ? " 📝 出席管理 " : " 📝 Attendance Manage ";
+            txtListTitle.Text = isJapanese ? "リアルタイム出席リスト" : "Real-time Attendance List";
+            lblNote.Text = isJapanese ? "修正理由（備考）：" : "Modification Reason (Note):";
+            btnPresent.Content = isJapanese ? "出席にする" : "Mark Present";
+            btnAbsent.Content = isJapanese ? "欠席にする" : "Mark Absent";
+            LoadDailyPeriods(); // Refresh dynamic cards language
         }
 
         private void LoadDailyPeriods()
@@ -32,28 +44,38 @@ namespace Student_Attendance_System.Views
                 int period = i + 1;
                 string subject = schedule[i].Subj;
                 string time = schedule[i].Time;
-
                 if (subject == "-" || string.IsNullOrEmpty(subject)) continue;
 
                 string key = $"{DateTime.Now:yyyyMMdd}_{day}_{period}";
                 bool isStarted = App.StartedPeriods.Contains(key);
 
-                Border b = new Border { Background = Brushes.White, CornerRadius = new CornerRadius(10), Padding = new Thickness(15), Margin = new Thickness(0, 0, 0, 10) };
+                // --- Glass Card UI Creation ---
+                Border b = new Border
+                {
+                    Background = new SolidColorBrush(Color.FromArgb(20, 255, 255, 255)),
+                    CornerRadius = new CornerRadius(15),
+                    BorderThickness = new Thickness(1),
+                    BorderBrush = new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
+                    Padding = new Thickness(20),
+                    Margin = new Thickness(0, 0, 0, 12)
+                };
+
                 Grid g = new Grid();
                 g.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
                 g.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
                 StackPanel sp = new StackPanel();
-                sp.Children.Add(new TextBlock { Text = $"{period}限目 ({time})", FontWeight = FontWeights.Bold, Foreground = Brushes.DodgerBlue });
-                sp.Children.Add(new TextBlock { Text = subject, FontSize = 18 });
+                sp.Children.Add(new TextBlock { Text = $"{period}限目 ({time})", FontWeight = FontWeights.Bold, Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#38BDF8")) });
+                sp.Children.Add(new TextBlock { Text = subject, FontSize = 20, Foreground = Brushes.White, Margin = new Thickness(0, 5, 0, 0) });
 
                 Button btn = new Button
                 {
-                    Content = isStarted ? "開始済み" : "授業開始",
+                    Content = isStarted ? (LanguageSettings.Language ? "開始済み" : "Started") : (LanguageSettings.Language ? "授業開始" : "Start Class"),
                     IsEnabled = !isStarted,
-                    Width = 110,
-                    Height = 40,
-                    Background = isStarted ? Brushes.Gray : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#27ae60")),
+                    Width = 130,
+                    Height = 45,
+                    Cursor = System.Windows.Input.Cursors.Hand,
+                    Background = isStarted ? Brushes.DimGray : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981")),
                     Foreground = Brushes.White,
                     Tag = new { Subj = subject, P = period, Key = key }
                 };
@@ -69,8 +91,9 @@ namespace Student_Attendance_System.Views
         {
             var btn = sender as Button;
             dynamic data = btn.Tag;
+            string confirmMsg = LanguageSettings.Language ? $"{data.Subj} の授業を開始しますか？" : $"Start {data.Subj} class?";
 
-            if (MessageBox.Show($"{data.Subj} の授業を開始しますか？", "確認", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            if (MessageBox.Show(confirmMsg, "Confirm", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
                 App.IsClassActive = true;
                 App.CurrentActiveSessionStart = DateTime.Now;
@@ -82,7 +105,6 @@ namespace Student_Attendance_System.Views
 
         private List<(string Time, string Subj)> GetLatterTermSchedule(DayOfWeek day)
         {
-            // Latter Term (後期) schedule based on image_57b450.jpg
             return day switch
             {
                 DayOfWeek.Monday => new List<(string, string)> { ("09:10-10:40", "テスト技法"), ("10:50-12:20", "テスト技法"), ("13:10-14:40", "データ構造 II") },
