@@ -4,11 +4,14 @@ using System.Windows.Threading;
 using Student_Attendance_System.Views;
 using Student_Attendance_System.Interfaces;
 using Student_Attendance_System.Models;
+using System.Xml.Serialization;
 
 namespace Student_Attendance_System
 {
     public partial class MainWindow : Window
     {
+        private bool isSideBarExpanded = true;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -16,7 +19,6 @@ namespace Student_Attendance_System
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            // ၁။ အချိန်ကို Real-time ပြဖို့ Timer ပေးမယ်
             DispatcherTimer timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(1);
             timer.Tick += (s, ev) => {
@@ -26,51 +28,65 @@ namespace Student_Attendance_System
             };
             timer.Start();
 
-            // ၂။ App စဖွင့်တာနဲ့ Login Page ကို တန်းပြမယ်
             MainFrame.Navigate(new LoginPage());
         }
-
-        // --- Login အောင်မြင်ရင် LoginPage ကနေ ဒီကောင်ကို လှမ်းခေါ်မယ် ---
-        public void HandleLoginSuccess(User user)
+        private void btnHomeLogo_Click(object sender, RoutedEventArgs e)
         {
-            txtWelcome.Text = user.FullName.ToUpper();
+            MainFrame.Navigate(new LoginPage());
 
-            // UI Toggle Logic: Login ကို ဖျောက်ပြီး Logout ကို ဖော်မယ်
-            btnLoginMenu.Visibility = Visibility.Collapsed;
-            btnLogout.Visibility = Visibility.Visible;
-
-            // Role အလိုက် Dashboard ခွဲပို့မယ်
-            if (user.Role == "Student")
+        }
+        // --- Hamburger Click Logic ---
+        private void btnHamburger_Click(object sender, RoutedEventArgs e)
+        {
+            if (isSideBarExpanded)
             {
-                MainFrame.Navigate(new TimetablePage());
+                // Sidebar ကို ကျုံ့မယ် (Icon mode)
+                SidebarBorder.Width = 75;
+                SideInfoPanel.Visibility = Visibility.Collapsed;
+                BottomPanel.Visibility = Visibility.Visible; // Developer button တွေ မပျောက်အောင်
+                ToggleLabels(Visibility.Collapsed);
             }
             else
             {
-                MainFrame.Navigate(new ScanPage());
+                // Sidebar ကို ပြန်ချဲ့မယ် (Full mode)
+                SidebarBorder.Width = 255;
+                SideInfoPanel.Visibility = Visibility.Visible;
+                ToggleLabels(Visibility.Visible);
             }
+            isSideBarExpanded = !isSideBarExpanded;
         }
 
-        // Sidebar က Login Button ကို နှိပ်ရင်
-        private void btnLoginMenu_Click(object sender, RoutedEventArgs e)
+        private void ToggleLabels(Visibility visibility)
         {
-            MainFrame.Navigate(new LoginPage());
+            lblLang.Visibility = visibility;
+            lblLogin.Visibility = visibility;
+            lblReg.Visibility = visibility;
+            lblScan.Visibility = visibility;
+            lblTable.Visibility = visibility;
+            lblReport.Visibility = visibility;
+            lblLogout.Visibility = visibility;
+            lblAbout.Visibility = visibility;
+            lblDev.Visibility = visibility;
         }
 
-        // Report အောက်က Logout Button ကို နှိပ်ရင်
+        public void HandleLoginSuccess(User user)
+        {
+            txtWelcome.Text = user.FullName.ToUpper();
+            btnLoginMenu.Visibility = Visibility.Collapsed;
+            btnLogout.Visibility = Visibility.Visible;
+
+            if (user.Role == "Student") MainFrame.Navigate(new TimetablePage());
+            else MainFrame.Navigate(new ScanPage());
+        }
+
         private void btnLogout_Click(object sender, RoutedEventArgs e)
         {
-            // Memory ထဲက User data ကို ရှင်းမယ်
             UserData.UserData.CurrentUser = null;
-
-            // UI Toggle Logic: Login ကို ပြန်ဖော်ပြီး Logout ကို ပြန်ဖျောက်မယ်
             btnLoginMenu.Visibility = Visibility.Visible;
             btnLogout.Visibility = Visibility.Collapsed;
-
-            UpdateLanguage(); // Sidebar စာသားတွေ မူလအတိုင်း ပြန်ပြင်မယ်
+            UpdateLanguage();
             MainFrame.Navigate(new LoginPage());
-
-            string msg = LanguageSettings.Language ? "ログアウトしました" : "Logged out successfully!";
-            MessageBox.Show(msg, "Logout", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(LanguageSettings.Language ? "ログアウトしました" : "Logged out successfully!");
         }
 
         private void btnLanguage_Click(object sender, RoutedEventArgs e)
@@ -82,37 +98,27 @@ namespace Student_Attendance_System
         private void UpdateLanguage()
         {
             bool isJp = LanguageSettings.Language;
+            if (UserData.UserData.CurrentUser == null) txtWelcome.Text = isJp ? "ようこそ" : "WELCOME";
 
-            // Login မဝင်ထားရင်ပဲ Welcome ပြမယ်
-            if (UserData.UserData.CurrentUser == null)
-            {
-                txtWelcome.Text = isJp ? "ようこそ" : "WELCOME";
-            }
+            lblLogin.Text = isJp ? "ログイン" : "Login";
+            lblReg.Text = isJp ? "新規登録" : "Register";
+            lblScan.Text = isJp ? "スキャン" : "Scan / Webcam";
+            lblTable.Text = isJp ? "タイムテーブル" : "Time Table";
+            lblReport.Text = isJp ? "レポート" : "Report";
+            lblLogout.Text = isJp ? "ログアウト" : "Logout";
+            lblAbout.Text = isJp ? "アプリについて" : "About Us";
+            lblDev.Text = isJp ? "開発チーム" : "Developer Team";
+            lblLang.Text = isJp ? "言語: JP / ENG" : "Language: ENG / JP";
 
-            // Button စာသားများ Update လုပ်ခြင်း
-            btnLoginMenu.Content = isJp ? "🔑 ログイン" : "🔑 Login";
-            btnRegister.Content = isJp ? "📝 新規登録" : "📝 Register";
-            btnScanMode.Content = isJp ? "📷 スキャンモード" : "📷 Scan / Webcam";
-            btnTimeTable.Content = isJp ? "📅 タイムテーブル" : "📅 Time Table";
-            btnReport.Content = isJp ? "📊 レポート" : "📊 Report";
-            btnLogout.Content = isJp ? "🚪 ログアウト" : "🚪 Logout";
-            btnAbout.Content = isJp ? "ℹ️ アプリについて" : "ℹ️ About Us";
-            btnDevTeam.Content = isJp ? "👨‍💻 開発チーム" : "👨‍💻 Developer Team";
-            btnLanguage.Content = isJp ? "🌐 言語: JP / ENG" : "🌐 Language: ENG / JP";
-
-            // လက်ရှိပွင့်နေတဲ့ Page ကိုပါ Language လှမ်းပြောင်းမယ်
-            if (MainFrame.Content is ILanguageSwitchable currentPage)
-            {
-                currentPage.ChangeLanguage(isJp);
-            }
+            if (MainFrame.Content is ILanguageSwitchable page) page.ChangeLanguage(isJp);
         }
 
-        // --- Navigation Methods ---
+        private void btnLoginMenu_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new LoginPage());
         private void btnRegister_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new RegisterPage());
         private void btnScanMode_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ScanPage());
         private void btnTimeTable_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new TimetablePage());
-        private void btnReport_Click(object sender, RoutedEventArgs e) { /* Navigate to ReportPage */ }
-        private void btnAbout_Click(object sender, RoutedEventArgs e) { /* Navigate to AboutPage */ }
-        private void btnDevTeam_Click(object sender, RoutedEventArgs e) { /* Navigate to DevTeamPage */ }
+        private void btnReport_Click(object sender, RoutedEventArgs e) { /* Navigate to Report */ }
+        private void btnAbout_Click(object sender, RoutedEventArgs e) { /* Navigate to About */ }
+        private void btnDevTeam_Click(object sender, RoutedEventArgs e) { /* Navigate to DevTeam */ }
     }
 }
