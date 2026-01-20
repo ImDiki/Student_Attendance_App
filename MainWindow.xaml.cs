@@ -120,7 +120,7 @@ namespace Student_Attendance_System
         private void btnScanMode_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ScanPage());
         private void btnTimeTable_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new TimetablePage());
         private void btnReport_Click(object sender, RoutedEventArgs e) { }
-        private void btnAbout_Click(object sender, RoutedEventArgs e) => MessageBox.Show(LanguageSettings.Language ? "情報" : "About System");
+        private void btnAbout_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProjectOverviewPage());
         private void btnDevTeam_Click(object sender, RoutedEventArgs e) => MessageBox.Show("Developer Team Console");
     }
 }
