@@ -11,6 +11,26 @@ namespace Student_Attendance_System.Views
         public AdminDashboardPage()
         {
             InitializeComponent();
+
+            // listen for teacher changes
+            TeacherManagementPage.TeacherChanged += RefreshTeacherCount;
+        }
+
+        private void RefreshTeacherCount()
+        {
+            LoadTeacherCount();
+        }
+        private void LoadTeacherCount()
+        {
+            using SqlConnection con = DBConnection.GetConnection();
+            con.Open();
+
+            string sql = "SELECT COUNT(*) FROM Users WHERE Role = 'Teacher'";
+            using SqlCommand cmd = new SqlCommand(sql, con);
+
+            int count = (int)cmd.ExecuteScalar();
+
+            txtTeachers.Text = count.ToString(); // or label/content
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -39,7 +59,7 @@ namespace Student_Attendance_System.Views
 
         private void ManageTeachers_Click(object sender, RoutedEventArgs e)
         {
-            //AdminFrame.Navigate(new TeacherManagementPage());
+            AdminFrame.Navigate(new TeacherManagementPage());
         }
         private void ManageClasses_Click(object sender, RoutedEventArgs e)
         {

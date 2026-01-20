@@ -122,8 +122,10 @@
                         BorderBrush="#26FFFFFF"
                         Padding="15">
                     <Frame x:Name="AdminFrame"
-                           Height="420"
-                           NavigationUIVisibility="Hidden"/>
+                     Height="Auto"
+                     Margin="0,20,0,0"
+                     NavigationUIVisibility="Hidden"/>
+
                 </Border>
 
             </StackPanel>
