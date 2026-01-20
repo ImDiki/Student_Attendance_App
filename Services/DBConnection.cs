@@ -10,7 +10,7 @@ namespace Student_Attendance_System.Views
     public static class DBConnection
     {
         private static readonly string connectionString =
-            @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=""C:\Users\Si Thu Bo Sann\source\repos\version01\Database\DatabaseCtrl.mdf"";Integrated Security=True";
+            @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=""C:\Users\Si Thu Bo Sann\source\repos\version01\Database\mainlineDB.mdf"";Integrated Security=True";
 
         public static SqlConnection GetConnection()
         {

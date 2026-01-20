@@ -4,6 +4,16 @@ using System.Windows.Controls;
 using System.Windows.Navigation;
 using Student_Attendance_System.Models;
 using Student_Attendance_System.Interfaces;
+using Microsoft.Data.SqlClient;
+using AForge.Video;
+using AForge.Video.DirectShow;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Windows.Media.Imaging;
+using System.Security.Cryptography;
+using System.Text;
+
 
 namespace Student_Attendance_System.Views
 {
@@ -64,38 +74,192 @@ namespace Student_Attendance_System.Views
             cboDepartment.SelectedIndex = selectedIndex;
         }
 
-        private void btnSave_Click(object sender, RoutedEventArgs e)
+        //private void btnSave_Click(object sender, RoutedEventArgs e)
+        //{
+        //    // Front-end Validation (အခြေခံစစ်ဆေးချက်)
+        //    if (string.IsNullOrWhiteSpace(txtName.Text) || string.IsNullOrWhiteSpace(txtStudentID.Text))
+        //    {
+        //        string msg = LanguageSettings.Language ? "必要事項を入力してください" : "Please fill required fields.";
+        //        MessageBox.Show(msg, "Validation");
+        //        return;
+        //    }
+
+        //    // Create Mock User for Redirect (Database မပါဘဲ Dashboard သို့ တိုက်ရိုက်ပို့ရန်)
+        //    var mockUser = new User
+        //    {
+        //        FullName = txtName.Text.Trim(),
+        //        Username = txtStudentID.Text.Trim(),
+        //        Role = "Student"
+        //    };
+
+        //    // MainWindow ရှိ HandleLoginSuccess ကို လှမ်းခေါ်ခြင်း
+        //    if (Application.Current.MainWindow is MainWindow main)
+        //    {
+        //        main.HandleLoginSuccess(mockUser);
+        //    }
+        //}
+        private string HashPassword(string password)
         {
-            // Front-end Validation (အခြေခံစစ်ဆေးချက်)
-            if (string.IsNullOrWhiteSpace(txtName.Text) || string.IsNullOrWhiteSpace(txtStudentID.Text))
+            using (SHA256 sha = SHA256.Create())
             {
-                string msg = LanguageSettings.Language ? "必要事項を入力してください" : "Please fill required fields.";
-                MessageBox.Show(msg, "Validation");
-                return;
-            }
+                byte[] bytes = Encoding.UTF8.GetBytes(password);
+                byte[] hash = sha.ComputeHash(bytes);
 
-            // Create Mock User for Redirect (Database မပါဘဲ Dashboard သို့ တိုက်ရိုက်ပို့ရန်)
-            var mockUser = new User
-            {
-                FullName = txtName.Text.Trim(),
-                Username = txtStudentID.Text.Trim(),
-                Role = "Student"
-            };
+                StringBuilder sb = new StringBuilder();
+                foreach (byte b in hash)
+                    sb.Append(b.ToString("x2"));
 
-            // MainWindow ရှိ HandleLoginSuccess ကို လှမ်းခေါ်ခြင်း
-            if (Application.Current.MainWindow is MainWindow main)
-            {
-                main.HandleLoginSuccess(mockUser);
+                return sb.ToString();
             }
         }
 
+        private void btnSave_Click(object sender, RoutedEventArgs e)
+        {
+            // Validation
+            if (string.IsNullOrWhiteSpace(txtStudentID.Text) ||
+                string.IsNullOrWhiteSpace(txtName.Text) ||
+                string.IsNullOrWhiteSpace(txtPassword.Password))
+            {
+                MessageBox.Show(
+                    LanguageSettings.Language
+                        ? "必要事項を入力してください"
+                        : "Please fill required fields.",
+                    "Validation");
+                return;
+            }
+
+            using SqlConnection con = DBConnection.GetConnection();
+            con.Open();
+            SqlTransaction tx = con.BeginTransaction();
+
+            try
+            {
+                //INSERT INTO Users (ROLE = Student)
+                string userSql = @"INSERT INTO Users (Username, PasswordHash, Role) 
+                OUTPUT INSERTED.UserId VALUES (@username, @password, 'Student')";
+
+                SqlCommand userCmd = new SqlCommand(userSql, con, tx);
+                userCmd.Parameters.AddWithValue("@username", txtStudentID.Text.Trim());
+                string hashedPassword = HashPassword(txtPassword.Password.Trim());
+                userCmd.Parameters.AddWithValue("@password", hashedPassword);
+
+
+                int userId = (int)userCmd.ExecuteScalar();
+
+                //INSERT INTO Students
+                string studentSql = @"INSERT INTO Students(StudentId, StudentCode, FullName, YearLevel, Class, Department,
+                BirthDate, EnrollmentDate, FacePhoto)VALUES(@id, @code, @name, @year, @class, @dept, @birth, @enroll, @photo)";
+
+                SqlCommand stuCmd = new SqlCommand(studentSql, con, tx);
+                stuCmd.Parameters.AddWithValue("@id", userId);
+                stuCmd.Parameters.AddWithValue("@code", txtStudentID.Text.Trim());
+                stuCmd.Parameters.AddWithValue("@name", txtName.Text.Trim());
+                stuCmd.Parameters.AddWithValue("@year",
+                    (cboYear.SelectedItem as ComboBoxItem)?.Content.ToString());
+                stuCmd.Parameters.AddWithValue("@class",
+                    (cboClass.SelectedItem as ComboBoxItem)?.Content.ToString());
+                stuCmd.Parameters.AddWithValue("@dept",
+                    (cboDepartment.SelectedItem as ComboBoxItem)?.Content.ToString());
+                stuCmd.Parameters.AddWithValue("@birth",
+                    dpBirthDate.SelectedDate ?? (object)DBNull.Value);
+                stuCmd.Parameters.AddWithValue("@enroll",
+                    dpEnrollDate.SelectedDate ?? DateTime.Today);
+
+                byte[] photoBytes = GetCapturedPhotoBytes();
+                stuCmd.Parameters.AddWithValue("@photo",
+                    (object)photoBytes ?? DBNull.Value);
+
+                stuCmd.ExecuteNonQuery();
+
+
+
+                //COMMIT
+                tx.Commit();
+
+                MessageBox.Show(
+                    LanguageSettings.Language
+                        ? "学生登録が完了しました"
+                        : "Student registered successfully!");
+
+                //Go back to Login page
+                NavigationService.GoBack();
+            }
+            catch (Exception ex)
+            {
+                tx.Rollback();
+                MessageBox.Show("Database Error:\n" + ex.Message);
+            }
+        }
+
+
         private void btnBack_Click(object sender, RoutedEventArgs e) => NavigationService.GoBack();
+
+        private FilterInfoCollection videoDevices;
+        private VideoCaptureDevice videoSource;
+        private Bitmap capturedBitmap;
+        private bool isCameraRunning = false;
 
         private void btnCapture_Click(object sender, RoutedEventArgs e)
         {
-            // Camera Mock Logic
-            string msg = LanguageSettings.Language ? "カメラを起動しています..." : "Starting Camera for Mock Capture...";
-            MessageBox.Show(msg, "Device");
+            if (!isCameraRunning)
+            {
+                // OPEN CAMERA
+                videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
+
+                if (videoDevices.Count == 0)
+                {
+                    MessageBox.Show("No camera detected");
+                    return;
+                }
+
+                videoSource = new VideoCaptureDevice(videoDevices[0].MonikerString);
+                videoSource.NewFrame += VideoSource_NewFrame;
+                videoSource.Start();
+
+                isCameraRunning = true;
+                btnCaptureText.Content = LanguageSettings.Language ? "撮影" : "Capture";
+            }
+            else
+            {
+                // CAPTURE & STOP CAMERA
+                videoSource.SignalToStop();
+                videoSource.NewFrame -= VideoSource_NewFrame;
+
+                isCameraRunning = false;
+                btnCaptureText.Content = LanguageSettings.Language ? "再撮影" : "Retake";
+            }
+        }
+        private void VideoSource_NewFrame(object sender, NewFrameEventArgs eventArgs)
+        {
+            capturedBitmap = (Bitmap)eventArgs.Frame.Clone();
+
+            Dispatcher.Invoke(() =>
+            {
+                imgCamera.Source = ConvertBitmapToBitmapImage(capturedBitmap);
+            });
+        }
+        private BitmapImage ConvertBitmapToBitmapImage(Bitmap bitmap)
+        {
+            using MemoryStream ms = new MemoryStream();
+            bitmap.Save(ms, ImageFormat.Png);
+            ms.Position = 0;
+
+            BitmapImage img = new BitmapImage();
+            img.BeginInit();
+            img.StreamSource = ms;
+            img.CacheOption = BitmapCacheOption.OnLoad;
+            img.EndInit();
+            return img;
+        }
+
+        private byte[] GetCapturedPhotoBytes()
+        {
+            if (capturedBitmap == null)
+                return null;
+
+            using MemoryStream ms = new MemoryStream();
+            capturedBitmap.Save(ms, ImageFormat.Png);
+            return ms.ToArray();
         }
     }
 }

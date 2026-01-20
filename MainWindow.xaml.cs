@@ -69,16 +69,31 @@ namespace Student_Attendance_System
 
         public void HandleLoginSuccess(User user)
         {
-            txtWelcome.Text = user.FullName.ToUpper();
+            txtWelcome.Text = user.Username.ToUpper();
             btnLoginMenu.Visibility = Visibility.Collapsed;
             btnLogout.Visibility = Visibility.Visible;
 
-            // Role redirection as per your request
-            if (user.Role == "Student")
-                MainFrame.Navigate(new StudentDashboardPage());
-            else
-                MainFrame.Navigate(new TeacherDashboard());
+            switch (user.Role)
+            {
+                case "Admin":
+                    MainFrame.Navigate(new AdminDashboardPage());
+                    break;
+
+                case "Teacher":
+                    MainFrame.Navigate(new TeacherDashboard());
+                    break;
+
+                case "Student":
+                    MainFrame.Navigate(new StudentDashboardPage());
+                    break;
+
+                default:
+                    MessageBox.Show("Unknown role: " + user.Role);
+                    MainFrame.Navigate(new LoginPage());
+                    break;
+            }
         }
+
 
         private void btnLogout_Click(object sender, RoutedEventArgs e)
         {

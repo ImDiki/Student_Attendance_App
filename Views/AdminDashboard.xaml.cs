@@ -1,45 +1,53 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using Student_Attendance_System.UserData;
+using Microsoft.Data.SqlClient;
+using Student_Attendance_System.Services;
 
 namespace Student_Attendance_System.Views
 {
-    public partial class AdminDashboard : Page
+    public partial class AdminDashboardPage : Page
     {
-        public AdminDashboard()
+        public AdminDashboardPage()
         {
             InitializeComponent();
-
-            txtDate.Text = DateTime.Now.ToString("yyyy/MM/dd");
-            txtAttendance.Text = "0";
-            txtClasses.Text = "0";
         }
 
-        // 🌙 Dark Mode
-        private void ThemeToggle_Checked(object sender, RoutedEventArgs e)
+        private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            Application.Current.Resources["WindowBg"] = Resources["DarkWindowBg"];
-            Application.Current.Resources["CardBg"] = Resources["DarkCardBg"];
-            Application.Current.Resources["TextColor"] = Resources["DarkText"];
+            LoadDashboardCounts();
         }
 
-        private void ThemeToggle_Unchecked(object sender, RoutedEventArgs e)
+        private void LoadDashboardCounts()
         {
-            Application.Current.Resources["WindowBg"] = Resources["LightWindowBg"];
-            Application.Current.Resources["CardBg"] = Resources["LightCardBg"];
-            Application.Current.Resources["TextColor"] = Resources["LightText"];
+            using SqlConnection con = DBConnection.GetConnection();
+            con.Open();
+
+            txtStudents.Text = GetCount(con, "Student");
+            txtTeachers.Text = GetCount(con, "Teacher");
+            txtClasses.Text = "0";        // placeholder (future)
+            txtAttendance.Text = "0";     // placeholder (future)
         }
 
-        // 🚪 Logout
-        private void Logout_Click(object sender, RoutedEventArgs e)
+        private string GetCount(SqlConnection con, string role)
         {
-            //UserData.CurrentUser = null;
+            string sql = "SELECT COUNT(*) FROM Users WHERE Role = @r";
+            using SqlCommand cmd = new SqlCommand(sql, con);
+            cmd.Parameters.AddWithValue("@r", role);
+            return cmd.ExecuteScalar().ToString();
+        }
 
-            if (Application.Current.MainWindow is MainWindow mw)
-            {
-                mw.MainFrame.Navigate(new LoginPage());
-            }
+        private void ManageTeachers_Click(object sender, RoutedEventArgs e)
+        {
+            //AdminFrame.Navigate(new TeacherManagementPage());
+        }
+        private void ManageClasses_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Class management coming soon");
+        }
+        private void Reports_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Reports coming soon");
         }
     }
 }

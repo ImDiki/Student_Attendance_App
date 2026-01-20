@@ -1,38 +1,56 @@
-﻿using System;
+﻿using Microsoft.Data.SqlClient;
 using Student_Attendance_System.Models;
+using Student_Attendance_System.Views;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Student_Attendance_System.Services
 {
-    class AuthService
+    public class AuthService
     {
         public User AuthenticateUser(string username, string password)
         {
-            // --- Teacher Login (Mock) ---
-            if (username == "admin" && password == "admin")
+            using SqlConnection con = DBConnection.GetConnection();
+            con.Open();
+
+            string hashedPassword = HashPassword(password);
+
+            string sql = @"
+                SELECT UserId, Username, Role
+                FROM Users
+                WHERE Username = @u
+                  AND PasswordHash = @p
+                  AND IsActive = 1";
+
+            using SqlCommand cmd = new SqlCommand(sql, con);
+            cmd.Parameters.AddWithValue("@u", username);
+            cmd.Parameters.AddWithValue("@p", hashedPassword);
+
+            using SqlDataReader dr = cmd.ExecuteReader();
+            if (dr.Read())
             {
                 return new User
                 {
-                    Username = "admin",
-                    FullName = "Head Master",
-                    Role = "Teacher"
+                    UserId = dr.GetInt32(0),
+                    Username = dr.GetString(1),
+                    Role = dr.GetString(2)
                 };
             }
 
-            // --- Student Login (Mock) ---
-            // ဥပမာ - Myat Thadar Linn က 2nd Year, C Class ဖြစ်တယ်ဆိုပါစို့
-            if (username == "C5292" && password == "1234")
-            {
-                return new User
-                {
-                    Username = "C5292",
-                    FullName = "Myat Thadar Linn",
-                    Role = "Student",
-                    YearLevel = 2,          // ၂ နှစ်မြောက်ကျောင်းသား
-                    AssignedClass = "C"      // C ခန်း
-                };
-            }
+            return null;
+        }
 
-            return null; // Login မှားရင် null ပြန်မယ်
+        private string HashPassword(string password)
+        {
+            using SHA256 sha = SHA256.Create();
+            byte[] bytes = Encoding.UTF8.GetBytes(password);
+            byte[] hash = sha.ComputeHash(bytes);
+
+            StringBuilder sb = new StringBuilder();
+            foreach (byte b in hash)
+                sb.Append(b.ToString("x2"));
+
+            return sb.ToString();
         }
     }
 }
