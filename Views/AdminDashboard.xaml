@@ -1,4 +1,4 @@
-﻿<Page x:Class="Student_Attendance_System.Views.AdminDashboardPage"
+﻿<Page x:Class="Student_Attendance_System.Views.AdminDashboard"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       Title="Admin Dashboard"

@@ -6,9 +6,9 @@ using Student_Attendance_System.Services;
 
 namespace Student_Attendance_System.Views
 {
-    public partial class AdminDashboardPage : Page
+    public partial class AdminDashboard : Page
     {
-        public AdminDashboardPage()
+        public AdminDashboard()
         {
             InitializeComponent();
 
