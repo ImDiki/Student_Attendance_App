@@ -112,7 +112,7 @@ namespace Student_Attendance_System.Views
             {
                 StudentID = UserData.UserData.CurrentUser?.Username,
                 Reason = txtLeaveReason.Text,
-                Date = DateTime.Now.ToString("yyyy/MM/dd HH:mm")
+                //Date = DateTime.Now.ToString("yyyy/MM/dd HH:mm")
             });
 
             string successMsg = LanguageSettings.Language ? "申請を送信しました。" : "Request submitted successfully!";
