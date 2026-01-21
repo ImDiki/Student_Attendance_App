@@ -30,16 +30,16 @@
                         </StackPanel>
                         <StackPanel Grid.Column="1" Margin="5,0,5,0">
                             <TextBlock x:Name="lblYear" Text="Year (学年)" Foreground="#94A3B8"/>
-                            <ComboBox x:Name="cboYear" Height="38">
-                                <ComboBoxItem Content="1" IsSelected="True"/>
-                                <ComboBoxItem Content="2"/>
-                                <ComboBoxItem Content="3"/>
-                                <ComboBoxItem Content="4"/>
+                            <ComboBox x:Name="cboYear" Style="{StaticResource GlassComboBoxStyle}" Padding="15,0,30,0" Height="38" HorizontalContentAlignment="Left" >
+                                <ComboBoxItem Content="1st Year" IsSelected="True"/>
+                                <ComboBoxItem Content="2nd Year"/>
+                                <ComboBoxItem Content="3rd Year"/>
+                                <ComboBoxItem Content="4th Year"/>
                             </ComboBox>
                         </StackPanel>
                         <StackPanel Grid.Column="2" Margin="5,0,0,0">
                             <TextBlock x:Name="lblClass" Text="Class" Foreground="#94A3B8"/>
-                            <ComboBox x:Name="cboClass" Height="38">
+                            <ComboBox x:Name="cboClass" Style="{StaticResource GlassComboBoxStyle}" Height="38"  Padding="15,0,30,0" HorizontalContentAlignment="Left">
                                 <ComboBoxItem Content="A"/>
                                 <ComboBoxItem Content="B"/>
                                 <ComboBoxItem Content="C" IsSelected="True"/>
@@ -53,7 +53,7 @@
                     <TextBox x:Name="txtName" Style="{StaticResource TechInputStyle}" Height="38" Margin="0,0,0,15"/>
 
                     <TextBlock x:Name="lblDept" Text="Department (学科 / 専攻)" Foreground="#94A3B8" Margin="0,10,0,5"/>
-                    <ComboBox x:Name="cboDepartment" Height="38">
+                    <ComboBox x:Name="cboDepartment" Style="{StaticResource GlassComboBoxStyle}" Height="38" Padding="15,0,30,0" HorizontalContentAlignment="Left" >
                         <ComboBoxItem Content="ITスペシャリスト専攻 (IT Specialist) - 4 Years" IsSelected="True"/>
                         <ComboBoxItem Content="ネットワークセキュリティ専攻 (Network Security) - 4 Years"/>
                         <ComboBoxItem Content="システムエンジニア専攻 (Systems Engineer) - 3 Years"/>
@@ -70,11 +70,11 @@
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0" Margin="0,0,10,0">
                             <TextBlock x:Name="lblBirth" Text="Birth Date" Foreground="#94A3B8"/>
-                            <DatePicker x:Name="dpBirthDate" Height="38"/>
+                            <DatePicker x:Name="dpBirthDate" Style="{StaticResource GlassDatePickerStyle}" Height="38"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Margin="10,0,0,0">
                             <TextBlock x:Name="lblEnroll" Text="Enrollment Date" Foreground="#94A3B8"/>
-                            <DatePicker x:Name="dpEnrollDate" Height="38"/>
+                            <DatePicker x:Name="dpEnrollDate" Style="{StaticResource GlassDatePickerStyle}" Height="38"/>
                         </StackPanel>
                     </Grid>
 
