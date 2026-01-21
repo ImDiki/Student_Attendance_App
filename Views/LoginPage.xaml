@@ -39,8 +39,8 @@
                     </PasswordBox.Resources>
                 </PasswordBox>
 
-                <Button x:Name="btnLogin" Content="LOGIN" Click="btnLogin_Click" Margin="0,35,0,0" 
-                        Height="48" FontWeight="Bold" Foreground="White" Cursor="Hand">
+                <Button x:Name="btnLogin"
+        Content="LOGIN" Click="btnLogin_Click" IsDefault="True" Margin="0,35,0,0" Height="48" FontWeight="Bold" Foreground="White" Cursor="Hand">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
                             <Border x:Name="btnBorder" CornerRadius="12">

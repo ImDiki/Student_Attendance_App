@@ -59,7 +59,7 @@
 
                 <TextBlock x:Name="lblTimetable" Text="今週の時間割 (Weekly Timetable)" FontSize="20" FontWeight="Bold" Margin="0,0,0,12" Foreground="White"/>
                 <Border Background="#0DFFFFFF" CornerRadius="20" BorderThickness="1" BorderBrush="#26FFFFFF" Padding="15" Margin="0,0,0,25">
-                    <Frame x:Name="TimetableFrame" Height="450" NavigationUIVisibility="Hidden"/>
+                    <Frame x:Name="TimetableFrame" Height="450"/>
                 </Border>
 
                 <TextBlock x:Name="lblLeaveTitle" Text="欠席・遅刻届 (Leave/Late Request)" FontSize="20" FontWeight="Bold" Margin="0,0,0,12" Foreground="White"/>

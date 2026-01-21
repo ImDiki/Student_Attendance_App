@@ -46,9 +46,16 @@ namespace Student_Attendance_System.Views
 
             if (loggedInUser != null)
             {
+                MessageBox.Show(
+                    $"Login OK\n" +
+                    $"User: {loggedInUser.Username}\n" +
+                    $"Role: {loggedInUser.Role}\n" +
+                    $"Year: {loggedInUser.YearLevel}\n" +
+                    $"Class: {loggedInUser.AssignedClass}"
+                );
+
                 UserData.UserData.CurrentUser = loggedInUser;
 
-                // MainWindow ဆီသို့ Success ဖြစ်ကြောင်း လှမ်းခေါ်ပြီး Role အလိုက် Redirect လုပ်ခိုင်းခြင်း
                 if (Application.Current.MainWindow is MainWindow main)
                 {
                     main.HandleLoginSuccess(loggedInUser);

@@ -44,15 +44,34 @@ namespace Student_Attendance_System
                 SidebarBorder.Width = 85;
                 SideInfoPanel.Visibility = Visibility.Collapsed;
                 ToggleSidebarUI(Visibility.Collapsed, HorizontalAlignment.Center);
+                Grid.SetRow(btnHamburger, 0);
+                Grid.SetColumn(btnHamburger, 1);
+
+                Grid.SetRow(btnHomeLogo, 1);
+                Grid.SetColumn(btnHomeLogo, 1);
+
+                btnHamburger.HorizontalAlignment = HorizontalAlignment.Center;
+                btnHomeLogo.HorizontalAlignment = HorizontalAlignment.Center;
             }
             else
             {
                 SidebarBorder.Width = 260;
                 SideInfoPanel.Visibility = Visibility.Visible;
                 ToggleSidebarUI(Visibility.Visible, HorizontalAlignment.Left);
+                Grid.SetRow(btnHomeLogo, 0);
+                Grid.SetColumn(btnHomeLogo, 0);
+
+                Grid.SetRow(btnHamburger, 0);
+                Grid.SetColumn(btnHamburger, 2);
+
+                btnHamburger.HorizontalAlignment = HorizontalAlignment.Right;
+                btnHomeLogo.HorizontalAlignment = HorizontalAlignment.Left;
             }
+
             isSideBarExpanded = !isSideBarExpanded;
         }
+
+
 
         private void ToggleSidebarUI(Visibility vis, HorizontalAlignment align)
         {

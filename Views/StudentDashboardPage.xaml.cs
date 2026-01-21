@@ -17,19 +17,45 @@ namespace Student_Attendance_System.Views
             ChangeLanguage(LanguageSettings.Language);
         }
 
+        //private void Page_Loaded(object sender, RoutedEventArgs e)
+        //{
+        //    // ၁။ User နာမည်ကို Dashboard မှာပြခြင်း
+        //    if (UserData.UserData.CurrentUser != null)
+        //    {
+        //        string greeting = LanguageSettings.Language ? "さん、ようこそ！" : " ,Welcome back!";
+        //        txtWelcome.Text = $"{UserData.UserData.CurrentUser.FullName}{greeting}";
+        //    }
+
+        //    // ၂။ Timetable ကို Frame ထဲမှာ Navigate လုပ်ခြင်း
+        //    TimetableFrame.Navigate(new TimetablePage());
+
+        //    // ၃။ ကိန်းဂဏန်းများ တွက်ချက်ခြင်း
+        //    LoadAttendanceStats();
+        //}
+
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            // ၁။ User နာမည်ကို Dashboard မှာပြခြင်း
-            if (UserData.UserData.CurrentUser != null)
+            var user = UserData.UserData.CurrentUser;
+
+            if (user == null)
             {
-                string greeting = LanguageSettings.Language ? "さん、ようこそ！" : " ,Welcome back!";
-                txtWelcome.Text = $"{UserData.UserData.CurrentUser.FullName}{greeting}";
+                MessageBox.Show("User session lost!");
+                return;
             }
 
-            // ၂။ Timetable ကို Frame ထဲမှာ Navigate လုပ်ခြင်း
+            if (user.YearLevel <= 0 || string.IsNullOrWhiteSpace(user.AssignedClass))
+            {
+                MessageBox.Show(
+                    $"Student info error!\nYear={user.YearLevel}\nClass={user.AssignedClass}"
+                );
+                return;
+            }
+
+            txtWelcome.Text = $"{user.FullName} さん、ようこそ！";
+
+            // 🔑 THIS loads timetable correctly
             TimetableFrame.Navigate(new TimetablePage());
 
-            // ၃။ ကိန်းဂဏန်းများ တွက်ချက်ခြင်း
             LoadAttendanceStats();
         }
 

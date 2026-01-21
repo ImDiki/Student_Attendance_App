@@ -71,10 +71,10 @@
                             BorderBrush="#33F59E0B"
                             Height="120" Margin="5,0,5,0" Padding="20">
                         <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="Classes"
+                            <TextBlock Text="Events"
                                        Foreground="#FCD34D"
                                        FontSize="14" FontWeight="SemiBold"/>
-                            <TextBlock x:Name="txtClasses"
+                            <TextBlock x:Name="txtEvent"
                                        Text="0"
                                        Foreground="White"
                                        FontSize="36" FontWeight="Bold"/>

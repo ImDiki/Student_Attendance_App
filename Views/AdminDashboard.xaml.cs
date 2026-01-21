@@ -45,8 +45,7 @@ namespace Student_Attendance_System.Views
 
             txtStudents.Text = GetCount(con, "Student");
             txtTeachers.Text = GetCount(con, "Teacher");
-            txtClasses.Text = "0";        // placeholder (future)
-            txtAttendance.Text = "0";     // placeholder (future)
+            txtEvent.Text = "0";
         }
 
         private string GetCount(SqlConnection con, string role)
@@ -63,7 +62,7 @@ namespace Student_Attendance_System.Views
         }
         private void ManageClasses_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Class management coming soon");
+            AdminFrame.Navigate(new AdminClassTimetablePage());
         }
         private void Reports_Click(object sender, RoutedEventArgs e)
         {

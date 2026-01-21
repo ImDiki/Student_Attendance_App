@@ -31,10 +31,10 @@
                         <StackPanel Grid.Column="1" Margin="5,0,5,0">
                             <TextBlock x:Name="lblYear" Text="Year (学年)" Foreground="#94A3B8"/>
                             <ComboBox x:Name="cboYear" Height="38">
-                                <ComboBoxItem Content="1st Year" IsSelected="True"/>
-                                <ComboBoxItem Content="2nd Year"/>
-                                <ComboBoxItem Content="3rd Year"/>
-                                <ComboBoxItem Content="4th Year"/>
+                                <ComboBoxItem Content="1" IsSelected="True"/>
+                                <ComboBoxItem Content="2"/>
+                                <ComboBoxItem Content="3"/>
+                                <ComboBoxItem Content="4"/>
                             </ComboBox>
                         </StackPanel>
                         <StackPanel Grid.Column="2" Margin="5,0,0,0">

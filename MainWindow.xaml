@@ -55,20 +55,36 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel Grid.Row="0">
-                    <Grid Margin="0,0,0,10">
-                        <Button x:Name="btnHamburger" Content="≡" FontSize="32" Foreground="#06B6D4" 
-                                FontWeight="Bold" Style="{StaticResource MenuButtonStyle}" 
-                                HorizontalAlignment="Right" Click="btnHamburger_Click" Margin="0,5,15,10"/>
-                    </Grid>
+                    <Grid x:Name="TopHeaderGrid" Margin="0,0,0,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Button x:Name="btnHomeLogo"  Grid.Row="0" Grid.Column="0"  Click="btnHomeLogo_Click" Cursor="Hand" Focusable="False" Margin="5,0,0,0">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <ContentPresenter/>
+                                </ControlTemplate>
+                            </Button.Template>
+                            <Image Source="/Assets/Owl.png" Height="45"/>
+                        </Button>
+                        <Button x:Name="btnHamburger" Grid.Row="0" Grid.Column="2" Content="≡" FontSize="28" 
+                                Foreground="#06B6D4" FontWeight="Bold" Style="{StaticResource MenuButtonStyle}" 
+                                Click="btnHamburger_Click" Margin="0,5,15,5"/>
+                        </Grid>
+
+
 
                     <StackPanel x:Name="SideInfoPanel">
                         <Border Background="#334155" CornerRadius="8" Padding="10" Margin="0,0,0,10">
                             <TextBlock x:Name="txtDate" Foreground="White" FontSize="13" HorizontalAlignment="Center"/>
                         </Border>
-
-                        <Button x:Name="btnHomeLogo" Background="Transparent" BorderThickness="0" Click="btnHomeLogo_Click" Cursor="Hand">
-                            <Image Source="/Assets/Owl.png" Height="45" Margin="0,5"/>
-                        </Button>
 
                         <TextBlock x:Name="txtWelcome" Text="WELCOME" Foreground="White" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,15"/>
                         <Separator Background="#26FFFFFF" Margin="10,0,10,15"/>

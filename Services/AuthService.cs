@@ -16,24 +16,42 @@ namespace Student_Attendance_System.Services
             string hashedPassword = HashPassword(password);
 
             string sql = @"
-                SELECT UserId, Username, Role
-                FROM Users
-                WHERE Username = @u
-                  AND PasswordHash = @p
-                  AND IsActive = 1";
+                SELECT 
+                    u.UserId,
+                    u.Username,
+                    u.Role,
+                    s.FullName,
+                    s.YearLevel,
+                    s.Class
+                FROM Users u
+                LEFT JOIN Students s
+                    ON UPPER(LTRIM(RTRIM(u.Username))) 
+                     = UPPER(LTRIM(RTRIM(s.StudentCode)))
+                WHERE u.Username = @u
+                  AND u.PasswordHash = @p
+                  AND u.IsActive = 1";
 
             using SqlCommand cmd = new SqlCommand(sql, con);
             cmd.Parameters.AddWithValue("@u", username);
             cmd.Parameters.AddWithValue("@p", hashedPassword);
 
             using SqlDataReader dr = cmd.ExecuteReader();
+
             if (dr.Read())
             {
                 return new User
                 {
                     UserId = dr.GetInt32(0),
                     Username = dr.GetString(1),
-                    Role = dr.GetString(2)
+                    Role = dr.GetString(2),
+
+                    FullName = dr.IsDBNull(3) ? "" : dr.GetString(3),
+
+                    YearLevel = dr.IsDBNull(4)
+                        ? 0
+                        : int.Parse(dr.GetString(4)),
+
+                    AssignedClass = dr.IsDBNull(5) ? "" : dr.GetString(5)
                 };
             }
 
