@@ -1,33 +1,85 @@
 ﻿<Page x:Class="Student_Attendance_System.Views.StudentDashboardPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      Title="Student Dashboard" Background="#E3F2FD">
+      Title="Student Dashboard" Background="Transparent"
+      Loaded="Page_Loaded">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="30">
+            <StackPanel>
+                <Border Background="#0DFFFFFF" CornerRadius="20" BorderThickness="1" BorderBrush="#26FFFFFF" Padding="25" Margin="0,0,0,25">
+                    <StackPanel>
+                        <TextBlock x:Name="txtWelcome" Text="ようこそ！ (Welcome back!)" FontSize="26" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock x:Name="txtWelcomeSub" Text="出席状況を確認してください。" Foreground="#94A3B8" Margin="0,5,0,0"/>
+                    </StackPanel>
+                </Border>
 
-        <Border Grid.Row="0" Background="White" Padding="15">
-            <StackPanel Orientation="Horizontal">
-                <Button Content="⬅ Logout (ログアウト)" Width="120" Height="35" Background="#FFEBEE" Foreground="Red" 
-                        FontWeight="Bold" BorderThickness="0" Click="btnLogout_Click"/>
-                <TextBlock x:Name="txtWelcome" Text="Welcome Student" FontSize="20" FontWeight="Bold" VerticalAlignment="Center" Margin="20,0,0,0"/>
+                <Grid Margin="0,0,0,25">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Background="#1A3B82F6" CornerRadius="15" BorderThickness="1" BorderBrush="#333B82F6" Height="120" Margin="0,0,10,0" Padding="20">
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Total Classes" Foreground="#38BDF8" FontSize="14" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="txtTotal" Text="0" Foreground="White" FontSize="38" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" Background="#1A10B981" CornerRadius="15" BorderThickness="1" BorderBrush="#3310B981" Height="120" Margin="5,0,5,0" Padding="20">
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock x:Name="lblPresent" Text="Present (出席)" Foreground="#34D399" FontSize="14" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="txtPresent" Text="0" Foreground="White" FontSize="38" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2" Background="#1AEF4444" CornerRadius="15" BorderThickness="1" BorderBrush="#33EF4444" Height="120" Margin="10,0,0,0" Padding="20">
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock x:Name="lblAbsent" Text="Absent (欠席)" Foreground="#F87171" FontSize="14" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="txtAbsent" Text="0" Foreground="White" FontSize="38" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <Border Background="#0DFFFFFF" CornerRadius="20" BorderThickness="1" BorderBrush="#26FFFFFF" Padding="25" Margin="0,0,0,25">
+                    <Grid>
+                        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center">
+                            <TextBlock x:Name="lblRateTitle" Text="Overall Attendance Rate" FontSize="18" FontWeight="Bold" Foreground="White"/>
+                            <TextBlock x:Name="lblRateSub" Text="You need 80% to pass." Foreground="#94A3B8" FontSize="13" Margin="0,5,0,0"/>
+                        </StackPanel>
+                        <TextBlock x:Name="txtPercent" Text="0%" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="42" FontWeight="Bold" Foreground="#38BDF8">
+                            <TextBlock.Effect>
+                                <DropShadowEffect Color="#38BDF8" BlurRadius="10" ShadowDepth="0"/>
+                            </TextBlock.Effect>
+                        </TextBlock>
+                    </Grid>
+                </Border>
+
+                <TextBlock x:Name="lblTimetable" Text="今週の時間割 (Weekly Timetable)" FontSize="20" FontWeight="Bold" Margin="0,0,0,12" Foreground="White"/>
+                <Border Background="#0DFFFFFF" CornerRadius="20" BorderThickness="1" BorderBrush="#26FFFFFF" Padding="15" Margin="0,0,0,25">
+                    <Frame x:Name="TimetableFrame" Height="450"/>
+                </Border>
+
+                <TextBlock x:Name="lblLeaveTitle" Text="欠席・遅刻届 (Leave/Late Request)" FontSize="20" FontWeight="Bold" Margin="0,0,0,12" Foreground="White"/>
+                <Border Background="#0DFFFFFF" CornerRadius="20" BorderThickness="1" BorderBrush="#26FFFFFF" Padding="25">
+                    <StackPanel>
+                        <TextBlock x:Name="lblReason" Text="申請理由 (Reason):" Foreground="#94A3B8" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                        <TextBox x:Name="txtLeaveReason" Height="100" Style="{StaticResource TechInputStyle}" AcceptsReturn="True" TextWrapping="Wrap"/>
+                        <Button x:Name="btnSubmit" Content="申請を送信する (Submit)" Click="btnSubmitLeave_Click" Margin="0,20,0,0" Height="45" Width="220" HorizontalAlignment="Right" Foreground="White" FontWeight="Bold">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="b" CornerRadius="12" Background="#E67E22">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </StackPanel>
+                </Border>
+
             </StackPanel>
-        </Border>
-
-        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock Text="🎓 Student Portal" FontSize="30" FontWeight="Bold" HorizontalAlignment="Center" Foreground="#1976D2"/>
-            <TextBlock Text="Attendance History will appear here." FontSize="16" Foreground="Gray" Margin="0,10,0,0"/>
-
-            <Border Background="White" CornerRadius="10" Padding="20" Margin="0,30,0,0" Width="300">
-                <StackPanel>
-                    <TextBlock Text="My Attendance" FontWeight="Bold" Margin="0,0,0,10"/>
-                    <ProgressBar Value="80" Height="20" Foreground="#4CAF50"/>
-                    <TextBlock Text="80% Present" HorizontalAlignment="Right" FontSize="12"/>
-                </StackPanel>
-            </Border>
-        </StackPanel>
-    </Grid>
+        </Grid>
+    </ScrollViewer>
 </Page>

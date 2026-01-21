@@ -1,52 +1,80 @@
-﻿using System.Linq; // List ရှာဖို့လိုတယ်
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Navigation;
-using Student_Attendance_System;
+using Student_Attendance_System.Interfaces;
+using Student_Attendance_System.Models;
+using Student_Attendance_System.Services;
 
 namespace Student_Attendance_System.Views
 {
-    public partial class LoginPage : Page
+    public partial class LoginPage : Page, ILanguageSwitchable
     {
         public LoginPage()
         {
             InitializeComponent();
+            // App-wide language settings ကို စတင်အသုံးပြုခြင်း
+            ChangeLanguage(LanguageSettings.Language);
         }
 
-        private void btnBack_Click(object sender, RoutedEventArgs e)
+        // --- ILanguageSwitchable Implementation ---
+        public void ChangeLanguage(bool isJapanese)
         {
-            if (NavigationService.CanGoBack) NavigationService.GoBack();
+            txtTitle.Text = isJapanese ? "ようこそ" : "WELCOME";
+            txtSubTitle.Text = isJapanese ? "サインインして続行してください" : "Sign in to Continue";
+            lblUsername.Text = isJapanese ? "ユーザー名" : "Username";
+            lblPassword.Text = isJapanese ? "パスワード" : "Password";
+            btnLogin.Content = isJapanese ? "ログイン" : "LOGIN";
+            txtForgetPass.Text = isJapanese ? "パスワードをお忘れですか？" : "Forgot Password?";
+            txtRegisterLink.Text = isJapanese ? "登録はこちら" : "No account? Register here.";
         }
 
         private void btnLogin_Click(object sender, RoutedEventArgs e)
         {
-            string inputUser = txtUsername.Text;
-            string inputPass = txtPassword.Password;
+            string user = txtUsername.Text.Trim();
+            string pass = txtPassword.Password.Trim();
 
-            // MockDatabase ထဲမှာ အဲ့ဒီလူ ရှိမရှိ စစ်မယ်
-            var user = MockDatabase.Users.FirstOrDefault(u => u.Username == inputUser && u.Password == inputPass);
-
-            if (user != null)
+            if (string.IsNullOrEmpty(user) || string.IsNullOrEmpty(pass))
             {
-                // ရှိတယ်ဆိုရင် Role ကို စစ်မယ်
-                if (user.Role == "Admin")
+                string msg = LanguageSettings.Language ? "すべての項目を入力してください" : "Please fill in all fields.";
+                MessageBox.Show(msg, "System Status");
+                return;
+            }
+
+            var auth = new AuthService();
+            User loggedInUser = auth.AuthenticateUser(user, pass);
+
+            if (loggedInUser != null)
+            {
+                MessageBox.Show(
+                    $"Login OK\n" +
+                    $"User: {loggedInUser.Username}\n" +
+                    $"Role: {loggedInUser.Role}\n" +
+                    $"Year: {loggedInUser.YearLevel}\n" +
+                    $"Class: {loggedInUser.AssignedClass}"
+                );
+
+                UserData.UserData.CurrentUser = loggedInUser;
+
+                if (Application.Current.MainWindow is MainWindow main)
                 {
-                    //NavigationService.Navigate(new DashboardPage()); // Admin Page
-                    Admin admin = new Admin();
-                    admin.Show();
-                    
-                    
-                }
-                else if (user.Role == "Student")
-                {
-                    
-                    NavigationService.Navigate(new StudentDashboardPage(user.FullName));
+                    main.HandleLoginSuccess(loggedInUser);
                 }
             }
             else
             {
-                MessageBox.Show("Invalid Username or Password!", "Login Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(LanguageSettings.Language ? "ログインに失敗しました" : "Login Failed!", "Auth Error");
             }
+        }
+
+        private void ForgetPassword_Click(object sender, MouseButtonEventArgs e)
+        {
+            MessageBox.Show(LanguageSettings.Language ? "教務課に連絡してください" : "Please contact the admin office.");
+        }
+
+        private void GoToRegister_Click(object sender, MouseButtonEventArgs e)
+        {
+            NavigationService.Navigate(new RegisterPage());
         }
     }
 }

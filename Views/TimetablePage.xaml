@@ -1,0 +1,84 @@
+﻿<Page x:Class="Student_Attendance_System.Views.TimetablePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Time Table" Background="Transparent" Loaded="Page_Loaded">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock x:Name="txtTitle" Grid.Row="0" Text="時間割 (TIMETABLE)" FontSize="28" FontWeight="Bold" Foreground="White" Margin="0,0,0,20"/>
+
+        <Border Grid.Row="1" Background="#1AFFFFFF" CornerRadius="15" BorderBrush="#33FFFFFF" BorderThickness="1" Margin="0,0,0,20" Padding="15">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock x:Name="lblYearSelect" Text="Year: " VerticalAlignment="Center" Foreground="#94A3B8" Margin="0,0,5,0"/>
+                <ComboBox x:Name="cboYear" Style="{StaticResource GlassComboBoxStyle}" Width="110" Height="35" Margin="0,0,15,0" SelectionChanged="Filter_Changed">
+                    <ComboBoxItem Content="1st Year" Tag="1"/>
+                    <ComboBoxItem Content="2nd Year" Tag="2"/>
+                    <ComboBoxItem Content="3rd Year" Tag="3"/>
+                    <ComboBoxItem Content="4th Year" Tag="4"/>
+                </ComboBox>
+
+                <TextBlock x:Name="lblClassSelect" Text="Class: " VerticalAlignment="Center" Foreground="#94A3B8" Margin="0,0,5,0"/>
+                <ComboBox x:Name="cboClass" Style="{StaticResource GlassComboBoxStyle}" Width="80" Height="35" Margin="0,0,15,0" SelectionChanged="Filter_Changed">
+                    <ComboBoxItem Content="A"/>
+                    <ComboBoxItem Content="B"/>
+                    <ComboBoxItem Content="C"/>
+                    <ComboBoxItem Content="D"/>
+                    <ComboBoxItem Content="E"/>
+                </ComboBox>
+
+                <TextBlock x:Name="lblTermSelect" Text="Term: " VerticalAlignment="Center" Foreground="#94A3B8" Margin="0,0,5,0"/>
+                <ComboBox x:Name="cboTerm" Style="{StaticResource GlassComboBoxStyle}" Width="130" Height="35" SelectionChanged="Filter_Changed">
+                    <ComboBoxItem Content="Former (前期)"/>
+                    <ComboBoxItem Content="Latter (後期)"/>
+                </ComboBox>
+
+                <TextBlock x:Name="txtTodayInfo" Text="Today" Margin="25,0,0,0" VerticalAlignment="Center" FontSize="14" FontWeight="SemiBold" Foreground="#06B6D4"/>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="2" Background="#1A000000" CornerRadius="20" BorderBrush="#33FFFFFF" BorderThickness="1" Padding="10">
+            <Grid x:Name="TimetableGrid">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="45"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Column="0" BorderBrush="#22FFFFFF" BorderThickness="0,0,1,1">
+                    <TextBlock x:Name="hPeriod" Text="時限" Foreground="#94A3B8" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+                </Border>
+                <Border Grid.Column="1" BorderBrush="#22FFFFFF" BorderThickness="0,0,1,1">
+                    <TextBlock x:Name="hMon" Text="MON" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+                </Border>
+                <Border Grid.Column="2" BorderBrush="#22FFFFFF" BorderThickness="0,0,1,1">
+                    <TextBlock x:Name="hTue" Text="TUE" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+                </Border>
+                <Border Grid.Column="3" BorderBrush="#22FFFFFF" BorderThickness="0,0,1,1">
+                    <TextBlock x:Name="hWed" Text="WED" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+                </Border>
+                <Border Grid.Column="4" BorderBrush="#22FFFFFF" BorderThickness="0,0,1,1">
+                    <TextBlock x:Name="hThu" Text="THU" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+                </Border>
+                <Border Grid.Column="5" BorderBrush="#22FFFFFF" BorderThickness="0,0,1,1">
+                    <TextBlock x:Name="hFri" Text="FRI" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

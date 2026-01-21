@@ -97,6 +97,9 @@ StyleCopReport.xml
 *.pidb
 *.svclog
 *.scc
+*.mdf
+*.ldf
+
 
 # Chutzpah Test files
 _Chutzpah*
@@ -361,3 +364,10 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Database/DatabaseCtrl.mdf
+/Database/DatabaseCtrl_log.ldf
+/Database/mainlineDB.mdf
+/Database/mainlineDB_log.ldf
+/Database/DatabaseCtrl.mdf
+/Database/DatabaseCtrl_log.ldf
+/Database/DatabaseCtrl.mdf
