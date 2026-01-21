@@ -55,22 +55,43 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel Grid.Row="0">
-                    <Grid Margin="0,0,0,10">
-                        <Button x:Name="btnHamburger" Content="≡" FontSize="32" Foreground="#06B6D4" 
-                                FontWeight="Bold" Style="{StaticResource MenuButtonStyle}" 
-                                HorizontalAlignment="Right" Click="btnHamburger_Click" Margin="0,5,15,10"/>
+                    <Grid x:Name="HeaderGrid" Margin="0,0,0,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Button x:Name="btnHomeLogo" Grid.Row="0" Grid.Column="0" Click="btnHomeLogo_Click" Cursor="Hand">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <ContentPresenter/>
+                                </ControlTemplate>
+                            </Button.Template>
+                            <Image Source="/Assets/Owl.png" Height="45"/>
+                        </Button>
+                        <Button x:Name="btnHamburger" Grid.Row="0" Grid.Column="1" Content="≡" FontSize="28" 
+                                Foreground="#06B6D4" FontWeight="Bold" Style="{StaticResource MenuButtonStyle}" 
+                                Click="btnHamburger_Click" Width="45" Height="45"/>
                     </Grid>
 
+                    <Border x:Name="ClockContainer" Background="#1AFFFFFF" CornerRadius="12" Padding="10" Margin="0,0,0,15" BorderBrush="#33FFFFFF" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock x:Name="txtDigitalClock" Text="00:00:00" Foreground="#06B6D4" 
+                                       FontSize="45" HorizontalAlignment="Center" 
+                                       FontFamily="./Assets/digital_7/#Digital-7">
+                                <TextBlock.Effect>
+                                    <DropShadowEffect Color="#06B6D4" BlurRadius="20" ShadowDepth="0" Opacity="0.9"/>
+                                </TextBlock.Effect>
+                            </TextBlock>
+                            <TextBlock x:Name="txtDate" Foreground="White" FontSize="11" HorizontalAlignment="Center" Opacity="0.7" Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </Border>
+
                     <StackPanel x:Name="SideInfoPanel">
-                        <Border Background="#334155" CornerRadius="8" Padding="10" Margin="0,0,0,10">
-                            <TextBlock x:Name="txtDate" Foreground="White" FontSize="13" HorizontalAlignment="Center"/>
-                        </Border>
-
-                        <Button x:Name="btnHomeLogo" Background="Transparent" BorderThickness="0" Click="btnHomeLogo_Click" Cursor="Hand">
-                            <Image Source="/Assets/Owl.png" Height="45" Margin="0,5"/>
-                        </Button>
-
-                        <TextBlock x:Name="txtWelcome" Text="WELCOME" Foreground="White" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,15"/>
+                        <TextBlock x:Name="txtWelcome" Text="WELCOME" Foreground="White" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,15"/>
                         <Separator Background="#26FFFFFF" Margin="10,0,10,15"/>
                     </StackPanel>
                 </StackPanel>
@@ -80,73 +101,67 @@
                         <Button Style="{StaticResource MenuButtonStyle}" Click="btnLanguage_Click">
                             <Grid x:Name="pnlLang">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="35"/>
+                                    <ColumnDefinition Width="40"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="🌐" FontSize="18" HorizontalAlignment="Center"/>
-                                <TextBlock x:Name="lblLang" Text="Language: ENG / JP" Grid.Column="1" Margin="10,0,0,0"/>
+                                <TextBlock x:Name="lblLang" Text="Language" Grid.Column="1" Margin="10,0,0,0"/>
                             </Grid>
                         </Button>
-
                         <Button x:Name="btnLoginMenu" Style="{StaticResource MenuButtonStyle}" Click="btnLoginMenu_Click">
                             <Grid x:Name="pnlLogin">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="35"/>
+                                    <ColumnDefinition Width="40"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="🔑" FontSize="18" HorizontalAlignment="Center"/>
                                 <TextBlock x:Name="lblLogin" Text="Login" Grid.Column="1" Margin="10,0,0,0"/>
                             </Grid>
                         </Button>
-
                         <Button x:Name="btnRegister" Style="{StaticResource MenuButtonStyle}" Click="btnRegister_Click">
                             <Grid x:Name="pnlReg">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="35"/>
+                                    <ColumnDefinition Width="40"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="📝" FontSize="18" HorizontalAlignment="Center"/>
                                 <TextBlock x:Name="lblReg" Text="Register" Grid.Column="1" Margin="10,0,0,0"/>
                             </Grid>
                         </Button>
-
                         <Button x:Name="btnScanMode" Style="{StaticResource MenuButtonStyle}" Click="btnScanMode_Click">
                             <Grid x:Name="pnlScan">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="35"/>
+                                    <ColumnDefinition Width="40"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="📷" FontSize="18" HorizontalAlignment="Center"/>
-                                <TextBlock x:Name="lblScan" Text="Scan / Webcam" Grid.Column="1" Margin="10,0,0,0"/>
+                                <TextBlock x:Name="lblScan" Text="Scan" Grid.Column="1" Margin="10,0,0,0"/>
                             </Grid>
                         </Button>
-
                         <Button x:Name="btnTimeTable" Style="{StaticResource MenuButtonStyle}" Click="btnTimeTable_Click">
                             <Grid x:Name="pnlTable">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="35"/>
+                                    <ColumnDefinition Width="40"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="📅" FontSize="18" HorizontalAlignment="Center"/>
-                                <TextBlock x:Name="lblTable" Text="Time Table" Grid.Column="1" Margin="10,0,0,0"/>
+                                <TextBlock x:Name="lblTable" Text="Timetable" Grid.Column="1" Margin="10,0,0,0"/>
                             </Grid>
                         </Button>
-
                         <Button x:Name="btnReport" Style="{StaticResource MenuButtonStyle}" Click="btnReport_Click">
                             <Grid x:Name="pnlReport">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="35"/>
+                                    <ColumnDefinition Width="40"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="📊" FontSize="18" HorizontalAlignment="Center"/>
                                 <TextBlock x:Name="lblReport" Text="Report" Grid.Column="1" Margin="10,0,0,0"/>
                             </Grid>
                         </Button>
-
                         <Button x:Name="btnLogout" Visibility="Collapsed" Style="{StaticResource MenuButtonStyle}" Click="btnLogout_Click">
                             <Grid x:Name="pnlLogout">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="35"/>
+                                    <ColumnDefinition Width="40"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="🚪" FontSize="18" HorizontalAlignment="Center"/>
@@ -161,7 +176,7 @@
                     <Button Style="{StaticResource MenuButtonStyle}" Click="btnAbout_Click">
                         <Grid x:Name="pnlAbout">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="35"/>
+                                <ColumnDefinition Width="40"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="ℹ️" FontSize="18" HorizontalAlignment="Center"/>
@@ -171,11 +186,11 @@
                     <Button Style="{StaticResource MenuButtonStyle}" Click="btnDevTeam_Click">
                         <Grid x:Name="pnlDev">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="35"/>
+                                <ColumnDefinition Width="40"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="👨‍💻" FontSize="18" HorizontalAlignment="Center"/>
-                            <TextBlock x:Name="lblDev" Text="Developer Team" Grid.Column="1" Margin="10,0,0,0"/>
+                            <TextBlock x:Name="lblDev" Text="Developer" Grid.Column="1" Margin="10,0,0,0"/>
                         </Grid>
                     </Button>
                 </StackPanel>
@@ -183,7 +198,20 @@
         </Border>
 
         <Grid Grid.Column="1">
-            <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden" Margin="0"/>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Button x:Name="btnGlobalBack" Grid.Row="0" HorizontalAlignment="Left" Margin="20,15,0,0"
+                    Background="#1AFFFFFF" BorderBrush="#33FFFFFF" BorderThickness="1" Foreground="White" 
+                    Content="← BACK" Width="90" Height="35" Visibility="Collapsed" Click="btnGlobalBack_Click">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="10"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+            <Frame x:Name="MainFrame" Grid.Row="1" NavigationUIVisibility="Hidden" Margin="0" Navigated="MainFrame_Navigated"/>
         </Grid>
     </Grid>
 </Window>
