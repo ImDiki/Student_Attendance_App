@@ -1,22 +1,27 @@
-﻿<Window x:Class="Student_Attendance_System.Views.WebcamWindow"
+﻿<Window x:Class="Student_Attendance_System.Views.Webcam"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="カメラスキャン" Height="600" Width="900" Closing="Window_Closing">
-    <Grid Background="#222">
+        Title="Camera Scan" Height="600" Width="900" Closing="Window_Closing"
+        WindowStartupLocation="CenterScreen" Background="#1A1A1A">
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="20" HorizontalAlignment="Center">
-            <ComboBox x:Name="cboCamera" Width="250" Height="35" VerticalContentAlignment="Center" Margin="0,0,10,0"/>
-
-            <Button Content="開始 (Start)" Click="btnStart_Click" Width="100" Height="35" Background="#4CAF50" Foreground="White" FontWeight="Bold" Margin="5"/>
-            <Button Content="停止 (Stop)" Click="btnStop_Click" Width="100" Height="35" Background="#F44336" Foreground="White" FontWeight="Bold" Margin="5"/>
-        </StackPanel>
-
-        <Border Grid.Row="1" Margin="20" BorderBrush="#555" BorderThickness="2" Background="Black">
+        <Border Grid.Row="0" Margin="20" BorderBrush="#06B6D4" BorderThickness="2" Background="Black" CornerRadius="10">
             <Image x:Name="imgWebcam" Stretch="Uniform"/>
         </Border>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,30">
+            <Button x:Name="btnCapture" Content="📷 Take Photo" Click="btnCapture_Click" 
+                    Width="180" Height="50" Background="#06B6D4" Foreground="White" FontSize="16" FontWeight="Bold" Margin="10"/>
+
+            <Button x:Name="btnRetake" Content="🔄 Retake" Click="btnRetake_Click" Visibility="Collapsed"
+                    Width="150" Height="50" Background="#F44336" Foreground="White" FontSize="16" FontWeight="Bold" Margin="10"/>
+
+            <Button x:Name="btnConfirm" Content="✅ Use This Photo" Click="btnConfirm_Click" Visibility="Collapsed"
+                    Width="180" Height="50" Background="#4CAF50" Foreground="White" FontSize="16" FontWeight="Bold" Margin="10"/>
+        </StackPanel>
     </Grid>
 </Window>

@@ -9,12 +9,17 @@ namespace Student_Attendance_System.Models
     public class User
     {
         public int UserId { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public string Role { get; set; } // "Student", "Teacher", "Admin"
-        public string FullName { get; set; }
-        public string Major { get; set; }
-        public int YearLevel { get; set; }
-        public string AssignedClass { get; set; }
+        public string Username { get; set; } = string.Empty;
+        public string PasswordHash { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty;
+        public string FullName { get; set; } = string.Empty;
+
+        // YearLevel ကို string ပြောင်းထားပါသည်
+        public string YearLevel { get; set; } = string.Empty;
+        public string AssignedClass { get; set; } = string.Empty;
+
+        // Profile ပုံ သိမ်းဆည်းရန်
+        public byte[]? FacePhoto { get; set; }
+        public bool IsActive { get; set; } = true;
     }
 }
