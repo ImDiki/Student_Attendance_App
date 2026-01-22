@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using Student_Attendance_System.Models;
 using Student_Attendance_System.Interfaces;
+using Microsoft.Data.SqlClient;
 
 namespace Student_Attendance_System.Views
 {
@@ -74,29 +75,55 @@ namespace Student_Attendance_System.Views
 
         private void LoadAttendanceStats()
         {
-            // Mock Data List ထဲကနေ လက်ရှိ Login ဝင်ထားတဲ့ကျောင်းသားရဲ့ data ပဲယူမယ်
-            string currentStudentID = UserData.UserData.CurrentUser?.Username;
+            string studentId = UserData.UserData.CurrentUser?.Username;
 
-            // App.TempAttendanceList ကနေ စစ်ထုတ်ခြင်း
-            var myRecords = App.TempAttendanceList.Where(r => r.StudentID == currentStudentID).ToList();
+            if (string.IsNullOrEmpty(studentId))
+                return;
 
-            int total = myRecords.Count;
-            int present = myRecords.Count(r => r.Status.Contains("Present") || r.Status.Contains("出席"));
+            int total = 0;
+            int present = 0;
+
+            using (SqlConnection con = DBConnection.GetConnection())
+            {
+                con.Open();
+
+                // Total classes attended
+                string totalQuery = @"SELECT COUNT(*) FROM Attendance WHERE StudentID = @sid";
+
+                SqlCommand totalCmd = new SqlCommand(totalQuery, con);
+                totalCmd.Parameters.AddWithValue("@sid", studentId);
+                total = (int)totalCmd.ExecuteScalar();
+
+                // Present count
+                string presentQuery = @"SELECT COUNT(*) FROM Attendance WHERE StudentID = @sid AND Status = 'Present'";
+
+                SqlCommand presentCmd = new SqlCommand(presentQuery, con);
+                presentCmd.Parameters.AddWithValue("@sid", studentId);
+                present = (int)presentCmd.ExecuteScalar();
+            }
+
             int absent = total - present;
 
+            // UI update
             txtTotal.Text = total.ToString();
             txtPresent.Text = present.ToString();
             txtAbsent.Text = absent.ToString();
 
             if (total > 0)
             {
-                double rate = ((double)present / total) * 100;
+                double rate = (double)present / total * 100;
                 txtPercent.Text = $"{rate:0.0}%";
-
-                // 80% အောက်ရောက်ရင် စာသားအနီပြောင်းမယ်
-                txtPercent.Foreground = rate < 80 ? Brushes.Red : (Brush)new BrushConverter().ConvertFromString("#38BDF8");
+                txtPercent.Foreground = rate < 80
+                    ? Brushes.Red
+                    : (Brush)new BrushConverter().ConvertFromString("#38BDF8");
+            }
+            else
+            {
+                txtPercent.Text = "0%";
+                txtPercent.Foreground = Brushes.Gray;
             }
         }
+
 
         private void btnSubmitLeave_Click(object sender, RoutedEventArgs e)
         {

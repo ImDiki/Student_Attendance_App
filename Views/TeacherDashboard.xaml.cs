@@ -112,7 +112,7 @@ namespace Student_Attendance_System.Views
                 DayOfWeek.Tuesday => new List<(string, string)> { ("09:10-10:40", "ビジネスアプリ II"), ("10:50-12:20", "システム開発基礎") },
                 DayOfWeek.Wednesday => new List<(string, string)> { ("09:10-10:40", "PG実践 I"), ("10:50-12:20", "PG実践 I"), ("13:10-14:40", "コミ技") },
                 DayOfWeek.Thursday => new List<(string, string)> { ("09:10-10:40", "プログラミング II"), ("10:50-12:20", "プログラミング II"), ("13:10-14:40", "キャリアデザイン") },
-                DayOfWeek.Friday => new List<(string, string)> { ("09:10-10:40", "ゼミナール I"), ("10:50-12:20", "データベース技術"), ("13:10-14:40", "データベース技術") },
+                DayOfWeek.Friday => new List<(string, string)> { ("09:10-10:40", "ゼミナール I"), ("10:50-12:20", "データベース技術"), ("13:10-14:40", "データベース技術"), ("14:50-16:20", "キャリアデザイン") },
                 _ => new List<(string, string)>()
             };
         }
@@ -125,11 +125,7 @@ namespace Student_Attendance_System.Views
             {
                 con.Open();
 
-                string query = @"
-SELECT AttendanceID, StudentID, Status, Note
-FROM Attendance
-WHERE AttendanceDate = CAST(GETDATE() AS DATE)
-  AND Subject = @subject";
+                string query = @"SELECT AttendanceID, StudentID, Status, Note FROM Attendance WHERE AttendanceDate = CAST(GETDATE() AS DATE) AND Subject = @subject";
 
                 SqlCommand cmd = new SqlCommand(query, con);
                 cmd.Parameters.AddWithValue("@subject", App.CurrentSubject);
@@ -173,11 +169,7 @@ WHERE AttendanceDate = CAST(GETDATE() AS DATE)
     {
         con.Open();
 
-        string query = @"
-UPDATE Attendance
-SET Status = @status,
-    Note = @note
-WHERE AttendanceID = @id";
+        string query = @"UPDATE Attendance SET Status = @status, Note = @note WHERE AttendanceID = @id";
 
         SqlCommand cmd = new SqlCommand(query, con);
         cmd.Parameters.AddWithValue("@status", status);

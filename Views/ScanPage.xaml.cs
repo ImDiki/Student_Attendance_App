@@ -133,12 +133,8 @@ WHERE StudentCode = @code";
             {
                 con.Open();
 
-                // 1️⃣ Check duplicate
-                string checkQuery = @"
-SELECT COUNT(*) FROM Attendance
-WHERE StudentID = @sid
-  AND AttendanceDate = CAST(GETDATE() AS DATE)
-  AND Subject = @subject";
+             
+                string checkQuery = @" SELECT COUNT(*) FROM Attendance WHERE StudentID = @sid AND AttendanceDate = CAST(GETDATE() AS DATE) AND Subject = @subject";
 
                 SqlCommand checkCmd = new SqlCommand(checkQuery, con);
                 checkCmd.Parameters.AddWithValue("@sid", studentCode);
@@ -148,25 +144,18 @@ WHERE StudentID = @sid
 
                 if (exists > 0)
                 {
-                    return false; // ❌ Duplicate
+                    return false;
                 }
 
-                // 2️⃣ Insert
-                string insertQuery = @"
-INSERT INTO Attendance
-(StudentID, Subject, AttendanceDate, AttendanceTime, Status, CreatedAt)
-VALUES
-(@sid, @subject,
- CAST(GETDATE() AS DATE),
- CAST(GETDATE() AS TIME),
- 'Present', GETDATE())";
+                
+                string insertQuery = @" INSERT INTO Attendance (StudentID, Subject, AttendanceDate, AttendanceTime, Status, CreatedAt) VALUES (@sid, @subject, CAST(GETDATE() AS DATE), CAST(GETDATE() AS TIME), 'Present', GETDATE())";
 
                 SqlCommand insertCmd = new SqlCommand(insertQuery, con);
                 insertCmd.Parameters.AddWithValue("@sid", studentCode);
                 insertCmd.Parameters.AddWithValue("@subject", App.CurrentSubject);
 
                 insertCmd.ExecuteNonQuery();
-                return true; // ✅ Success
+                return true; 
             }
         }
 
