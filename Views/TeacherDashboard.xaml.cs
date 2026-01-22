@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using Student_Attendance_System.Models;
 using Student_Attendance_System.Interfaces;
+using Microsoft.Data.SqlClient;
 
 namespace Student_Attendance_System.Views
 {
@@ -116,8 +117,76 @@ namespace Student_Attendance_System.Views
             };
         }
 
-        private void RefreshList() { dgAttendance.ItemsSource = null; dgAttendance.ItemsSource = App.TempAttendanceList; }
-        private void btnMarkPresent_Click(object sender, RoutedEventArgs e) { /* Update Present Logic */ RefreshList(); }
-        private void btnMarkAbsent_Click(object sender, RoutedEventArgs e) { /* Update Absent Logic */ RefreshList(); }
+        private void RefreshList()
+        {
+            App.TempAttendanceList.Clear();
+
+            using (SqlConnection con = DBConnection.GetConnection())
+            {
+                con.Open();
+
+                string query = @"
+SELECT AttendanceID, StudentID, Status, Note
+FROM Attendance
+WHERE AttendanceDate = CAST(GETDATE() AS DATE)
+  AND Subject = @subject";
+
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@subject", App.CurrentSubject);
+
+                SqlDataReader r = cmd.ExecuteReader();
+
+                while (r.Read())
+                {
+                    App.TempAttendanceList.Add(new AttendanceRecord
+                    {
+                        AttendanceID = (int)r["AttendanceID"],
+                        StudentID = r["StudentID"].ToString(),
+                        Status = r["Status"].ToString(),
+                        Note = r["Note"]?.ToString()
+                    });
+                }
+            }
+
+            dgAttendance.ItemsSource = null;
+            dgAttendance.ItemsSource = App.TempAttendanceList;
+        }
+
+        private void btnMarkPresent_Click(object sender, RoutedEventArgs e)
+        {
+            if (dgAttendance.SelectedItem is not AttendanceRecord selected) return;
+
+            UpdateAttendance(selected.AttendanceID, "Present", txtReason.Text);
+            RefreshList();
+        }
+
+        private void btnMarkAbsent_Click(object sender, RoutedEventArgs e)
+        {
+            if (dgAttendance.SelectedItem is not AttendanceRecord selected) return;
+
+            UpdateAttendance(selected.AttendanceID, "Absent", txtReason.Text);
+            RefreshList();
+        }
+        private void UpdateAttendance(int attendanceId, string status, string note)
+{
+    using (SqlConnection con = DBConnection.GetConnection())
+    {
+        con.Open();
+
+        string query = @"
+UPDATE Attendance
+SET Status = @status,
+    Note = @note
+WHERE AttendanceID = @id";
+
+        SqlCommand cmd = new SqlCommand(query, con);
+        cmd.Parameters.AddWithValue("@status", status);
+        cmd.Parameters.AddWithValue("@note", note ?? "");
+        cmd.Parameters.AddWithValue("@id", attendanceId);
+
+        cmd.ExecuteNonQuery();
+    }
+}
+
     }
 }

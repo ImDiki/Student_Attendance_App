@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Threading; // Timer အတွက်လိုအပ်
 using Student_Attendance_System.Interfaces;
 using Student_Attendance_System.Models;
+using Microsoft.Data.SqlClient;
 
 namespace Student_Attendance_System.Views
 {
@@ -51,28 +52,126 @@ namespace Student_Attendance_System.Views
             }
         }
 
-        private void ProcessScan(string id)
+        private void ProcessScan(string scannedCode)
         {
-            var student = mockStudentDb.FirstOrDefault(s => s.BarcodeID.ToUpper() == id);
-
-            if (student != null)
+            using (SqlConnection con = DBConnection.GetConnection())
             {
-                lblScannedName.Text = student.Name;
-                lblScannedID.Text = student.StudentID;
-                AttendanceBadge.Visibility = Visibility.Visible;
-                lblStatusMessage.Text = _isJapanese ? "成功しました。間もなく戻ります..." : "Success. Redirecting soon...";
-                lblStatusMessage.Foreground = Brushes.LightGreen;
-                System.Media.SystemSounds.Beep.Play();
+                con.Open();
 
-                StartRedirectTimer(); // Card ဖတ်ပြီးတာနဲ့ Timer စမယ်
-            }
-            else
-            {
-                lblScannedName.Text = _isJapanese ? "未登録" : "Not Found";
-                lblStatusMessage.Text = _isJapanese ? "無効なカードです" : "Invalid Card ID";
-                lblStatusMessage.Foreground = Brushes.Salmon;
+                string query = @"
+SELECT StudentCode, FullName
+FROM Students
+WHERE StudentCode = @code";
+
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@code", scannedCode);
+
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    string studentCode = reader["StudentCode"].ToString();
+                    string name = reader["FullName"].ToString();
+
+
+                    lblScannedName.Text = name;
+                    lblScannedID.Text = scannedCode;
+
+                    AttendanceBadge.Visibility = Visibility.Visible;
+                    lblStatusMessage.Text = _isJapanese
+                        ? "出席が記録されました"
+                        : "Attendance recorded";
+
+                    lblStatusMessage.Foreground = Brushes.LightGreen;
+                    System.Media.SystemSounds.Beep.Play();
+
+                    reader.Close();
+                    //SaveAttendance(studentCode);
+
+                    //StartRedirectTimer();
+                    bool saved = SaveAttendance(studentCode);
+
+                    if (saved)
+                    {
+                        lblStatusMessage.Text = _isJapanese
+                            ? "出席が記録されました"
+                            : "Attendance recorded";
+
+                        lblStatusMessage.Foreground = Brushes.LightGreen;
+                        System.Media.SystemSounds.Beep.Play();
+
+                        StartRedirectTimer();
+                    }
+                    else
+                    {
+                        lblStatusMessage.Text = _isJapanese
+                            ? "すでに出席済みです"
+                            : "Already scanned";
+
+                        lblStatusMessage.Foreground = Brushes.Orange;
+                        System.Media.SystemSounds.Hand.Play();
+                    }
+
+                }
+                else
+                {
+                    lblScannedName.Text = _isJapanese ? "未登録" : "Not Found";
+                    lblScannedID.Text = "----";
+                    AttendanceBadge.Visibility = Visibility.Collapsed;
+
+                    lblStatusMessage.Text = _isJapanese
+                        ? "無効なカードです"
+                        : "Invalid Card";
+
+                    lblStatusMessage.Foreground = Brushes.Salmon;
+                }
             }
         }
+        private bool SaveAttendance(string studentCode)
+        {
+            using (SqlConnection con = DBConnection.GetConnection())
+            {
+                con.Open();
+
+                // 1️⃣ Check duplicate
+                string checkQuery = @"
+SELECT COUNT(*) FROM Attendance
+WHERE StudentID = @sid
+  AND AttendanceDate = CAST(GETDATE() AS DATE)
+  AND Subject = @subject";
+
+                SqlCommand checkCmd = new SqlCommand(checkQuery, con);
+                checkCmd.Parameters.AddWithValue("@sid", studentCode);
+                checkCmd.Parameters.AddWithValue("@subject", App.CurrentSubject);
+
+                int exists = (int)checkCmd.ExecuteScalar();
+
+                if (exists > 0)
+                {
+                    return false; // ❌ Duplicate
+                }
+
+                // 2️⃣ Insert
+                string insertQuery = @"
+INSERT INTO Attendance
+(StudentID, Subject, AttendanceDate, AttendanceTime, Status, CreatedAt)
+VALUES
+(@sid, @subject,
+ CAST(GETDATE() AS DATE),
+ CAST(GETDATE() AS TIME),
+ 'Present', GETDATE())";
+
+                SqlCommand insertCmd = new SqlCommand(insertQuery, con);
+                insertCmd.Parameters.AddWithValue("@sid", studentCode);
+                insertCmd.Parameters.AddWithValue("@subject", App.CurrentSubject);
+
+                insertCmd.ExecuteNonQuery();
+                return true; // ✅ Success
+            }
+        }
+
+
+
 
         // --- ၃ စက္ကန့်အကြာတွင် LoginPage ဆီသို့ အလိုအလျောက်ပြန်သွားရန် ---
         private void StartRedirectTimer()
