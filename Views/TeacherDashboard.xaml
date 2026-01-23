@@ -45,6 +45,7 @@
 
             <TabItem x:Name="tabManage" Header=" 📝 出席管理 ">
                 <Border Background="#0DFFFFFF" Margin="0,15,0,0" Padding="25" CornerRadius="20" BorderThickness="1" BorderBrush="#26FFFFFF">
+                
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
