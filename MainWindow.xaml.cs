@@ -12,7 +12,7 @@ namespace Student_Attendance_System
     public partial class MainWindow : Window
     {
         private bool isSideBarExpanded = true;
-        private DispatcherTimer? _timer; // Fixed CS8618
+        private DispatcherTimer? _timer;
 
         public MainWindow()
         {
@@ -50,15 +50,6 @@ namespace Student_Attendance_System
                 SideInfoPanel.Visibility = Visibility.Collapsed;
                 txtDigitalClock.FontSize = 20;
                 txtDate.Visibility = Visibility.Collapsed;
-
-                // Vertical Header Layout
-                Grid.SetColumn(btnHomeLogo, 0); Grid.SetColumnSpan(btnHomeLogo, 2);
-                btnHomeLogo.HorizontalAlignment = HorizontalAlignment.Center;
-
-                Grid.SetRow(btnHamburger, 1); Grid.SetColumn(btnHamburger, 0); Grid.SetColumnSpan(btnHamburger, 2);
-                btnHamburger.HorizontalAlignment = HorizontalAlignment.Center;
-                btnHamburger.Margin = new Thickness(0, 10, 0, 0);
-
                 ToggleSidebarUI(Visibility.Collapsed, HorizontalAlignment.Center);
                 UpdateClockDisplay(true);
             }
@@ -68,35 +59,65 @@ namespace Student_Attendance_System
                 SideInfoPanel.Visibility = Visibility.Visible;
                 txtDigitalClock.FontSize = 35;
                 txtDate.Visibility = Visibility.Visible;
-
-                // Restore Horizontal Layout
-                Grid.SetColumn(btnHomeLogo, 0); Grid.SetColumnSpan(btnHomeLogo, 1);
-                btnHomeLogo.HorizontalAlignment = HorizontalAlignment.Left;
-
-                Grid.SetRow(btnHamburger, 0); Grid.SetColumn(btnHamburger, 1); Grid.SetColumnSpan(btnHamburger, 1);
-                btnHamburger.HorizontalAlignment = HorizontalAlignment.Right;
-                btnHamburger.Margin = new Thickness(0, 5, 15, 5);
-
                 ToggleSidebarUI(Visibility.Visible, HorizontalAlignment.Left);
                 UpdateClockDisplay(false);
             }
             isSideBarExpanded = !isSideBarExpanded;
         }
 
-        // Fix for image_f4f7a5.png: Defined HandleLoginSuccess
+        // ✅ LoginPage ကနေ လှမ်းခေါ်မယ့် Login Success Logic
         public void HandleLoginSuccess(User user)
         {
             if (user == null) return;
-            txtWelcome.Text = user.Username.ToUpper();
-            btnLoginMenu.Visibility = Visibility.Collapsed;
-            btnLogout.Visibility = Visibility.Visible;
 
-            if (user.Role == "Admin") MainFrame.Navigate(new AdminDashboard());
-            else if (user.Role == "Teacher") MainFrame.Navigate(new TeacherDashboard());
-            else MainFrame.Navigate(new StudentDashboardPage());
+            // ၁။ Sidebar ကို Login State သို့ ပြောင်းပါ
+            UpdateSidebar(true);
+
+            // ၂။ Role အလိုက် Dashboard ခွဲပို့ပါ
+            if (user.Role == "Admin")
+                MainFrame.Navigate(new AdminDashboard());
+            else if (user.Role == "Teacher")
+                MainFrame.Navigate(new TeacherDashboard());
+            else
+                MainFrame.Navigate(new StudentDashboardPage());
         }
 
-        // Fix for image_f39ae3.png: Defined btnLanguage_Click
+        // ✅ Sidebar Toggle Logic
+        public void UpdateSidebar(bool isLoggedIn)
+        {
+            if (isLoggedIn)
+            {
+                pnlLogin.Visibility = Visibility.Collapsed;
+                btnLogout.Visibility = Visibility.Visible;
+                lblLogout.Visibility = Visibility.Visible;
+
+                pnlReg.Visibility = Visibility.Visible;
+                pnlScan.Visibility = Visibility.Visible;
+                pnlTable.Visibility = Visibility.Visible;
+
+                if (UserData.UserData.CurrentUser != null)
+                    txtWelcome.Text = UserData.UserData.CurrentUser.Username.ToUpper();
+            }
+            else
+            {
+                btnLogout.Visibility = Visibility.Collapsed;
+                lblLogout.Visibility = Visibility.Collapsed;
+
+                pnlLogin.Visibility = Visibility.Visible;
+                lblLogin.Visibility = Visibility.Visible;
+
+                txtWelcome.Text = LanguageSettings.Language ? "ようこそ" : "WELCOME";
+            }
+        }
+
+        private void btnLogout_Click(object sender, RoutedEventArgs e)
+        {
+            UserData.UserData.CurrentUser = null;
+            UpdateSidebar(false);
+            UpdateLanguage();
+            MainFrame.Navigate(new LoginPage());
+        }
+
         private void btnLanguage_Click(object sender, RoutedEventArgs e)
         {
             LanguageSettings.Language = !LanguageSettings.Language;
@@ -111,7 +132,6 @@ namespace Student_Attendance_System
             lblReg.Text = isJp ? "新規登録" : "Register";
             lblScan.Text = isJp ? "スキャン" : "Scan";
             lblTable.Text = isJp ? "タイムテーブル" : "Timetable";
-           
             lblLogout.Text = isJp ? "ログアウト" : "Logout";
             lblAbout.Text = isJp ? "情報" : "About";
             lblDev.Text = isJp ? "開発者" : "Developer";
@@ -122,11 +142,11 @@ namespace Student_Attendance_System
         private void ToggleSidebarUI(Visibility vis, HorizontalAlignment align)
         {
             lblLang.Visibility = lblLogin.Visibility = lblReg.Visibility =
-           
+            lblScan.Visibility = lblTable.Visibility =
             lblLogout.Visibility = lblAbout.Visibility = lblDev.Visibility = vis;
 
             pnlLang.HorizontalAlignment = pnlLogin.HorizontalAlignment = pnlReg.HorizontalAlignment =
-          
+            pnlScan.HorizontalAlignment = pnlTable.HorizontalAlignment =
             pnlLogout.HorizontalAlignment = pnlAbout.HorizontalAlignment = pnlDev.HorizontalAlignment = align;
         }
 
@@ -137,9 +157,7 @@ namespace Student_Attendance_System
         private void btnRegister_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new RegisterPage());
         private void btnScanMode_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ScanPage());
         private void btnTimeTable_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new TimetablePage());
-        private void btnReport_Click(object sender, RoutedEventArgs e) { }
         private void btnAbout_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProjectOverviewPage());
         private void btnDevTeam_Click(object sender, RoutedEventArgs e) => MessageBox.Show("Developer Team: OWL-SYS");
-        private void btnLogout_Click(object sender, RoutedEventArgs e) { UserData.UserData.CurrentUser = null; UpdateLanguage(); MainFrame.Navigate(new LoginPage()); }
     }
 }

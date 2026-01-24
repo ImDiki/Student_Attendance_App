@@ -105,7 +105,7 @@ namespace Student_Attendance_System.Views
                 MessageBox.Show(LanguageSettings.Language ? "登録が完了しました！" : "Registration Successful!");
 
                 // ၅။ Dashboard ကို သွားမည်
-                NavigationService.Navigate(new StudentDashboardPage());
+                NavigationService.Navigate(new ProjectOverviewPage());
             }
         }
 
