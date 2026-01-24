@@ -158,6 +158,6 @@ namespace Student_Attendance_System
         private void btnScanMode_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ScanPage());
         private void btnTimeTable_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new TimetablePage());
         private void btnAbout_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProjectOverviewPage());
-        private void btnDevTeam_Click(object sender, RoutedEventArgs e) => MessageBox.Show("Developer Team: OWL-SYS");
+        private void btnDevTeam_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new DeveloperTeamPage());
     }
 }
