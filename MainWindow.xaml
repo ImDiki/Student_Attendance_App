@@ -148,16 +148,7 @@
                                 <TextBlock x:Name="lblTable" Text="Timetable" Grid.Column="1" Margin="10,0,0,0"/>
                             </Grid>
                         </Button>
-                        <Button x:Name="btnReport" Style="{StaticResource MenuButtonStyle}" Click="btnReport_Click">
-                            <Grid x:Name="pnlReport">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="40"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="📊" FontSize="18" HorizontalAlignment="Center"/>
-                                <TextBlock x:Name="lblReport" Text="Report" Grid.Column="1" Margin="10,0,0,0"/>
-                            </Grid>
-                        </Button>
+                       
                         <Button x:Name="btnLogout" Visibility="Collapsed" Style="{StaticResource MenuButtonStyle}" Click="btnLogout_Click">
                             <Grid x:Name="pnlLogout">
                                 <Grid.ColumnDefinitions>

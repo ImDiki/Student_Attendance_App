@@ -111,7 +111,7 @@ namespace Student_Attendance_System
             lblReg.Text = isJp ? "新規登録" : "Register";
             lblScan.Text = isJp ? "スキャン" : "Scan";
             lblTable.Text = isJp ? "タイムテーブル" : "Timetable";
-            lblReport.Text = isJp ? "レポート" : "Report";
+           
             lblLogout.Text = isJp ? "ログアウト" : "Logout";
             lblAbout.Text = isJp ? "情報" : "About";
             lblDev.Text = isJp ? "開発者" : "Developer";
@@ -122,11 +122,11 @@ namespace Student_Attendance_System
         private void ToggleSidebarUI(Visibility vis, HorizontalAlignment align)
         {
             lblLang.Visibility = lblLogin.Visibility = lblReg.Visibility =
-            lblScan.Visibility = lblTable.Visibility = lblReport.Visibility =
+           
             lblLogout.Visibility = lblAbout.Visibility = lblDev.Visibility = vis;
 
             pnlLang.HorizontalAlignment = pnlLogin.HorizontalAlignment = pnlReg.HorizontalAlignment =
-            pnlScan.HorizontalAlignment = pnlTable.HorizontalAlignment = pnlReport.HorizontalAlignment =
+          
             pnlLogout.HorizontalAlignment = pnlAbout.HorizontalAlignment = pnlDev.HorizontalAlignment = align;
         }
 
