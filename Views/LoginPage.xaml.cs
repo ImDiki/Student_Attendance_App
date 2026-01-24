@@ -46,15 +46,18 @@ namespace Student_Attendance_System.Views
 
             if (loggedInUser != null)
             {
-                MessageBox.Show(
-                    $"Login OK\n" +
-                    $"User: {loggedInUser.Username}\n" +
-                    $"Role: {loggedInUser.Role}\n" +
-                    $"Year: {loggedInUser.YearLevel}\n" +
-                    $"Class: {loggedInUser.AssignedClass}"
-                );
-
+                // 🔹 အရေးကြီးဆုံးအပိုင်း: CurrentUser ထဲသို့ User Object တစ်ခုလုံး သိမ်းဆည်းခြင်း
+                // ဤနေရာတွင် UserData.UserData.CurrentUser သို့မဟုတ် CurrentUser.UserID (ဘရိုဆောက်ထားသော Class ပေါ်မူတည်၍) သိမ်းပါ
                 UserData.UserData.CurrentUser = loggedInUser;
+
+                // Storyline အရ Default Password သုံးနေလျှင် သတိပေးချက်ပြခြင်း
+                if (pass == "123456")
+                {
+                    string welcomeMsg = LanguageSettings.Language
+                        ? "初期パスワードを使用しています。プロフィールで変更してください。"
+                        : "Welcome! You are using a temporary password. Please change it in your Profile.";
+                    MessageBox.Show(welcomeMsg, "Security Alert");
+                }
 
                 if (Application.Current.MainWindow is MainWindow main)
                 {
@@ -67,9 +70,14 @@ namespace Student_Attendance_System.Views
             }
         }
 
+        // 🔹 Forgot Password Storyline
         private void ForgetPassword_Click(object sender, MouseButtonEventArgs e)
         {
-            MessageBox.Show(LanguageSettings.Language ? "教務課に連絡してください" : "Please contact the admin office.");
+            string info = LanguageSettings.Language
+                ? "教務課(Admin Office)でパスワードをリセットしてください。\nリセット後の初期パスワードは '123456' です。"
+                : "Please contact the Admin Office to reset your password.\n\nYour default password after reset will be '123456'.";
+
+            MessageBox.Show(info, "Forgot Password Info", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void GoToRegister_Click(object sender, MouseButtonEventArgs e)
