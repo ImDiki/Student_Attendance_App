@@ -3,6 +3,23 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       Title="Developer Team" Background="Transparent">
 
+    <Page.Resources>
+        <Style x:Key="CardHoverStyle" TargetType="Border">
+            <Setter Property="Background" Value="#1AFFFFFF"/>
+            <Setter Property="CornerRadius" Value="15"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Padding" Value="25"/>
+            <Setter Property="Width" Value="320"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#26FFFFFF"/>
+                    <Setter Property="BorderBrush" Value="#38BDF8"/>
+                    <Setter Property="BorderThickness" Value="1"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Page.Resources>
+
     <Grid Margin="30">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel HorizontalAlignment="Center">
@@ -10,50 +27,54 @@
                            FontWeight="Bold" Margin="0,0,0,30" HorizontalAlignment="Center"/>
 
                 <UniformGrid Columns="2" HorizontalAlignment="Center">
-                    <Border Background="#1AFFFFFF" CornerRadius="15" Margin="10" Padding="20" Width="300">
+                    <Border Style="{StaticResource CardHoverStyle}">
                         <StackPanel HorizontalAlignment="Center">
-                            <Ellipse Width="85" Height="85" Fill="#38BDF8" Margin="0,0,0,12"/>
-                            <TextBlock Text="MYAT THADAR LINN" Foreground="White" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
-                            <TextBlock Text="TEAM LEADER | FULL STACK" Foreground="#38BDF8" FontSize="13" FontWeight="Bold" Margin="0,5"/>
+                            <Ellipse Width="110" Height="110" Margin="0,0,0,15" Stroke="#38BDF8" StrokeThickness="2">
+                                <Ellipse.Fill>
+                                    <ImageBrush ImageSource="/Assets/diki.jpg" Stretch="UniformToFill"/>
+                                </Ellipse.Fill>
+                            </Ellipse>
+                            <TextBlock Text="MYAT THADAR LINN" Foreground="White" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="TEAM LEADER | FULL STACK" Foreground="#38BDF8" FontSize="14" FontWeight="Bold" Margin="0,5"/>
                             <TextBlock Text="C5292@oic.jp" Foreground="#CBD5E1" FontSize="12" Margin="0,2"/>
 
-                            <StackPanel Orientation="Vertical" Margin="0,15,0,0">
+                            <StackPanel Orientation="Vertical" Margin="0,20,0,0">
                                 <Button Content="Personal Portfolio" Click="btnLink_Click" Tag="https://Imdiki.github.io"
-                                        Background="#334155" Foreground="White" Margin="0,0,0,8" Padding="15,5"/>
+                                        Background="#0284C7" Foreground="White" Margin="0,0,0,10" Padding="20,8" BorderThickness="0"/>
                                 <Button Content="GitHub Profile" Click="btnLink_Click" Tag="https://github.com/Imdiki"
-                                        Background="#334155" Foreground="White" Padding="15,5"/>
+                                        Background="#334155" Foreground="White" Padding="20,8" BorderThickness="0"/>
                             </StackPanel>
                         </StackPanel>
                     </Border>
 
-                    <Border Background="#1AFFFFFF" CornerRadius="15" Margin="10" Padding="20" Width="300">
+                    <Border Style="{StaticResource CardHoverStyle}">
                         <StackPanel HorizontalAlignment="Center">
-                            <Ellipse Width="85" Height="85" Fill="#94A3B8" Margin="0,0,0,12"/>
-                            <TextBlock Text="SI THU BO SANN" Foreground="White" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
-                            <TextBlock Text="ADVISOR &amp; FULL STACK" Foreground="#38BDF8" FontSize="13" FontWeight="Bold" Margin="0,5"/>
+                            <Ellipse Width="110" Height="110" Fill="#475569" Margin="0,0,0,15" Stroke="#38BDF8" StrokeThickness="2"/>
+                            <TextBlock Text="SI THU BO SANN" Foreground="White" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="ADVISOR | FULL STACK" Foreground="#38BDF8" FontSize="14" FontWeight="Bold" Margin="0,5"/>
                             <TextBlock Text="C5128@oic.jp" Foreground="#CBD5E1" FontSize="12" Margin="0,2"/>
 
-                            <StackPanel Orientation="Vertical" Margin="0,15,0,0">
+                            <StackPanel Orientation="Vertical" Margin="0,20,0,0">
                                 <Button Content="Send Email" Click="btnEmail_Click" Tag="mailto:C5128@oic.jp"
-                                        Background="#334155" Foreground="White" Margin="0,0,0,8" Padding="15,5"/>
+                                        Background="#334155" Foreground="White" Margin="0,0,0,10" Padding="20,8" BorderThickness="0"/>
                                 <Button Content="GitHub Profile" Click="btnLink_Click" Tag="https://github.com/sithubosann"
-                                        Background="#334155" Foreground="White" Padding="15,5"/>
+                                        Background="#334155" Foreground="White" Padding="20,8" BorderThickness="0"/>
                             </StackPanel>
                         </StackPanel>
                     </Border>
                 </UniformGrid>
 
-                <TextBlock Text="CORE TECHNOLOGIES" Foreground="White" FontSize="20" FontWeight="Bold" 
-                           Margin="0,40,0,15" HorizontalAlignment="Center"/>
+                <TextBlock Text="CORE TECHNOLOGIES" Foreground="White" FontSize="22" FontWeight="Bold" 
+                           Margin="0,50,0,20" HorizontalAlignment="Center"/>
                 <WrapPanel HorizontalAlignment="Center">
-                    <Border Background="#0DFFFFFF" Padding="12,6" CornerRadius="20" Margin="5">
-                        <TextBlock Text="C# / .NET" Foreground="#38BDF8" FontSize="12"/>
+                    <Border Background="#1AFFFFFF" Padding="15,8" CornerRadius="20" Margin="8">
+                        <TextBlock Text="C# / .NET" Foreground="#38BDF8" FontWeight="Bold"/>
                     </Border>
-                    <Border Background="#0DFFFFFF" Padding="12,6" CornerRadius="20" Margin="5">
-                        <TextBlock Text="WPF (XAML)" Foreground="#38BDF8" FontSize="12"/>
+                    <Border Background="#1AFFFFFF" Padding="15,8" CornerRadius="20" Margin="8">
+                        <TextBlock Text="WPF (XAML)" Foreground="#38BDF8" FontWeight="Bold"/>
                     </Border>
-                    <Border Background="#0DFFFFFF" Padding="12,6" CornerRadius="20" Margin="5">
-                        <TextBlock Text="SQL SERVER" Foreground="#38BDF8" FontSize="12"/>
+                    <Border Background="#1AFFFFFF" Padding="15,8" CornerRadius="20" Margin="8">
+                        <TextBlock Text="SQL SERVER" Foreground="#38BDF8" FontWeight="Bold"/>
                     </Border>
                 </WrapPanel>
             </StackPanel>
