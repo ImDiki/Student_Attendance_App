@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Input;
-using System.Windows.Threading; // Timer အတွက်လိုအပ်
+using System.Windows.Threading;
 using Student_Attendance_System.Interfaces;
-using Student_Attendance_System.Models;
+using Student_Attendance_System.Services;
 using Microsoft.Data.SqlClient;
 
 namespace Student_Attendance_System.Views
@@ -15,13 +13,7 @@ namespace Student_Attendance_System.Views
     public partial class ScanPage : Page, ILanguageSwitchable
     {
         private bool _isJapanese = false;
-        private DispatcherTimer redirectTimer; // Redirect လုပ်ဖို့ Timer
-
-        private List<StudentMock> mockStudentDb = new List<StudentMock>()
-        {
-            new StudentMock { BarcodeID = "C5292", Name = "MYAT THADAR LINN", StudentID = "C5292" },
-            new StudentMock { BarcodeID = "123456789", Name = "DIKI", StudentID = "D001" }
-        };
+        private DispatcherTimer redirectTimer;
 
         public ScanPage()
         {
@@ -36,6 +28,7 @@ namespace Student_Attendance_System.Views
             txtTitle.Text = isJapanese ? "出席管理スキャン" : "Attendance Scanning";
             lblHeaderName.Text = isJapanese ? "氏名" : "Name";
             lblHeaderID.Text = isJapanese ? "学籍番号" : "Student ID";
+            lblHeaderMajor.Text = isJapanese ? "専攻" : "Major";
             txtBadgeStatus.Text = isJapanese ? "出席 ✅ PRESENT" : "PRESENT ✅ ATTENDED";
 
             if (lblScannedName.Text == "Waiting..." || lblScannedName.Text == "待機中...")
@@ -46,7 +39,26 @@ namespace Student_Attendance_System.Views
         {
             if (e.Key == Key.Enter)
             {
+                // ၁။ Weekend Check
+                DayOfWeek today = DateTime.Today.DayOfWeek;
+                if (today == DayOfWeek.Saturday || today == DayOfWeek.Sunday)
+                {
+                    lblStatusMessage.Text = _isJapanese ? "本日は休日です" : "Today is Weekend. No classes.";
+                    lblStatusMessage.Foreground = Brushes.Orange;
+                    txtScannerInput.Clear();
+                    return;
+                }
+
+                // ၂။ Teacher Start Class Check
                 string id = txtScannerInput.Text.Trim().ToUpper();
+                if (!AttendanceService.IsClassActive(App.CurrentSubject))
+                {
+                    lblStatusMessage.Text = _isJapanese ? "授業はまだ開始されていません" : "Class not started or unavailable";
+                    lblStatusMessage.Foreground = Brushes.Orange;
+                    txtScannerInput.Clear();
+                    return;
+                }
+
                 ProcessScan(id);
                 txtScannerInput.Clear();
             }
@@ -54,121 +66,75 @@ namespace Student_Attendance_System.Views
 
         private void ProcessScan(string scannedCode)
         {
-            using (SqlConnection con = DBConnection.GetConnection())
+            try
             {
-                con.Open();
-
-                string query = @"
-SELECT StudentCode, FullName
-FROM Students
-WHERE StudentCode = @code";
-
-                SqlCommand cmd = new SqlCommand(query, con);
-                cmd.Parameters.AddWithValue("@code", scannedCode);
-
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                if (reader.Read())
+                using (SqlConnection con = DBConnection.GetConnection())
                 {
-                    string studentCode = reader["StudentCode"].ToString();
-                    string name = reader["FullName"].ToString();
+                    con.Open();
+                    // Department (Major) ကိုပါ SELECT လုပ်ပါတယ်
+                    string query = "SELECT StudentCode, FullName, Department FROM Students WHERE StudentCode = @code";
+                    SqlCommand cmd = new SqlCommand(query, con);
+                    cmd.Parameters.AddWithValue("@code", scannedCode);
 
-
-                    lblScannedName.Text = name;
-                    lblScannedID.Text = scannedCode;
-
-                    AttendanceBadge.Visibility = Visibility.Visible;
-                    lblStatusMessage.Text = _isJapanese
-                        ? "出席が記録されました"
-                        : "Attendance recorded";
-
-                    lblStatusMessage.Foreground = Brushes.LightGreen;
-                    System.Media.SystemSounds.Beep.Play();
-
-                    reader.Close();
-                    //SaveAttendance(studentCode);
-
-                    //StartRedirectTimer();
-                    bool saved = SaveAttendance(studentCode);
-
-                    if (saved)
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        lblStatusMessage.Text = _isJapanese
-                            ? "出席が記録されました"
-                            : "Attendance recorded";
+                        if (reader.Read())
+                        {
+                            string studentCode = reader["StudentCode"].ToString();
+                            string name = reader["FullName"].ToString();
+                            string major = reader["Department"]?.ToString() ?? "N/A";
 
-                        lblStatusMessage.Foreground = Brushes.LightGreen;
-                        System.Media.SystemSounds.Beep.Play();
+                            lblScannedName.Text = name;
+                            lblScannedID.Text = studentCode;
+                            lblScannedMajor.Text = major;
+                            AttendanceBadge.Visibility = Visibility.Visible;
 
-                        StartRedirectTimer();
+                            // Attendance Logic
+                            string currentStatus = AttendanceService.GetTodayStatus(studentCode, App.CurrentSubject);
+
+                            if (string.IsNullOrEmpty(currentStatus))
+                            {
+                                AttendanceService.MarkPresent(studentCode, App.CurrentSubject);
+                                lblStatusMessage.Text = _isJapanese ? "出席が記録されました" : "Attendance recorded";
+                                lblStatusMessage.Foreground = Brushes.LightGreen;
+                                System.Media.SystemSounds.Beep.Play();
+                                StartRedirectTimer();
+                            }
+                            else
+                            {
+                                lblStatusMessage.Text = _isJapanese ? "すでに出席済みです" : "Already scanned today";
+                                lblStatusMessage.Foreground = Brushes.Orange;
+                                System.Media.SystemSounds.Hand.Play();
+                            }
+                        }
+                        else
+                        {
+                            ShowInvalidCard();
+                        }
                     }
-                    else
-                    {
-                        lblStatusMessage.Text = _isJapanese
-                            ? "すでに出席済みです"
-                            : "Already scanned";
-
-                        lblStatusMessage.Foreground = Brushes.Orange;
-                        System.Media.SystemSounds.Hand.Play();
-                    }
-
-                }
-                else
-                {
-                    lblScannedName.Text = _isJapanese ? "未登録" : "Not Found";
-                    lblScannedID.Text = "----";
-                    AttendanceBadge.Visibility = Visibility.Collapsed;
-
-                    lblStatusMessage.Text = _isJapanese
-                        ? "無効なカードです"
-                        : "Invalid Card";
-
-                    lblStatusMessage.Foreground = Brushes.Salmon;
                 }
             }
+            catch (Exception)
+            {
+                lblStatusMessage.Text = "Database Error!";
+                lblStatusMessage.Foreground = Brushes.Salmon;
+            }
         }
-        private bool SaveAttendance(string studentCode)
+
+        private void ShowInvalidCard()
         {
-            using (SqlConnection con = DBConnection.GetConnection())
-            {
-                con.Open();
-
-             
-                string checkQuery = @" SELECT COUNT(*) FROM Attendance WHERE StudentID = @sid AND AttendanceDate = CAST(GETDATE() AS DATE) AND Subject = @subject";
-
-                SqlCommand checkCmd = new SqlCommand(checkQuery, con);
-                checkCmd.Parameters.AddWithValue("@sid", studentCode);
-                checkCmd.Parameters.AddWithValue("@subject", App.CurrentSubject);
-
-                int exists = (int)checkCmd.ExecuteScalar();
-
-                if (exists > 0)
-                {
-                    return false;
-                }
-
-                
-                string insertQuery = @" INSERT INTO Attendance (StudentID, Subject, AttendanceDate, AttendanceTime, Status, CreatedAt) VALUES (@sid, @subject, CAST(GETDATE() AS DATE), CAST(GETDATE() AS TIME), 'Present', GETDATE())";
-
-                SqlCommand insertCmd = new SqlCommand(insertQuery, con);
-                insertCmd.Parameters.AddWithValue("@sid", studentCode);
-                insertCmd.Parameters.AddWithValue("@subject", App.CurrentSubject);
-
-                insertCmd.ExecuteNonQuery();
-                return true; 
-            }
+            lblScannedName.Text = _isJapanese ? "未登録" : "Not Found";
+            lblScannedID.Text = "----";
+            lblScannedMajor.Text = "----";
+            AttendanceBadge.Visibility = Visibility.Collapsed;
+            lblStatusMessage.Text = _isJapanese ? "無効なカードです" : "Invalid Card";
+            lblStatusMessage.Foreground = Brushes.Salmon;
         }
 
-
-
-
-        // --- ၃ စက္ကန့်အကြာတွင် LoginPage ဆီသို့ အလိုအလျောက်ပြန်သွားရန် ---
         private void StartRedirectTimer()
         {
             if (redirectTimer != null) redirectTimer.Stop();
-
-            redirectTimer = new DispatcherTimer();
-            redirectTimer.Interval = TimeSpan.FromSeconds(3); // ၃ စက္ကန့် စောင့်မယ်
+            redirectTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
             redirectTimer.Tick += (s, e) =>
             {
                 redirectTimer.Stop();
@@ -181,12 +147,5 @@ WHERE StudentCode = @code";
         {
             txtScannerInput.Focus();
         }
-    }
-
-    public class StudentMock
-    {
-        public string BarcodeID { get; set; }
-        public string Name { get; set; }
-        public string StudentID { get; set; }
     }
 }

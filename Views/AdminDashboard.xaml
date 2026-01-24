@@ -9,7 +9,6 @@
         <Grid Margin="30">
             <StackPanel>
 
-                <!-- ===== Header ===== -->
                 <Border Background="#0DFFFFFF" CornerRadius="20"
                         BorderThickness="1" BorderBrush="#26FFFFFF"
                         Padding="25" Margin="0,0,0,25">
@@ -27,11 +26,8 @@
                     </Grid>
                 </Border>
 
-                <!-- ===== KPI Cards ===== -->
                 <Grid Margin="0,0,0,25">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
@@ -39,93 +35,64 @@
                     <Border Grid.Column="0" Background="#1A3B82F6"
                             CornerRadius="15" BorderThickness="1"
                             BorderBrush="#333B82F6"
-                            Height="120" Margin="0,0,10,0" Padding="20">
+                            Height="140" Margin="0,0,10,0" Padding="25">
                         <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="Students"
+                            <TextBlock x:Name="lblStudents" Text="Students"
                                        Foreground="#38BDF8"
-                                       FontSize="14" FontWeight="SemiBold"/>
+                                       FontSize="16" FontWeight="SemiBold"/>
                             <TextBlock x:Name="txtStudents"
                                        Text="0"
                                        Foreground="White"
-                                       FontSize="36" FontWeight="Bold"/>
+                                       FontSize="42" FontWeight="Bold" Margin="0,10,0,0"/>
                         </StackPanel>
                     </Border>
 
                     <Border Grid.Column="1" Background="#1A10B981"
                             CornerRadius="15" BorderThickness="1"
                             BorderBrush="#3310B981"
-                            Height="120" Margin="5,0,5,0" Padding="20">
+                            Height="140" Margin="10,0,0,0" Padding="25">
                         <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="Teachers"
+                            <TextBlock x:Name="lblTeachers" Text="Teachers"
                                        Foreground="#34D399"
-                                       FontSize="14" FontWeight="SemiBold"/>
+                                       FontSize="16" FontWeight="SemiBold"/>
                             <TextBlock x:Name="txtTeachers"
                                        Text="0"
                                        Foreground="White"
-                                       FontSize="36" FontWeight="Bold"/>
-                        </StackPanel>
-                    </Border>
-
-                    <Border Grid.Column="2" Background="#1AF59E0B"
-                            CornerRadius="15" BorderThickness="1"
-                            BorderBrush="#33F59E0B"
-                            Height="120" Margin="5,0,5,0" Padding="20">
-                        <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="Events"
-                                       Foreground="#FCD34D"
-                                       FontSize="14" FontWeight="SemiBold"/>
-                            <TextBlock x:Name="txtEvent"
-                                       Text="0"
-                                       Foreground="White"
-                                       FontSize="36" FontWeight="Bold"/>
-                        </StackPanel>
-                    </Border>
-
-                    <Border Grid.Column="3" Background="#1AEF4444"
-                            CornerRadius="15" BorderThickness="1"
-                            BorderBrush="#33EF4444"
-                            Height="120" Margin="10,0,0,0" Padding="20">
-                        <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="Today Attendance"
-                                       Foreground="#F87171"
-                                       FontSize="14" FontWeight="SemiBold"/>
-                            <TextBlock x:Name="txtAttendance"
-                                       Text="0"
-                                       Foreground="White"
-                                       FontSize="36" FontWeight="Bold"/>
+                                       FontSize="42" FontWeight="Bold" Margin="0,10,0,0"/>
                         </StackPanel>
                     </Border>
                 </Grid>
 
-                <!-- ===== Management Actions ===== -->
-                <TextBlock Text="管理メニュー"
-                           FontSize="20" FontWeight="Bold"
+                <TextBlock x:Name="lblMgmtMenu" Text="管理メニュー"
+                           FontSize="22" FontWeight="Bold"
                            Foreground="White"
-                           Margin="0,0,0,12"/>
+                           Margin="0,0,0,15"/>
 
-                <UniformGrid Columns="3" Margin="0,0,0,25">
-                    <Button Content="👨‍🏫 教師管理" Height="60"
-                            Background="#3B82F6"
-                            Click="ManageTeachers_Click"/>
-                    <Button Content="🏫 クラス管理" Height="60"
-                            Background="#F59E0B"
-                            Click="ManageClasses_Click"/>
-                    <Button Content="📊 レポート" Height="60"
-                            Background="#22C55E"
-                            Click="Reports_Click"/>
+                <UniformGrid Columns="2" Margin="0,0,0,25">
+                    <Button Content="👨‍🏫 教師管理 (Teachers)" Height="70"
+                            Background="#3B82F6" Foreground="White" FontSize="18" FontWeight="SemiBold"
+                            Margin="0,0,10,0" Click="ManageTeachers_Click"
+                            Style="{StaticResource ModernButtonStyle}"/>
+
+                    <Button Content="🏫 クラス管理 (Classes)" Height="70"
+                            Background="#F59E0B" Foreground="White" FontSize="18" FontWeight="SemiBold"
+                            Margin="10,0,0,0" Click="ManageClasses_Click"
+                            Style="{StaticResource ModernButtonStyle}"/>
                 </UniformGrid>
 
-                <!-- ===== Optional content frame ===== -->
                 <Border Background="#0DFFFFFF"
                         CornerRadius="20"
                         BorderThickness="1"
                         BorderBrush="#26FFFFFF"
-                        Padding="15">
-                    <Frame x:Name="AdminFrame"
-                     Height="Auto"
-                     Margin="0,20,0,0"
-                     NavigationUIVisibility="Hidden"/>
-
+                        Padding="20">
+                    <StackPanel>
+                        <TextBlock x:Name="lblTimetableTitle" Text="CLASS TIMETABLE (ADMIN)" 
+                                   Foreground="White" FontSize="20" FontWeight="Bold" Margin="0,0,0,10"/>
+                        <Frame x:Name="AdminFrame"
+                               Height="Auto"
+                               MinHeight="400"
+                               NavigationUIVisibility="Hidden"/>
+                    </StackPanel>
                 </Border>
 
             </StackPanel>

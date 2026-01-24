@@ -1,72 +1,66 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using Microsoft.Data.SqlClient;
-using Student_Attendance_System.Services;
+using Student_Attendance_System.Services; // AdminService ကို သုံးရန်
+using Student_Attendance_System.Interfaces;
 
 namespace Student_Attendance_System.Views
 {
-    public partial class AdminDashboard : Page
+    public partial class AdminDashboard : Page, ILanguageSwitchable
     {
         public AdminDashboard()
         {
             InitializeComponent();
-
-            // listen for teacher changes
-            TeacherManagementPage.TeacherChanged += RefreshTeacherCount;
-        }
-
-        private void RefreshTeacherCount()
-        {
-            LoadTeacherCount();
-        }
-        private void LoadTeacherCount()
-        {
-            using SqlConnection con = DBConnection.GetConnection();
-            con.Open();
-
-            string sql = "SELECT COUNT(*) FROM Users WHERE Role = 'Teacher'";
-            using SqlCommand cmd = new SqlCommand(sql, con);
-
-            int count = (int)cmd.ExecuteScalar();
-
-            txtTeachers.Text = count.ToString(); // or label/content
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            LoadDashboardCounts();
-        }
+            ChangeLanguage(LanguageSettings.Language);
 
-        private void LoadDashboardCounts()
-        {
-            using SqlConnection con = DBConnection.GetConnection();
-            con.Open();
+            // Database မှ Stats များ Load လုပ်ခြင်း
+            txtStudents.Text = AdminService.GetTotalStudents().ToString();
+            txtTeachers.Text = AdminService.GetTotalTeachers().ToString();
 
-            txtStudents.Text = GetCount(con, "Student");
-            txtTeachers.Text = GetCount(con, "Teacher");
-            txtEvent.Text = "0";
-        }
-
-        private string GetCount(SqlConnection con, string role)
-        {
-            string sql = "SELECT COUNT(*) FROM Users WHERE Role = @r";
-            using SqlCommand cmd = new SqlCommand(sql, con);
-            cmd.Parameters.AddWithValue("@r", role);
-            return cmd.ExecuteScalar().ToString();
-        }
-
-        private void ManageTeachers_Click(object sender, RoutedEventArgs e)
-        {
-            AdminFrame.Navigate(new TeacherManagementPage());
-        }
-        private void ManageClasses_Click(object sender, RoutedEventArgs e)
-        {
+            // Timetable Page ကို အောက်က Frame ထဲမှာ Navigate လုပ်ပါတယ်
             AdminFrame.Navigate(new AdminClassTimetablePage());
         }
-        private void Reports_Click(object sender, RoutedEventArgs e)
+
+        public void ChangeLanguage(bool isJapanese)
         {
-            MessageBox.Show("Reports coming soon");
+            txtWelcome.Text = isJapanese ? "管理者ダッシュボード" : "Admin Dashboard";
+            txtWelcomeSub.Text = isJapanese ? "システム全体を管理します。" : "Manage the entire system.";
+            lblStudents.Text = isJapanese ? "全学生数" : "TOTAL STUDENTS";
+            lblTeachers.Text = isJapanese ? "全教員数" : "TOTAL TEACHERS";
+            lblMgmtMenu.Text = isJapanese ? "管理メニュー" : "Management Menu";
+            lblTimetableTitle.Text = isJapanese ? "クラス時間割管理" : "CLASS TIMETABLE (ADMIN)";
+        }
+
+        // Teacher Management ခလုတ်နှိပ်လျှင်
+        private void ManageTeachers_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // AdminFrame ဆိုတဲ့ Frame ထဲမှာ Teacher Management Page ကို ဖွင့်ပြပါတယ်
+                AdminFrame.Navigate(new TeacherManagementPage());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error navigating to Teacher Management: " + ex.Message);
+            }
+        }
+
+        // Class Management ခလုတ်နှိပ်လျှင်
+        private void ManageClasses_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // AdminFrame ထဲမှာ Class Management Page ကို ဖွင့်ပြပါတယ်
+                AdminFrame.Navigate(new ClassManagementPage());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error navigating to Class Management: " + ex.Message);
+            }
         }
     }
 }
