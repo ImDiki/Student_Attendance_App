@@ -1,0 +1,62 @@
+﻿<Page x:Class="Student_Attendance_System.Views.StudentProfile"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Student Profile" Background="Transparent" Loaded="Page_Loaded">
+
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="50">
+
+                <Border Background="#1AFFFFFF" CornerRadius="25" Padding="40" Width="600" 
+                        BorderBrush="#22FFFFFF" BorderThickness="1">
+                    <StackPanel>
+                        <Border Width="160" Height="160" HorizontalAlignment="Center" 
+                                BorderBrush="#38BDF8" BorderThickness="3" Margin="0,0,0,30">
+                            <Image x:Name="imgProfile" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" Source="/Assets/default_user.png"/>
+                        </Border>
+
+                        <TextBlock x:Name="txtTitle" Text="MY PROFILE" Foreground="White" FontSize="32" 
+                                   FontWeight="ExtraBold" Margin="0,0,0,40" HorizontalAlignment="Center"/>
+
+                        <UniformGrid Columns="2" Margin="0,12">
+                            <TextBlock x:Name="lblID" Text="Student ID" Foreground="#94A3B8" FontSize="18"/>
+                            <TextBlock x:Name="txtID" Text="C1357" Foreground="White" FontSize="18" FontWeight="Bold"/>
+                        </UniformGrid>
+
+                        <UniformGrid Columns="2" Margin="0,12">
+                            <TextBlock x:Name="lblName" Text="Full Name" Foreground="#94A3B8" FontSize="18"/>
+                            <TextBlock x:Name="txtName" Text="Eric" Foreground="White" FontSize="18" FontWeight="Bold"/>
+                        </UniformGrid>
+
+                        <UniformGrid Columns="2" Margin="0,12">
+                            <TextBlock x:Name="lblYear" Text="Year Level" Foreground="#94A3B8" FontSize="18"/>
+                            <TextBlock x:Name="txtYear" Text="2nd Year" Foreground="White" FontSize="18" FontWeight="Bold"/>
+                        </UniformGrid>
+
+                        <UniformGrid Columns="2" Margin="0,12">
+                            <TextBlock x:Name="lblClass" Text="Class" Foreground="#94A3B8" FontSize="18"/>
+                            <TextBlock x:Name="txtClass" Text="C" Foreground="White" FontSize="18" FontWeight="Bold"/>
+                        </UniformGrid>
+
+                        <UniformGrid Columns="2" Margin="0,12">
+                            <TextBlock x:Name="lblDept" Text="Department" Foreground="#94A3B8" FontSize="18"/>
+                            <TextBlock x:Name="txtDept" Text="Network Engineer" Foreground="White" FontSize="18" 
+                                       FontWeight="Bold" TextWrapping="Wrap"/>
+                        </UniformGrid>
+
+                        <Separator Background="#22FFFFFF" Margin="0,35"/>
+
+                        <TextBlock x:Name="lblSecurity" Text="Account Security" Foreground="#94A3B8" FontSize="15" Margin="0,0,0,15"/>
+                        <Border Background="#0DFFFFFF" CornerRadius="15" Padding="20">
+                            <DockPanel>
+                                <TextBlock x:Name="lblPassword" Text="Password" Foreground="White" VerticalAlignment="Center" FontSize="16"/>
+                                <TextBlock x:Name="txtPassStars" Text="••••••••" Foreground="#38BDF8" 
+                                           HorizontalAlignment="Right" FontSize="22" FontWeight="Bold" VerticalAlignment="Center"/>
+                            </DockPanel>
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

@@ -1,0 +1,68 @@
+﻿<Page x:Class="Student_Attendance_System.Views.ClassManagementPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Class Management" Background="Transparent">
+
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="280"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Background="#1AFFFFFF" CornerRadius="20" Padding="20" Margin="0,0,20,0">
+            <StackPanel>
+                <TextBlock Text="STUDENT DETAILS" Foreground="White" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
+
+                <TextBlock Text="Student ID (Required)" Foreground="#94A3B8" Margin="0,5"/>
+                <TextBox x:Name="txtSID" Style="{StaticResource TechInputStyle}"/>
+
+                <TextBlock Text="Full Name" Foreground="#94A3B8" Margin="0,10,0,5"/>
+                <TextBox x:Name="txtSName" Style="{StaticResource TechInputStyle}"/>
+
+                <TextBlock Text="Year Level" Foreground="#94A3B8" Margin="0,10,0,5"/>
+                <ComboBox x:Name="cboYear" Style="{StaticResource GlassComboBoxStyle}" Height="35">
+                    <ComboBoxItem Content="1st Year"/>
+                    <ComboBoxItem Content="2nd Year"/>
+                    <ComboBoxItem Content="3rd Year"/>
+                    <ComboBoxItem Content="4th Year"/>
+                </ComboBox>
+
+                <TextBlock Text="Class" Foreground="#94A3B8" Margin="0,10,0,5"/>
+                <TextBox x:Name="txtSClass" Style="{StaticResource TechInputStyle}"/>
+
+                <TextBlock Text="Department" Foreground="#94A3B8" Margin="0,10,0,5"/>
+                <ComboBox x:Name="cboSDpt" Style="{StaticResource GlassComboBoxStyle}" Height="35">
+                   
+                    <ComboBoxItem Content="ITスペシャリスト専攻 (IT Specialist) - 4 Years" IsSelected="True"/>
+                    <ComboBoxItem Content="ネットワークセキュリティ専攻 (Network Security) - 4 Years"/>
+                    <ComboBoxItem Content="システムエンジニア専攻 (Systems Engineer) - 3 Years"/>
+                    <ComboBoxItem Content="ネットワークエンジニア専攻 (Network Engineer) - 3 Years"/>
+                    <ComboBoxItem Content="Webエンジニア専攻 (Web Engineer) - 3 Years"/>
+                    <ComboBoxItem Content="テクニカルコース (Technical Course) - 2 Years"/>
+                    <ComboBoxItem Content="ネットワークシステムコース (Network Systems Course) - 2 Years"/>
+                </ComboBox>
+                <UniformGrid Columns="2" Margin="0,20,0,0">
+                    <Button x:Name="btnAdd" Content="Save/Update" Click="AddOrUpdateStudent_Click" Background="#10B981" Style="{StaticResource ModernButtonStyle}" Margin="0,0,5,0"/>
+                    <Button x:Name="btnClear" Content="Clear" Click="ClearFields_Click" Background="#475569" Style="{StaticResource ModernButtonStyle}" Margin="5,0,0,0"/>
+                </UniformGrid>
+
+                <Button Content="DELETE STUDENT" Click="DeleteStudent_Click" Background="#EF4444" Style="{StaticResource ModernButtonStyle}" Margin="0,10,0,0" Height="35"/>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Column="1" Background="#0DFFFFFF" CornerRadius="20" Padding="15">
+            <DataGrid x:Name="dgStudents" AutoGenerateColumns="False" Background="Transparent" 
+                      Foreground="Black" BorderThickness="0" CanUserAddRows="False"
+                      RowBackground="Transparent" AlternatingRowBackground="#08FFFFFF" 
+                      SelectionChanged="dgStudents_SelectionChanged" Margin="0,-5,-15,0">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="CODE" Binding="{Binding StudentCode}" Width="80"/>
+                    <DataGridTextColumn Header="FULL NAME" Binding="{Binding FullName}" Width="*"/>
+                    <DataGridTextColumn Header="YEAR" Binding="{Binding YearLevel}" Width="100"/>
+                    <DataGridTextColumn Header="CLASS" Binding="{Binding ClassName}" Width="80"/>
+                    <DataGridTextColumn Header="DEPARTMENT" Binding="{Binding Department}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+    </Grid>
+</Page>
