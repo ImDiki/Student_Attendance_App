@@ -20,7 +20,7 @@ namespace Student_Attendance_System.Views
             lblRoles.Text = isJapanese ? "👥 ユーザー権限" : "👥 USER ROLES & PERMISSIONS";
             lblPrivacy.Text = isJapanese ? "🔒 セキュリティとプライバシー" : "🔒 DATA PRIVACY & SECURITY";
 
-            // 🔄 Attendance Process Logic
+            //  Attendance Process Logic
             txtAttendanceContent.Text = isJapanese ?
                 "1. 講師が授業を開始（Start Class）すると、出席スキャンが可能になります。\n" +
                 "2. 学生は顔認証スキャンを行い、出席を確定させます。\n" +

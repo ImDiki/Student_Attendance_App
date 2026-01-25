@@ -86,7 +86,7 @@
                         BorderBrush="#26FFFFFF"
                         Padding="20">
                     <StackPanel>
-                        <TextBlock x:Name="lblTimetableTitle" Text="CLASS TIMETABLE (ADMIN)" 
+                        <TextBlock x:Name="lblTimetableTitle" Text="ADMIN MANAGEMENT" 
                                    Foreground="White" FontSize="20" FontWeight="Bold" Margin="0,0,0,10"/>
                         <Frame x:Name="AdminFrame"
                                Height="Auto"
