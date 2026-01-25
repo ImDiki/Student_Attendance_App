@@ -32,7 +32,7 @@ namespace Student_Attendance_System.Views
             lblStudents.Text = isJapanese ? "全学生数" : "TOTAL STUDENTS";
             lblTeachers.Text = isJapanese ? "全教員数" : "TOTAL TEACHERS";
             lblMgmtMenu.Text = isJapanese ? "管理メニュー" : "Management Menu";
-            lblTimetableTitle.Text = isJapanese ? "クラス時間割管理" : "CLASS TIMETABLE (ADMIN)";
+            lblTimetableTitle.Text = isJapanese ? "管理 (ADMIN)" : "MANAGEMENT (ADMIN)";
         }
 
         // Teacher Management ခလုတ်နှိပ်လျှင်

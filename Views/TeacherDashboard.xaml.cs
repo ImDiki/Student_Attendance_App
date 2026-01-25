@@ -88,6 +88,7 @@ namespace Student_Attendance_System.Views
             }
         }
 
+
         private void StartClass_Click(object sender, RoutedEventArgs e)
         {
             var btn = sender as Button;
@@ -96,14 +97,46 @@ namespace Student_Attendance_System.Views
 
             if (MessageBox.Show(confirmMsg, "Confirm", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
+                // ၁။ Memory ပေါ်တွင် Update လုပ်ခြင်း
                 App.IsClassActive = true;
                 App.CurrentActiveSessionStart = DateTime.Now;
                 App.CurrentSubject = data.Subj;
                 App.StartedPeriods.Add(data.Key);
+
+                // ၂။ Database ထဲက Timetable မှာ Status ကို 'Started' လို့ သွားပြင်ခြင်း
+                UpdateClassStatusInDatabase(data.Subj);
+
                 this.NavigationService.Navigate(new ScanPage());
             }
         }
 
+        // Database Status ကို 'Started' ပြောင်းပေးမည့် Method အသစ်
+        private void UpdateClassStatusInDatabase(string subject)
+        {
+            try
+            {
+                using (SqlConnection con = DBConnection.GetConnection())
+                {
+                    con.Open();
+                    // Status အစား ရှိပြီးသား Period column ကို 99 (Started အဖြစ် သတ်မှတ်ချက်) လို့ ပြောင်းပါမယ်
+                    string query = @"UPDATE Timetables SET Period = 99 
+                             WHERE SubjectName = @subj 
+                             AND DayOfWeek = @day";
+
+                    SqlCommand cmd = new SqlCommand(query, con);
+                    cmd.Parameters.AddWithValue("@subj", subject);
+
+                    int today = (int)DateTime.Now.DayOfWeek;
+                    cmd.Parameters.AddWithValue("@day", today);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+        }
         private List<(string Time, string Subj)> GetLatterTermSchedule(DayOfWeek day)
         {
             return day switch
@@ -116,6 +149,8 @@ namespace Student_Attendance_System.Views
                 _ => new List<(string, string)>()
             };
         }
+
+
 
         private void RefreshList()
         {

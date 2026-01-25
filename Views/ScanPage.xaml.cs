@@ -19,7 +19,10 @@ namespace Student_Attendance_System.Views
         {
             InitializeComponent();
             ChangeLanguage(LanguageSettings.Language);
+
+            // UI တစ်ခုလုံးကို နှိပ်လိုက်တိုင်း Input Box ဆီ Focus ပြန်သွားစေရန်
             this.Loaded += (s, e) => txtScannerInput.Focus();
+            this.PreviewMouseDown += (s, e) => txtScannerInput.Focus();
         }
 
         public void ChangeLanguage(bool isJapanese)
@@ -39,7 +42,7 @@ namespace Student_Attendance_System.Views
         {
             if (e.Key == Key.Enter)
             {
-                // ၁။ Weekend Check
+                // ၁။ Weekend Check (စနေ၊ တနင်္ဂနွေ ဖြစ်ပါက Scan ပိတ်မည်)
                 DayOfWeek today = DateTime.Today.DayOfWeek;
                 if (today == DayOfWeek.Saturday || today == DayOfWeek.Sunday)
                 {
@@ -49,11 +52,13 @@ namespace Student_Attendance_System.Views
                     return;
                 }
 
-                // ၂။ Teacher Start Class Check
+                // ၂။ Teacher Start Class Check (Teacher ဘက်က Class စတင်မှ Scan ခွင့်ပြုမည်)
                 string id = txtScannerInput.Text.Trim().ToUpper();
-                if (!AttendanceService.IsClassActive(App.CurrentSubject))
+
+                // Teacher Portal မှ Status ကို Database တွင် တိုက်ရိုက်စစ်ဆေးခြင်း
+                if (!IsTeacherClassStarted())
                 {
-                    lblStatusMessage.Text = _isJapanese ? "授業はまだ開始されていません" : "Class not started or unavailable";
+                    lblStatusMessage.Text = _isJapanese ? "授業はまだ開始されていません" : "Class not started by Teacher";
                     lblStatusMessage.Foreground = Brushes.Orange;
                     txtScannerInput.Clear();
                     return;
@@ -64,6 +69,70 @@ namespace Student_Attendance_System.Views
             }
         }
 
+        // Teacher Dashboard အခြေအနေကို Database မှ တိုက်ရိုက်စစ်သည့် Method
+        /* private bool IsTeacherClassStarted()
+         {
+             try
+             {
+                 using (SqlConnection con = DBConnection.GetConnection())
+                 {
+                     con.Open();
+
+                     // ScanPage.xaml.cs ထဲက IsTeacherClassStarted method မှာ ဒီလိုလေး ပြောင်းစမ်းကြည့်ပါ
+                     string query = @"SELECT COUNT(*) FROM Timetable 
+                  WHERE CAST(Date AS DATE) = CAST(GETDATE() AS DATE) 
+                  AND Status = 'Started'";
+                     // အချိန်နဲ့ စစ်တဲ့အပိုင်းကို ခေတ္တ ဖျောက်ထားသည်
+
+
+
+
+
+                     // ပိုမိုတိကျစေရန် ယနေ့ရက်စွဲသာမက လက်ရှိအချိန် (Current Time) အတွင်းမှာရှိတဲ့ Started class ကို စစ်ပါမယ်
+
+                     // string query = @"SELECT COUNT(*) FROM Timetable 
+                     //    WHERE CAST(Date AS DATE) = CAST(GETDATE() AS DATE) 
+                     //  AND Status = 'Started' 
+                     //AND @currentTime BETWEEN StartTime AND EndTime";
+
+                     SqlCommand cmd = new SqlCommand(query, con);
+                     // လက်ရှိအချိန်ကို Parameter အဖြစ် ထည့်ပေးပါ
+                     cmd.Parameters.AddWithValue("@currentTime", DateTime.Now.ToString("HH:mm"));
+
+                     int count = (int)cmd.ExecuteScalar();
+                     return count > 0;
+                 }
+             }
+             catch (Exception)
+             {
+                 return false;
+             }
+         } */
+        private bool IsTeacherClassStarted()
+        {
+            try
+            {
+                using (SqlConnection con = DBConnection.GetConnection())
+                {
+                    con.Open();
+                    // Period က 99 ဖြစ်နေရင် Teacher က Start Class နှိပ်ထားတယ်လို့ ယူဆပါမယ်
+                    string query = @"SELECT COUNT(*) FROM Timetables 
+                             WHERE SubjectName = @subj 
+                             AND DayOfWeek = @day 
+                             AND Period = 99";
+
+                    SqlCommand cmd = new SqlCommand(query, con);
+                    cmd.Parameters.AddWithValue("@subj", App.CurrentSubject);
+                    cmd.Parameters.AddWithValue("@day", (int)DateTime.Now.DayOfWeek);
+
+                    return (int)cmd.ExecuteScalar() > 0;
+                }
+            }
+            catch { return false; }
+        }
+
+
+
         private void ProcessScan(string scannedCode)
         {
             try
@@ -71,7 +140,6 @@ namespace Student_Attendance_System.Views
                 using (SqlConnection con = DBConnection.GetConnection())
                 {
                     con.Open();
-                    // Department (Major) ကိုပါ SELECT လုပ်ပါတယ်
                     string query = "SELECT StudentCode, FullName, Department FROM Students WHERE StudentCode = @code";
                     SqlCommand cmd = new SqlCommand(query, con);
                     cmd.Parameters.AddWithValue("@code", scannedCode);
@@ -97,7 +165,7 @@ namespace Student_Attendance_System.Views
                                 AttendanceService.MarkPresent(studentCode, App.CurrentSubject);
                                 lblStatusMessage.Text = _isJapanese ? "出席が記録されました" : "Attendance recorded";
                                 lblStatusMessage.Foreground = Brushes.LightGreen;
-                                System.Media.SystemSounds.Beep.Play();
+                                System.Media.SystemSounds.Beep.Play(); // အောင်မြင်ပါက Beep မြည်မည်
                                 StartRedirectTimer();
                             }
                             else
@@ -134,6 +202,7 @@ namespace Student_Attendance_System.Views
         private void StartRedirectTimer()
         {
             if (redirectTimer != null) redirectTimer.Stop();
+            // ၃ စက္ကန့်အကြာတွင် LoginPage သို့ အလိုအလျောက်ပြန်ပို့မည်
             redirectTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
             redirectTimer.Tick += (s, e) =>
             {
