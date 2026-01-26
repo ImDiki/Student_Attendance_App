@@ -49,7 +49,11 @@
 
                     <Border Style="{StaticResource CardHoverStyle}">
                         <StackPanel HorizontalAlignment="Center">
-                            <Ellipse Width="110" Height="110" Fill="#475569" Margin="0,0,0,15" Stroke="#38BDF8" StrokeThickness="2"/>
+                            <Ellipse Width="110" Height="110" Margin="0,0,0,15" Stroke="#38BDF8" StrokeThickness="2">
+                                <Ellipse.Fill>
+                                    <ImageBrush ImageSource="/Assets/S.jpg" Stretch="UniformToFill"/>
+                                </Ellipse.Fill>
+                            </Ellipse>
                             <TextBlock Text="SI THU BO SANN" Foreground="White" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
                             <TextBlock Text="ADVISOR | FULL STACK" Foreground="#38BDF8" FontSize="14" FontWeight="Bold" Margin="0,5"/>
                             <TextBlock Text="C5128@oic.jp" Foreground="#CBD5E1" FontSize="12" Margin="0,2"/>
