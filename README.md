@@ -1,47 +1,67 @@
 Student Attendance System
 
-A Windows desktop project for managing student attendance and class information. It uses separate student, teacher, and administrator screens, with English and Japanese interface text. This project is under active development.
+A desktop application for managing classes and attendance
 
-What the application currently includes
+C# · .NET 8 · WPF · SQL Server LocalDB
 
-Students: sign in, view attendance totals and percentage, see a timetable, and view their profile.
+Student Attendance System provides separate screens for students, teachers, and administrators. Its interface includes English and Japanese text. The project is under active development.
 
-Teachers: start a class session, view attendance records, and mark a selected record present or absent with a note.
+Features
 
-Administrators: screens for managing teachers, classes, and timetables.
+Student
 
-Attendance entry: a scan screen accepts a student code from keyboard-style input, checks the current session, and records attendance in SQL Server.
+Sign in and view attendance totals, attendance percentage, timetable, and profile.
 
-Registration: a camera window can capture a profile photo when a webcam is available.
+Teacher
 
-The timetable screen reads database entries for first-year classes when available; otherwise it displays generated example subjects. Other years also use example subjects. The QR Scan menu item is currently a placeholder, and the application does not yet decode QR codes through the camera. These areas are still being developed.
+Start a class session and view attendance records.
 
-Technology
+Mark a selected record present or absent and add a note.
 
-C# and .NET 8 (Windows), WPF and XAML
+Administrator
 
-SQL Server LocalDB via Microsoft.Data.SqlClient
+Access screens for teacher, class, and timetable management.
 
-AForge.Video for webcam capture
+Attendance and registration
 
-ZXing.Net is referenced by the project but is not yet used for QR decoding in the current code
+Enter a student code through the scan screen to record attendance for an active session.
+
+Capture a profile photo during registration when a webcam is available.
+
+Current limitations
+
+The timetable shows database entries for first-year classes when available. It otherwise generates example subjects; other years also use example subjects.
+
+The QR Scan menu item is a placeholder. The application does not yet decode QR codes through a camera. Attendance entry currently accepts keyboard-style student-code input.
+
+The database connection uses a machine-specific file path, so local setup is required before the app can run on another computer.
+
+Tech stack
+
+Desktop: C#, .NET 8 for Windows, WPF, XAML
+
+Database: SQL Server LocalDB, Microsoft.Data.SqlClient
+
+Camera: AForge.Video for profile-photo capture
+
+QR library: ZXing.Net is referenced but is not yet used for QR decoding
 
 Run locally
 
-1.On Windows, install Visual Studio 2022 with the .NET desktop development workload and SQL Server LocalDB.
+On Windows, install Visual Studio 2022 with the .NET desktop development workload and SQL Server LocalDB.
 
-2.Clone this repository and open Student_Attendance_System.sln in Visual Studio.
+Clone the repository and open Student_Attendance_System.sln in Visual Studio.
 
-3.Review the connection string in Services/DBConnection.cs. It currently points to a machine-specific absolute path; change AttachDbFilename to the location of your local database file before running. Use test data rather than personal student records.
+In Services/DBConnection.cs, set AttachDbFilename to the location of your local database file. Use test data instead of personal student records.
 
-4.Restore NuGet packages, then build and run the solution.
+Restore NuGet packages, then build and run the solution.
 
-The repository includes a LocalDB database file, but the database setup is not automated. Running the application on a different machine may require additional database configuration. A Windows runtime and LocalDB are required for end-to-end testing.
+The repository contains a LocalDB database file, but database setup is not automated. Additional local configuration may be needed.
 
 Related project
 
-Attendance MCP Server is a separate C#/.NET project that exposes student-record lookup from a local attendance database through the Model Context Protocol. It is not a component of this WPF application.
+Attendance MCP Server is a separate C#/.NET project for looking up student records in a local attendance database through the Model Context Protocol. It is not part of this WPF application.
 
-日本語
+日本語概要
 
-学生出席管理のための開発中の Windows デスクトップアプリです。学生・教員・管理者向けの画面と、英語・日本語の表示を備えています。時間割には一部サンプルデータを使用しています。QR コードのカメラ読み取り機能はまだ実装されていません。実行前に Services/DBConnection.cs の接続先をローカル環境に合わせて設定してください。
+学生・教員・管理者向けの画面を備えた、開発中の出席管理デスクトップアプリです。出席記録、時間割表示、プロフィール写真の撮影に対応しています。時間割の一部はサンプルデータを使用しており、カメラによる QR コード読み取りはまだ実装されていません。実行前に Services/DBConnection.cs の接続先をローカル環境に合わせて設定してください。
