@@ -1,113 +1,47 @@
-> [!IMPORTANT]
-> Status: This project is currently under active development. Some features are being finalized and optimized.
-> ステータス: このプロジェクトは現在開発中です。一部の機能は現在最適化および最終調整を行っています。
-> >feedback and contributions are welcome!
-現在開発段階のため、フィードバックや改善案がございましたらぜひご連絡ください！
+Student Attendance System
 
-****************************************************************************************************************************************************************************
-Student Attendance System (WPF)
-A modern, desktop-based attendance management system designed for educational institutions. This application features a role-based dashboard for both teachers and students, real-time QR code scanning for attendance marking, and automated timetable management.
+A Windows desktop project for managing student attendance and class information. It uses separate student, teacher, and administrator screens, with English and Japanese interface text. This project is under active development.
 
- Key Features
-📅 Advanced Timetable System
-Automated Color Logic: Class periods are dynamically highlighted. Orange indicates an ongoing class, while Brown signifies completed or already started sessions.
+What the application currently includes
 
-Horizontal Grid Layout: A clean, card-based interface providing a full weekly view (Monday to Friday).
+Students: sign in, view attendance totals and percentage, see a timetable, and view their profile.
 
-Term Sync: Synchronized data management for both Former (前期) and Latter (後期) terms across all user dashboards.
+Teachers: start a class session, view attendance records, and mark a selected record present or absent with a note.
 
- Teacher Portal
-Session Control: Teachers can initiate a specific class period, which automatically marks it as "Started" globally.
+Administrators: screens for managing teachers, classes, and timetables.
 
-QR Code Management: Generates/activates the scanning system for students to mark their attendance.
+Attendance entry: a scan screen accepts a student code from keyboard-style input, checks the current session, and records attendance in SQL Server.
 
-Leave Requests: Teachers can review and track student absence requests stored in a global system.
+Registration: a camera window can capture a profile photo when a webcam is available.
 
- Student Dashboard
-Real-time Statistics: Students can view their attendance percentages, total classes attended, and absent counts.
+The timetable screen reads database entries for first-year classes when available; otherwise it displays generated example subjects. Other years also use example subjects. The QR Scan menu item is currently a placeholder, and the application does not yet decode QR codes through the camera. These areas are still being developed.
 
-QR Scanning: A modern, web-style scanning interface to register attendance quickly.
+Technology
 
-Leave Submission: A built-in form to submit reasons for absence (欠席届) directly to the teacher.
+C# and .NET 8 (Windows), WPF and XAML
 
-🚀 Technical Stack
-Framework: .NET / WPF (C#)
+SQL Server LocalDB via Microsoft.Data.SqlClient
 
-UI Design: XAML with Glassmorphism and Acrylic Sidebar accents
+AForge.Video for webcam capture
 
-Libraries:
+ZXing.Net is referenced by the project but is not yet used for QR decoding in the current code
 
-ZXing.Net: For QR code decoding and generation
+Run locally
 
-AForge.Video: For camera and webcam integration
+1.On Windows, install Visual Studio 2022 with the .NET desktop development workload and SQL Server LocalDB.
 
-🛠️ Installation & Setup
-Clone the repository: git clone https://github.com/ImDiki/Student_Attendance_App.git
+2.Clone this repository and open Student_Attendance_System.sln in Visual Studio.
 
-Open the solution file .sln in Visual Studio 2022.
+3.Review the connection string in Services/DBConnection.cs. It currently points to a machine-specific absolute path; change AttachDbFilename to the location of your local database file before running. Use test data rather than personal student records.
 
-Ensure all NuGet packages (ZXing, AForge) are restored.
+4.Restore NuGet packages, then build and run the solution.
 
-If a StaticResourceException occurs, ensure App.xaml contains the necessary brush resources.
+The repository includes a LocalDB database file, but the database setup is not automated. Running the application on a different machine may require additional database configuration. A Windows runtime and LocalDB are required for end-to-end testing.
 
-Build > Rebuild Solution and Run.
+Related project
 
-Bug Fixes & Optimization (Recent Updates)
-Navigation Fix: Resolved the issue where the app stayed on the scan screen; it now automatically returns to the Dashboard after a successful scan.
+Attendance MCP Server is a separate C#/.NET project that exposes student-record lookup from a local attendance database through the Model Context Protocol. It is not a component of this WPF application.
 
-Resource Optimization: Fixed the InitializeComponent() crash by correcting resource keys and replacing invalid markup with {x:Null}.
+日本語
 
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-学生出席管理システム (Student Attendance System)
-学校や教育機関向けに開発された、WPF ベースのモダンな出席管理システムです。教師と学生それぞれのダッシュボード、QRコードによるリアルタイム出席確認、自動時間割管理機能を備えています。
-
- 主な機能 (Key Features)
- 高機能時間割システム (Timetable System)
-自動色分けロジック: 現在の時刻に合わせて、授業の色が自動的に変化します。
-
-オレンジ色: 現在進行中の授業。
-
-茶色: 終了した授業、または既に開始された授業。
-
-グリッドレイアウト: 月曜日から金曜日までの一週間分を横並びのカード形式で表示します。
-
-学期同期: 前期と後期の切り替えが全ユーザー間で同期されます。
-
- 教師用ポータル (Teacher Portal)
-授業開始コントロール: 特定の時限の授業を開始し、全システムで「開始済み」としてマークできます。
-
-出席状況の監視: 学生の出席、遅刻、欠席をリアルタイムで確認・修正できます。
-
-欠席届の確認: 学生から提出された欠席理由を一覧で確認できます。
-
- 学生用ダッシュボード (Student Dashboard)
-出席統計: 自分の出席率、出席日数、欠席日数をグラフや数値で視覚的に確認できます。
-
-QRコードスキャン: Webカメラを使用して、素早く出席登録ができるモダンなUIです。
-
-欠席届の提出: フォームから直接、教師へ欠席理由を送信できます。
-
-🚀 技術スタック (Technical Stack)
-フレームワーク: .NET / WPF (C#)
-
-UIデザイン: XAML (グラスモーフィズムとアクリルサイドバーアクセントを採用)
-
-使用ライブラリ:
-
-ZXing.Net: QRコードのデコードおよび生成
-
-AForge.Video: カメラおよびウェブカメラの制御
-
-🛠️ セットアップ (Setup)
-リポジトリをクローン: git clone https://github.com/ImDiki/Student_Attendance_App.git
-
-Visual Studio 2022 で .sln ファイルを開きます。
-
-App.xaml に必要なリソース（WindowBackgroundBrush等）が含まれていることを確認してください。
-
-ビルド > ソリューションの再ビルド を実行し、デバッグを開始します。
-
-📝 最近の更新事項 (Recent Updates)
-ナビゲーションの改善: スキャン成功後、自動的にダッシュボードに戻るように修正しました。
-
-リソースの最適化: InitializeComponent() でのクラッシュを修正し、無効なマークアップを {x:Null} に置き換えました。
+学生出席管理のための開発中の Windows デスクトップアプリです。学生・教員・管理者向けの画面と、英語・日本語の表示を備えています。時間割には一部サンプルデータを使用しています。QR コードのカメラ読み取り機能はまだ実装されていません。実行前に Services/DBConnection.cs の接続先をローカル環境に合わせて設定してください。
