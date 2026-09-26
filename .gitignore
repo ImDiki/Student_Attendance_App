@@ -371,3 +371,6 @@ FodyWeavers.xsd
 /Database/DatabaseCtrl.mdf
 /Database/mainlineDB.mdf
 /Database/mainlineDB_log.ldf
+
+*.mdf
+*.ldf
