@@ -5,6 +5,8 @@ using System.Windows.Controls;
 using Microsoft.Data.SqlClient;
 using System.Security.Cryptography;
 using System.Text;
+using Student_Attendance_System.Services;
+using System.Data;
 
 
 namespace Student_Attendance_System.Views
@@ -67,20 +69,7 @@ ORDER BY t.TeacherCode";
 
             dgTeachers.ItemsSource = list;
         }
-        private string HashPassword(string password)
-        {
-            using (SHA256 sha = SHA256.Create())
-            {
-                byte[] bytes = Encoding.UTF8.GetBytes(password);
-                byte[] hash = sha.ComputeHash(bytes);
-
-                StringBuilder sb = new StringBuilder();
-                foreach (byte b in hash)
-                    sb.Append(b.ToString("x2"));
-
-                return sb.ToString();
-            }
-        }
+        // Password hashing is delegated to Services.PasswordHasher
         public static event Action TeacherChanged;
 
         // ===== Add teacher =====
@@ -114,8 +103,8 @@ OUTPUT INSERTED.UserId
 VALUES (@u, @p, 'Teacher')";
 
                 using SqlCommand userCmd = new SqlCommand(userSql, con, tx);
-                userCmd.Parameters.AddWithValue("@u", code);
-                userCmd.Parameters.AddWithValue("@p", HashPassword(pass));
+                userCmd.Parameters.Add("@u", SqlDbType.NVarChar, 100).Value = code;
+                userCmd.Parameters.Add("@p", SqlDbType.NVarChar, 200).Value = PasswordHasher.Hash(pass);
                 //userCmd.Parameters.AddWithValue("@f", name);
 
                 int userId = (int)userCmd.ExecuteScalar();
@@ -146,7 +135,8 @@ VALUES (@id, @code, @name, @dept, @email, @phone)";
             }
             catch (Exception ex)
             {
-                tx.Rollback();
+                try { tx.Rollback(); } catch { }
+                Student_Attendance_System.Services.Logger.LogError("Add teacher failed", ex);
                 MessageBox.Show("Add failed:\n" + ex.Message);
             }
         }
@@ -234,7 +224,8 @@ VALUES (@id, @code, @name, @dept, @email, @phone)";
             }
             catch (Exception ex)
             {
-                tx.Rollback();
+                try { tx.Rollback(); } catch { }
+                Student_Attendance_System.Services.Logger.LogError("Update teacher failed", ex);
                 MessageBox.Show("Update failed:\n" + ex.Message);
             }
         }
@@ -260,8 +251,8 @@ VALUES (@id, @code, @name, @dept, @email, @phone)";
 
             string sql = "UPDATE Users SET PasswordHash = @p WHERE UserId = @id";
             using SqlCommand cmd = new SqlCommand(sql, con);
-            cmd.Parameters.AddWithValue("@p", HashPassword(pass));
-            cmd.Parameters.AddWithValue("@id", _selectedTeacherId);
+            cmd.Parameters.Add("@p", SqlDbType.NVarChar, 200).Value = PasswordHasher.Hash(pass);
+            cmd.Parameters.Add("@id", SqlDbType.Int).Value = _selectedTeacherId;
 
             try
             {
@@ -271,6 +262,7 @@ VALUES (@id, @code, @name, @dept, @email, @phone)";
             }
             catch (Exception ex)
             {
+                Student_Attendance_System.Services.Logger.LogError("Reset teacher password failed", ex);
                 MessageBox.Show("Reset failed:\n" + ex.Message);
             }
         }
@@ -322,7 +314,8 @@ VALUES (@id, @code, @name, @dept, @email, @phone)";
             }
             catch (Exception ex)
             {
-                tx.Rollback();
+                try { tx.Rollback(); } catch { }
+                Student_Attendance_System.Services.Logger.LogError("Delete teacher failed", ex);
                 MessageBox.Show("Delete failed:\n" + ex.Message);
             }
         }
