@@ -46,7 +46,7 @@ Security notes
 - New and reset passwords are hashed with bcrypt via `Services/PasswordHasher.cs`.
 - The application also supports migrating legacy SHA256-stored password hashes to bcrypt on successful login: the authentication flow compares a computed SHA256 value to the stored hash and, if matched, re-hashes the supplied password with bcrypt and updates the `Users.PasswordHash` column. The migration update is executed after the original reader is closed to avoid concurrency issues.
 - SQL queries use parameterized `SqlCommand` parameters in many places; some remaining calls still use `AddWithValue`. Not every query has been exhaustively converted to typed parameters.
-- No secrets or credentials are committed to the repository by design. The DB connection uses a local `AttachDbFilename` resolved at runtime relative to the app base directory; no hard-coded personal paths were left in the committed code.
+- The DB connection uses a local `AttachDbFilename` resolved at runtime relative to the app base directory. Do not assume the repository history is free of large or sensitive artifacts: older commits in this repository tracked `Database/mainlineDB.mdf` and `Database/mainlineDB_log.ldf`. Review history before publishing and remove any secrets if present.
 
 Local setup (developer)
 Prerequisites
@@ -60,8 +60,8 @@ Clone and build
 4. dotnet build Student_Attendance_System.sln
 
 Database file and local configuration
-- The project expects a LocalDB `.mdf` file at `Database/mainlineDB.mdf` relative to the app base directory. The repository does not include `.mdf` or `.ldf` files in the commit history. You must provide your own LocalDB file or configure LocalDB and attach a database matching the expected schema.
-- Do not commit personal database files or credentials.
+ - The project expects a LocalDB `.mdf` file at `Database/mainlineDB.mdf` relative to the app base directory. Note: older commits in this repository tracked `Database/mainlineDB.mdf` and `Database/mainlineDB_log.ldf`; a pending cleanup commit will remove those files from the current branch. A fresh clone will therefore need a locally supplied LocalDB database with the expected schema. Runtime setup and login on a fresh clone have not been verified and require manual configuration and testing.
+ - Do not commit personal database files or credentials.
 
 Run
 - Launch from Visual Studio or run the project using `dotnet run --project Student_Attendance_System.csproj` (ensure LocalDB is accessible and the database file path resolves).
