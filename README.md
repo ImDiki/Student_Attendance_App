@@ -1,67 +1,87 @@
-Student Attendance System
+# Student Attendance System
 
-A desktop application for managing classes and attendance
+A WPF desktop application for recording and viewing student attendance intended for small school/classroom use. The app uses a LocalDB (SQL Server LocalDB) database and provides role-based views for Students, Teachers, and Administrators. The primary attendance workflow in the current codebase records attendance when a student code is scanned or entered into the scanning page.
 
-C# · .NET 8 · WPF · SQL Server LocalDB
+Project Status
+- Preserved portfolio snapshot. The repository contains working build artifacts and code verified to compile under .NET 8 (WPF). The UI and database interactions are implemented as code-behind in XAML pages.
+- Build-verified: `dotnet build Student_Attendance_System.sln` completes successfully (see warnings below).
+- Runtime-verified: none of the runtime flows (login, teacher CRUD, scanning) were executed by the maintainer during this snapshot; manual runtime testing is required.
+- Partially implemented or referenced features: camera-based QR decoding or video capture components are referenced (AForge, ZXing) but may require additional configuration or platform compatibility. The scanning page currently supports typed or scanned student codes via a focused text input box.
 
-Student Attendance System provides separate screens for students, teachers, and administrators. Its interface includes English and Japanese text. The project is under active development.
+Features by role (implemented in code)
+- Student
+  - The codebase contains models and student profile UI pages. Student dashboard code reads attendance counts and percentages from the `Attendance` table.
+- Teacher
+  - The Teacher dashboard and teacher management UI exist. Teachers can be created, updated, and deleted via `TeacherManagementPage` (teacher creation inserts a `Users` row and `Teachers` row).
+  - Teachers can 'start' a class (the code uses timetable entries with Period = 99 to indicate started class) and then the `ScanPage` is used to mark attendance.
+- Administrator
+  - Admin pages and timetable management exist in the Views. Administrators can manage classes and teachers via the provided UI.
 
-Features
+Attendance workflow (current implementation)
+- The active `ScanPage` accepts input in a text box (intended for barcode/QR scanners that act as keyboard devices or manual entry).
+- When a student code is submitted, the page looks up the `Students` table by `StudentCode`. If found and today's attendance for the current subject is not already present, the app calls `AttendanceService.MarkPresent(studentId, subject)` which inserts a row into `Attendance` with Status = 'Present'.
+- Attendance statistics (present/absent counts, percentage) are computed by `AttendanceService` via SQL queries.
 
-Student
-
-Sign in and view attendance totals, attendance percentage, timetable, and profile.
-
-Teacher
-
-Start a class session and view attendance records.
-
-Mark a selected record present or absent and add a note.
-
-Administrator
-
-Access screens for teacher, class, and timetable management.
-
-Attendance and registration
-
-Enter a student code through the scan screen to record attendance for an active session.
-
-Capture a profile photo during registration when a webcam is available.
-
-Current limitations
-
-The timetable shows database entries for first-year classes when available. It otherwise generates example subjects; other years also use example subjects.
-
-The QR Scan menu item is a placeholder. The application does not yet decode QR codes through a camera. Attendance entry currently accepts keyboard-style student-code input.
-
-The database connection uses a machine-specific file path, so local setup is required before the app can run on another computer.
+Screenshots
+- Placeholders: add screenshots into `Assets/` (or the README) and replace the placeholders below.
+  - `screenshots/login.png` — Login screen
+  - `screenshots/scan.png` — Scanner input and attendance badge
+  - `screenshots/teacher_management.png` — Teacher management grid
 
 Tech stack
+- C# 12 (net8.0-windows)
+- WPF / XAML desktop UI
+- SQL Server LocalDB via `Microsoft.Data.SqlClient`
+- Password hashing: `BCrypt.Net-Next` (bcrypt)
+- Camera/QR libraries referenced: `AForge`, `ZXing.Net` (these are included as package references; camera integration may require platform dependencies)
+- Other packages: `System.Drawing.Common`, `ZXing.Net.Bindings.Windows.Compatibility`
 
-Desktop: C#, .NET 8 for Windows, WPF, XAML
+Code structure
+- `Views/` — XAML pages and code-behind implementing UI and direct database calls.
+- `Services/` — Helper classes for database connection, authentication (`AuthService`), attendance logic (`AttendanceService`), and utilities added in Phase 1 (`PasswordHasher`, `Logger`).
+- `Models/` — Plain data models used by the UI and services.
+- The application follows a code-behind style: database access is synchronous and performed directly in UI event handlers and service methods. There is no formal DI container or repository pattern in the current snapshot.
 
-Database: SQL Server LocalDB, Microsoft.Data.SqlClient
+Security notes
+- New and reset passwords are hashed with bcrypt via `Services/PasswordHasher.cs`.
+- The application also supports migrating legacy SHA256-stored password hashes to bcrypt on successful login: the authentication flow compares a computed SHA256 value to the stored hash and, if matched, re-hashes the supplied password with bcrypt and updates the `Users.PasswordHash` column. The migration update is executed after the original reader is closed to avoid concurrency issues.
+- SQL queries use parameterized `SqlCommand` parameters in many places; some remaining calls still use `AddWithValue`. Not every query has been exhaustively converted to typed parameters.
+- No secrets or credentials are committed to the repository by design. The DB connection uses a local `AttachDbFilename` resolved at runtime relative to the app base directory; no hard-coded personal paths were left in the committed code.
 
-Camera: AForge.Video for profile-photo capture
+Local setup (developer)
+Prerequisites
+- .NET SDK 8.0 (matching `TargetFramework` net8.0-windows)
+- Visual Studio 2022/2023 or `dotnet` CLI for building WPF projects
 
-QR library: ZXing.Net is referenced but is not yet used for QR decoding
+Clone and build
+1. git clone https://github.com/ImDiki/Student_Attendance_App.git
+2. cd Student_Attendance_App
+3. dotnet restore
+4. dotnet build Student_Attendance_System.sln
 
-Run locally
+Database file and local configuration
+- The project expects a LocalDB `.mdf` file at `Database/mainlineDB.mdf` relative to the app base directory. The repository does not include `.mdf` or `.ldf` files in the commit history. You must provide your own LocalDB file or configure LocalDB and attach a database matching the expected schema.
+- Do not commit personal database files or credentials.
 
-On Windows, install Visual Studio 2022 with the .NET desktop development workload and SQL Server LocalDB.
+Run
+- Launch from Visual Studio or run the project using `dotnet run --project Student_Attendance_System.csproj` (ensure LocalDB is accessible and the database file path resolves).
 
-Clone the repository and open Student_Attendance_System.sln in Visual Studio.
+Testing and verification
+- Build command used: `dotnet build Student_Attendance_System.sln` (build succeeded during this snapshot).
+- Known warning categories observed during build:
+  - NU1701: package compatibility warnings for `AForge` packages targeting .NET Framework
+  - CS86xx series: nullable-reference warnings in several code-behind files (existing codebase warnings)
+- Runtime behaviors (login, teacher CRUD, scanning badge) require manual testing since credentials and local DB were not executed during this snapshot.
 
-In Services/DBConnection.cs, set AttachDbFilename to the location of your local database file. Use test data instead of personal student records.
+Known limitations and future work
+- Camera-based QR scanning is referenced but may not be fully integrated or tested on all platforms.
+- Many database calls are synchronous and in code-behind; refactoring to async/await and a repository or service layer would improve maintainability.
+- Nullable-reference warnings should be addressed to reduce runtime null reference risks.
+- Verify all SQL usage is typed (avoid `AddWithValue`) and ensure database column sizes are sufficient for bcrypt hashes.
 
-Restore NuGet packages, then build and run the solution.
+License / Attribution
+- This repository contains original code by the author. Third-party libraries are referenced via NuGet (see project file). Do not redistribute third-party binaries without their licenses.
 
-The repository contains a LocalDB database file, but database setup is not automated. Additional local configuration may be needed.
+---
 
-Related project
-
-Attendance MCP Server is a separate C#/.NET project for looking up student records in a local attendance database through the Model Context Protocol. It is not part of this WPF application.
-
-日本語概要
-
-学生・教員・管理者向けの画面を備えた、開発中の出席管理デスクトップアプリです。出席記録、時間割表示、プロフィール写真の撮影に対応しています。時間割の一部はサンプルデータを使用しており、カメラによる QR コード読み取りはまだ実装されていません。実行前に Services/DBConnection.cs の接続先をローカル環境に合わせて設定してください。
+If you want, run the project locally and follow the `ScanPage` to test marking attendance with an existing `Students` table and student codes.
