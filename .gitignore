@@ -374,3 +374,5 @@ FodyWeavers.xsd
 
 *.mdf
 *.ldf
+/outbuild/
+/build_output*.txt
